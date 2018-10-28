@@ -3,4 +3,3 @@ if (file_exists("FoSho.txt")) {
 }
 else
 	show_message("The file does not exist.")
-	
