@@ -1,4 +1,6 @@
-#macro c_fields make_color_rgb(255, 228, 181)
+#macro sec room_speed
+
+#macro c_fields c_yellow
 #macro c_desert make_color_rgb(238, 232, 170)
 #macro c_brick make_color_rgb(80, 25, 33)
 

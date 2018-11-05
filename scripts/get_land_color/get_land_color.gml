@@ -15,6 +15,5 @@ else if (landType == ltype_hills) {
 else if (landType == ltype_mountains) {
 	return c_dkgray
 }
-else if (landType == ltype_desert) {
-	return c_desert
-}
+
+return c_desert
