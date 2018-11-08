@@ -4,10 +4,12 @@ public class Land {
     int index;
     LandType type;
     ArrayList<Location> adjentLocations;
+    int diceNo;
 
     public Land(int index){
         this.adjentLocations = new ArrayList<>();
         this.index = index;
+        this.type = LandType.NONE;
     }
 
     public Land(int index, LandType type){
