@@ -8,8 +8,11 @@ import java.math.*;
 public class Main {
     static ArrayList<Land> lands = new ArrayList<>();
     static ArrayList<Location> locations = new ArrayList<>();
-    static int landCount_horizontal_max = 5;
-    static int landCount_vertical = 5;
+
+    static StructerList structures = new StructerList();
+
+    static final int landCount_horizontal_max = 5;
+    static final int landCount_vertical = 5;
     static final int landCount_horizontal_min = landCount_horizontal_max - (int)Math.floor(landCount_vertical / 2);
     static int landIndex;
     static int locationCount = calculateLocations();
@@ -20,7 +23,7 @@ public class Main {
     private final static int HILLS_COUNT = 3;
     private final static int MOUNTAINS_COUNT = 3;
     private final static int DESERT_COUNT = 1;
-
+    private final static int[] DICE_FORMAT_5x5 = {11, 12, 9, 4, 6, 5, 10, 3, 11, 4, 8, 10, 8, 9, 3, 5, 2, 6};
 
 
 
@@ -61,25 +64,18 @@ public class Main {
                 Land land = lands.get(landIndex);
                 int result = 2 * landIndex + fib(i + 1);
 
-                land.getAdjentLocations().add(locations.get(result - 1));
-                land.getAdjentLocations().add(locations.get(result));
-                land.getAdjentLocations().add(locations.get(result + 1));
-                result += 2 * landCount_horizontal + 2 - ((landCount_horizontal == landCount_horizontal_max) ? 1 : 0);
-                land.getAdjentLocations().add(locations.get(result - 1));
-                land.getAdjentLocations().add(locations.get(result));
-                land.getAdjentLocations().add(locations.get(result + 1));
 
+                bind(land, locations.get(result - 1));
+                bind(land, locations.get(result));
+                bind(land, locations.get(result + 1));
+                result += 2 * landCount_horizontal + 2 - ((landCount_horizontal == landCount_horizontal_max) ? 1 : 0);
+                bind(land, locations.get(result - 1));
+                bind(land, locations.get(result));
+                bind(land, locations.get(result + 1));
                 landIndex++;
             }
         }
 
-        for(int i = 0; i < locations.size(); i++) {
-            for (int j = 0; j < lands.size(); j++) {
-                for (int k = 0; k < lands.get(j).getAdjentLocations().size(); k++) {
-                    if(locations.get(i).index == lands.get(j).getAdjentLocations().get(k).index) locations.get(i).getAdjentLands().add(lands.get(j));
-                }
-            }
-        }
         load(lands, locations);
 
         for(int i = 0; i < lands.size(); i++){
@@ -120,5 +116,30 @@ public class Main {
         for (Land land : lands) {
             land.type = LandType.values()[new Random().nextInt(LandType.values().length - 1)];
         }
+    }
+
+    private static void bind(Land land, Location location){
+        land.getAdjentLocations().add(location);
+        location.getAdjentLands().add(land);
+    }
+
+    private static void addBuilding(Player player, Location location, BuildingType buildingType) throws Exception{
+        Building building;
+        if (buildingType == BuildingType.Settlement)
+            building = new Settlement(location, player);
+        else if (buildingType == BuildingType.City)
+            building = new City(location, player);
+        else
+            throw new Exception("Unknown BuildingType");
+
+        structures.add(building);
+    }
+
+    /*private static City upgradeSettlement(Settlement settlement){
+        return new
+    }*/
+
+    private static void addRoad(){
+
     }
 }

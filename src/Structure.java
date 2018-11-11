@@ -1,11 +1,11 @@
 public abstract class Structure {
-    private int ownerIndex;
+    private Player player;
 
-    public Structure(int ownerIndex){
-        this.ownerIndex = ownerIndex;
+    public Structure(Player player){
+        this.player = player;
     }
 
-    public int getOwnerIndex() {
-        return ownerIndex;
+    public Player getPlayer() {
+        return player;
     }
 }

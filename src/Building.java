@@ -1,9 +1,11 @@
-public class Building extends Structure {
+public abstract class Building extends Structure {
     private Location location;
+    private BuildingType type;
 
-    public Building(Location location, int ownerIndex){
-        super(ownerIndex);
+    public Building(Location location, Player player, BuildingType type){
+        super(player);
         this.location = location;
+        this.type = type;
     }
 
     public Location getLocation() {
