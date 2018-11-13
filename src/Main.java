@@ -1,3 +1,6 @@
+import org.ini4j.Wini;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -40,7 +43,7 @@ public class Main {
         return fib(n - 1) + fib(n - 2);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         for(int i = 0; i < locationCount; i++) {
             Location land  = new Location(i);
@@ -64,7 +67,6 @@ public class Main {
                 Land land = lands.get(landIndex);
                 int result = 2 * landIndex + fib(i + 1);
 
-
                 bind(land, locations.get(result - 1));
                 bind(land, locations.get(result));
                 bind(land, locations.get(result + 1));
@@ -78,20 +80,21 @@ public class Main {
 
         load(lands, locations);
 
-        for(int i = 0; i < lands.size(); i++){
+        /*for(int i = 0; i < lands.size(); i++){
             System.out.println(lands.get(i).type.toString() + " " + lands.get(i).index);
             for(int j = 0; j < lands.get(i).getAdjentLocations().size(); j++){
                 System.out.println(lands.get(i).getAdjentLocations().get(j).index);
+
             }
-        }
+        }*/
 
 
-        for(int i = 0; i < locations.size(); i++) {
+        /*for(int i = 0; i < locations.size(); i++) {
             System.out.println("Location " + locations.get(i).index);
             for (int j = 0; j < locations.get(i).getAdjentLands().size(); j++) {
                 System.out.println(locations.get(i).getAdjentLands().get(j).index);
             }
-        }
+        }*/
 
 
 
@@ -113,8 +116,25 @@ public class Main {
     }
 
     static void load(ArrayList<Land> lands, ArrayList<Location> locations){
-        for (Land land : lands) {
-            land.type = LandType.values()[new Random().nextInt(LandType.values().length - 1)];
+        try{
+            Wini ini = new Wini(new File("environment.ini"));
+            String type_str;
+            int diceNo;
+
+            for (Land land : lands) {
+                type_str = ini.get("LandTypes", Integer.toString(land.index), String.class);
+                type_str = String.copyValueOf(type_str.toCharArray(), 1, type_str.length()-2);
+
+                diceNo = ini.get("Dice", Integer.toString(land.index), int.class);
+
+                land.type = LandType.valueOf(type_str.toUpperCase());
+                land.diceNo = diceNo;
+
+                System.out.println(land.diceNo);
+            }
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 

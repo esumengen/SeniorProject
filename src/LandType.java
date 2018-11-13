@@ -7,4 +7,5 @@ public enum LandType {
     public String toString() {
         return super.toString();
     }
+
 }
