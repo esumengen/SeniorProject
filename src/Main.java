@@ -8,6 +8,18 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.math.*;
 
+/*
+---First Priority Decisions
+buildSettlement()
+buildRoad()
+upgradeSettlement()
+pickCard()
+---Second Priority Decisions
+tradeNegotiation()
+tradeBank()
+
+* */
+
 public class Main {
     static ArrayList<Land> lands = new ArrayList<>();
     static ArrayList<Location> locations = new ArrayList<>();
@@ -95,8 +107,6 @@ public class Main {
                 System.out.println(locations.get(i).getAdjentLands().get(j).index);
             }
         }*/
-
-
 
 
 

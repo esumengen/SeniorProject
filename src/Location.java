@@ -2,10 +2,16 @@ import java.util.ArrayList;
 
 public class Location {
     int index;
-    ArrayList<Land> adjentLands;
+    ArrayList<Land> adjacentLands;
+    ArrayList<Road> connectedRoads;
+    ArrayList<Location> connectedLocations;
+    ArrayList<Structure> structures;
 
     public Location(int index) {
-        this.adjentLands = new ArrayList<>();
+        this.adjacentLands = new ArrayList<>();
+        this.connectedRoads = new ArrayList<>();
+        this.connectedLocations = new ArrayList<>();
+        this.structures = new ArrayList<>();
         this.index = index;
     }
 
@@ -14,6 +20,6 @@ public class Location {
     }
 
     public ArrayList<Land> getAdjentLands() {
-        return adjentLands;
+        return adjacentLands;
     }
 }

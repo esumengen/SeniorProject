@@ -39,7 +39,29 @@ public class StructerList implements List<Structure> {
 
     @Override
     public boolean add(Structure structure) {
+        addStructure(structure);
         return structures.add(structure);
+    }
+
+    private void addStructure(Structure structure){
+        if(structure instanceof Road) {
+            Road road = (Road) structure;
+            road.getStartLocation().connectedLocations.add(road.getEndLocation());
+            road.getEndLocation().connectedLocations.add(road.getStartLocation());
+            road.getStartLocation().connectedRoads.add(road);
+            road.getEndLocation().connectedRoads.add(road);
+            road.getPlayer().roads.add(road);
+        }
+        else if(structure instanceof City) {
+            City city = (City) structure;
+            city.getPlayer().cities.add(city);
+            city.getLocation().structures.add(city);
+        }
+        else if(structure instanceof Settlement) {
+            Settlement settlement = (Settlement) structure;
+            settlement.getPlayer().settlements.add(settlement);
+            settlement.getLocation().structures.add(settlement);
+        }
     }
 
     @Override
@@ -54,11 +76,15 @@ public class StructerList implements List<Structure> {
 
     @Override
     public boolean addAll(Collection<? extends Structure> c) {
+        for (Structure structure : c)
+            addStructure(structure);
         return structures.addAll(c);
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends Structure> c) {
+        for (Structure structure : c)
+            addStructure(structure);
         return structures.addAll(index, c);
     }
 
@@ -89,6 +115,7 @@ public class StructerList implements List<Structure> {
 
     @Override
     public void add(int index, Structure element) {
+        addStructure(element);
         structures.add(index, element);
     }
 
