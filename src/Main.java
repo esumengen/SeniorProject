@@ -2,7 +2,9 @@ import org.ini4j.Wini;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -25,7 +27,7 @@ public class Main {
     static ArrayList<Location> locations = new ArrayList<>();
 
     static StructerList structures = new StructerList();
-    static final String path = "C:\\Users\\Bekir Onur Gölgedar\\AppData\\Local\\Catan\n";
+    static final String path = "C:\\Users\\Bekir Onur Gölgedar\\AppData\\Local\\Catan";
     static Formatter x;
 
     static final int landCount_horizontal_max = 5;
@@ -74,7 +76,6 @@ public class Main {
             }
         }
 
-
         landIndex = 0;
         for(int i = 0; i < landCount_vertical; i++) {
             int landCount_horizontal = landCount_horizontal_max - Math.abs(i - (int)Math.floor(landCount_vertical / 2));
@@ -95,14 +96,13 @@ public class Main {
 
         load(lands, locations);
 
-        /*for(int i = 0; i < lands.size(); i++){
+        for(int i = 0; i < lands.size(); i++){
             System.out.println(lands.get(i).type.toString() + " " + lands.get(i).index);
             for(int j = 0; j < lands.get(i).getAdjentLocations().size(); j++){
                 System.out.println(lands.get(i).getAdjentLocations().get(j).index);
 
             }
-        }*/
-
+        }
 
         /*for(int i = 0; i < locations.size(); i++) {
             System.out.println("Location " + locations.get(i).index);
@@ -110,58 +110,45 @@ public class Main {
                 System.out.println(locations.get(i).getAdjentLands().get(j).index);
             }
         }*/
-
-
-
-/*        System.out.println("Hello World!");
-
-        final Formatter x;
-        try {
-            x = new Formatter("communication.txt");
-            System.out.println("You created a file called FoSho.txt");
-        } catch (Exception e) {
-            System.out.println("You got an error");
-        }
-
-        Files.write(Paths.get("FoSho.txt"), "Beni Oku: Onur".getBytes(StandardCharsets.UTF_8));
-*/
-
     }
 
     static void load(ArrayList<Land> lands, ArrayList<Location> locations){
-        try{
-            Wini ini = new Wini(new File(path));
+        try {
+            Wini ini = new Wini(new File(path+"\\environment.ini"));
+
             String type_str;
+            String dice_str;
             int diceNo;
 
             for (Land land : lands) {
                 type_str = ini.get("LandTypes", Integer.toString(land.index), String.class);
                 type_str = String.copyValueOf(type_str.toCharArray(), 1, type_str.length()-2);
+                land.type = LandType.valueOf(type_str.toUpperCase(Locale.ENGLISH));
 
-                diceNo = ini.get("Dice", Integer.toString(land.index), int.class);
+                dice_str = ini.get("Dice", Integer.toString(land.index), String.class);
+                diceNo = Integer.parseInt(String.copyValueOf(dice_str.toCharArray(), 1, dice_str.length()-2));
 
-                land.type = LandType.valueOf(type_str.toUpperCase());
                 land.diceNo = diceNo;
-
-                System.out.println(land.diceNo);
             }
             communicate("Environment okundu.");
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
             communicate("Environment okunamadı.");
-
         }
     }
 
     private static void communicate(String s) {
         try {
-            x = new Formatter("C:\\Users\\Bekir Onur Gölgedar\\AppData\\Local\\Catan\\communication.txt");
-            System.out.println("You created a file called communication.txt");
-            Files.write(Paths.get("C:\\Users\\Bekir Onur Gölgedar\\AppData\\Local\\Catan\\communication.txt"), s.getBytes(StandardCharsets.UTF_8));
+            File file = new File(path+"\\communication.txt");
+            PrintWriter printWriter = new PrintWriter(file);
 
+            printWriter.println(s);
+            printWriter.close();
+
+            System.out.println("You created a file called communication.txt");
         } catch (Exception e) {
-            System.out.println("You got an error");
+            new Warning(e.getMessage());
         }
 
     }
