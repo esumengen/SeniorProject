@@ -25,6 +25,8 @@ public class Main {
     static ArrayList<Location> locations = new ArrayList<>();
 
     static StructerList structures = new StructerList();
+    static final String path = "C:\\Users\\Bekir Onur Gölgedar\\AppData\\Local\\Catan\n";
+    static Formatter x;
 
     static final int landCount_horizontal_max = 5;
     static final int landCount_vertical = 5;
@@ -56,6 +58,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
+
 
         for(int i = 0; i < locationCount; i++) {
             Location land  = new Location(i);
@@ -114,7 +117,7 @@ public class Main {
 
         final Formatter x;
         try {
-            x = new Formatter("FoSho.txt");
+            x = new Formatter("communication.txt");
             System.out.println("You created a file called FoSho.txt");
         } catch (Exception e) {
             System.out.println("You got an error");
@@ -127,7 +130,7 @@ public class Main {
 
     static void load(ArrayList<Land> lands, ArrayList<Location> locations){
         try{
-            Wini ini = new Wini(new File("environment.ini"));
+            Wini ini = new Wini(new File(path));
             String type_str;
             int diceNo;
 
@@ -142,10 +145,25 @@ public class Main {
 
                 System.out.println(land.diceNo);
             }
+            communicate("Environment okundu.");
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
+            communicate("Environment okunamadı.");
+
         }
+    }
+
+    private static void communicate(String s) {
+        try {
+            x = new Formatter("C:\\Users\\Bekir Onur Gölgedar\\AppData\\Local\\Catan\\communication.txt");
+            System.out.println("You created a file called communication.txt");
+            Files.write(Paths.get("C:\\Users\\Bekir Onur Gölgedar\\AppData\\Local\\Catan\\communication.txt"), s.getBytes(StandardCharsets.UTF_8));
+
+        } catch (Exception e) {
+            System.out.println("You got an error");
+        }
+
     }
 
     private static void bind(Land land, Location location){
