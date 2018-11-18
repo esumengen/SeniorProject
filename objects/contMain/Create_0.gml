@@ -1,11 +1,13 @@
 randomize()
 draw_set_font(fontMain)
 
-ExecuteShell("CatanAI.jar", true)
-alarm[0] = sec
+global.player = 0
 
-/*for (var i = 1; i < 10; i++)
-	show_message(fib(i))*/
+#region PUBLIC DATA
+	global.typeMap = ds_map_create()
+#endregion
+
+alarm[0] = sec
 
 global.locations = ds_list_create()
 global.lands = ds_list_create()
@@ -30,8 +32,10 @@ for (var i = 0; i < landCount_vertical; i++) {
 		
 		land.type = choose(ltype_forest, ltype_mountains, ltype_pasture, ltype_fields, ltype_hills)
 		
-		if (i == floor(landCount_vertical/2) and j == floor(landCount_horizontal_max/2))
+		if (i == floor(landCount_vertical/2) and j == floor(landCount_horizontal_max/2)) {
 			land.image_blend = c_desert
+			land.type = ltype_desert
+		}
 		else
 			land.image_blend = get_land_color(land.type)
 		
@@ -46,7 +50,7 @@ for (var i = 0; i < landCount_vertical; i++) {
 			var yy = land.y+lengthdir_y(landHeight/2, angle)
 			
 			if (!position_meeting(xx, yy, objLocation)) {
-				var location = instance_create_layer(xx, yy, "lyLand_upper", objLocation)
+				var location = instance_create_layer(xx, yy, "lyRoad", objLocation)
 				location.index = land.index+(angle-30)/60
 				ds_list_add(global.locations, location)
 			}
@@ -98,3 +102,65 @@ for (var i = 0; i < landCount_vertical; i++) {
 		landIndex++
 	}
 }
+
+ini_open("environment.ini")
+#region SET LAND TYPES
+	var fieldsLeft = FIELDS_COUNT
+	var pastureLeft = PASTURE_COUNT
+	var forestLeft = FOREST_COUNT
+	var mountainsLeft = MOUNTAINS_COUNT
+	var hillsLeft = HILLS_COUNT
+	
+	for (var i = 0; i < ds_list_size(global.lands); i++) {
+		if (i == 9) {
+			ini_write_string("Dice", i, 0)
+			ini_write_string("LandTypes", i, get_type_name(ltype_desert))
+			continue
+		}
+	
+		var land = ds_list_find_value(global.lands, i)
+	
+		diceList = [11, 12, 9, 4, 6, 5, 10, 3, 11, 0, 4, 8, 10, 8, 9, 3, 5, 2, 6]
+		with (land) {
+			diceNo = other.diceList[i]
+			
+			while (fieldsLeft+pastureLeft+forestLeft+mountainsLeft+hillsLeft > 0) {
+				var selectedType = choose(ltype_desert, ltype_fields, ltype_forest, ltype_hills, ltype_mountains, ltype_pasture)
+			
+				if (selectedType == ltype_fields and fieldsLeft > 0) {
+					type = selectedType
+					fieldsLeft--
+					break
+				}
+				else if (selectedType == ltype_forest and forestLeft > 0) {
+					type = selectedType
+					forestLeft--
+					break
+				}
+				else if (selectedType == ltype_hills and hillsLeft > 0) {
+					type = selectedType
+					hillsLeft--
+					break
+				}
+				else if (selectedType == ltype_mountains and mountainsLeft > 0) {
+					type = selectedType
+					mountainsLeft--
+					break
+				}
+				else if (selectedType == ltype_pasture and pastureLeft > 0) {
+					type = selectedType
+					pastureLeft--
+					break
+				}
+			}
+		
+			image_blend = get_land_color(type)
+		
+			ini_write_string("LandTypes", i, get_type_name(selectedType))
+			ini_write_string("Dice", i, irandom(8))
+		}
+	}
+	#endregion
+ini_close()
+
+ExecuteShell("CatanAI.jar", true)

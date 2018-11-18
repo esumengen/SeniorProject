@@ -1,0 +1,2 @@
+x = startX
+y = startY
