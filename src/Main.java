@@ -24,8 +24,47 @@ tradeBank()
 
 public class Main {
 
+    static int sayac = 0;
+
     public static void main(String[] args) {
+
         Board board = new Board();
+
+        Timer myTimer = new Timer();
+        TimerTask gorev = new TimerTask() {
+
+            @Override
+            public void run() {
+                try {
+//          Wini ini = new Wini(new File(Board.path+"\\environment.ini"));
+                    Wini ini = new Wini(new File(Board.path+"/environment.ini"));
+
+                    String isSynchronized_str;
+                    boolean isSynchronized;
+
+                    isSynchronized_str = ini.get("General", "isSynchronized", String.class);
+                    isSynchronized_str = String.copyValueOf(isSynchronized_str.toCharArray(), 1, isSynchronized_str.length()-2);
+                    isSynchronized = isSynchronized_str.equals("true");
+
+                    if (!isSynchronized) {
+                        ActionReader actionReader = new ActionReader(board);
+
+                        ini.put("General", "isSynchronized", "\"true\"");
+                        ini.store();
+                    }
+
+                }
+                catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        };
+        myTimer.schedule(gorev,0,100);
+
+
+
+
+
     }
 
 

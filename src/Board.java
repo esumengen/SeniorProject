@@ -7,10 +7,11 @@ import java.util.Formatter;
 import java.util.Locale;
 
 public class Board {
-    static ArrayList<Land> lands = new ArrayList<>();
-    static ArrayList<Location> locations = new ArrayList<>();
+    public static ArrayList<Land> lands = new ArrayList<>();
+    public static ArrayList<Location> locations = new ArrayList<>();
+    public static ArrayList<Player> players = new ArrayList<>();
 
-    static StructerList structures = new StructerList();
+    public static StructerList structures = new StructerList();
     static final String path = "/Users/emresumengen/Desktop/deneme";
 //  static final String path = "C:\\Users\\Bekir Onur Gölgedar\\AppData\\Local\\Catan";
     static Formatter x;
@@ -30,6 +31,7 @@ public class Board {
     private final static int[] DICE_FORMAT_5x5 = {11, 12, 9, 4, 6, 5, 10, 3, 11, 4, 8, 10, 8, 9, 3, 5, 2, 6};
 
     public Board(){
+        players.add(new Player(0));
 
         for(int i = 0; i < locationCount; i++) {
             Location land  = new Location(i);
@@ -73,8 +75,6 @@ public class Board {
             }
         }
     }
-
-
 
     private static int calculateLocations(){
         int sum = 0;
@@ -135,5 +135,12 @@ public class Board {
     private static void bind(Land land, Location location){
         land.getAdjentLocations().add(location);
         location.getAdjentLands().add(land);
+    }
+
+    public void createSettlement(Player player, Location location){
+        Settlement settlement = new Settlement(location, player);
+        structures.add(settlement);
+        new Warning("Settlement eklendi " + location.getIndex());
+
     }
 }

@@ -8,4 +8,8 @@ public class Player {
     ArrayList<Settlement> settlements = new ArrayList<>();
     ArrayList<City> cities = new ArrayList<>();
 
+    public Player (int index){
+        this.index = index;
+    }
+
 }
