@@ -35,9 +35,14 @@ public class Main {
 
             @Override
             public void run() {
+                String osType = System.getProperty("os.name").toLowerCase();
                 try {
-//          Wini ini = new Wini(new File(Board.path+"\\environment.ini"));
-                    Wini ini = new Wini(new File(Board.path+"/environment.ini"));
+                    Wini ini ;
+                    if(osType.contains("windows")){
+                        ini = new Wini(new File(Board.path+"\\environment.ini"));
+                    }else {
+                        ini = new Wini(new File(Board.path + "/environment.ini"));
+                    }
 
                     String isSynchronized_str;
                     boolean isSynchronized;

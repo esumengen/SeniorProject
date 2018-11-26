@@ -12,8 +12,8 @@ public class Board {
     public static ArrayList<Player> players = new ArrayList<>();
 
     public static StructerList structures = new StructerList();
-    static final String path = "/Users/emresumengen/Desktop/deneme";
-//  static final String path = "C:\\Users\\Bekir Onur Gölgedar\\AppData\\Local\\Catan";
+    String osType = System.getProperty("os.name").toLowerCase();
+    static  String path = "";
     static Formatter x;
 
     static final int landCount_horizontal_max = 5;
@@ -31,6 +31,11 @@ public class Board {
     private final static int[] DICE_FORMAT_5x5 = {11, 12, 9, 4, 6, 5, 10, 3, 11, 4, 8, 10, 8, 9, 3, 5, 2, 6};
 
     public Board(){
+        if(osType.contains("windows")){
+            path = "C:\\Users\\Bekir Onur Gölgedar\\AppData\\Local\\Catan";
+        } else {
+            path = "/Users/emresumengen/Desktop/deneme";
+        }
         players.add(new Player(0));
 
         for(int i = 0; i < locationCount; i++) {
