@@ -1,5 +1,7 @@
-public enum BuildingType {
-    Settlement, City;
+package SeniorProject;
+
+enum BuildingType {
+    SETTLEMENT, CITY;
 
     @Override
     public String toString() {
