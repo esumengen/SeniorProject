@@ -31,7 +31,7 @@ class Synchronizer {
             actionType = String.copyValueOf(line.toCharArray(), 4, 2);
             actionParam = Integer.parseInt(String.copyValueOf(line.toCharArray(), 7, 2));
             actionParam2 = (actionType == "R") ? Integer.parseInt(String.copyValueOf(line.toCharArray(), 10, 2)) :0;
-            objectType = Character.toString(line.charAt(line.length()-1));
+            objectType = Character.toString(line.charAt(11));
 
             switch (actionType){
                 case "CR":
