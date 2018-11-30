@@ -176,6 +176,8 @@ class Board {
             players.get(playerIndex).setStone(players.get(playerIndex).getStone() - stone);
             players.get(playerIndex).setBrick(players.get(playerIndex).getBrick() - brick);
             addLog("ACTION: A Trade with Bank has been done by [Player " + playerIndex + "]");
+        }else {
+            addLog("ACTION: A Trade with Bank has been failed by [Player " + playerIndex + "]");
         }
     }
 
