@@ -19,6 +19,7 @@ class Synchronizer {
 
         int playerIndex;
         int actionParam;
+        int actionParam2 = 0;
         String actionType;
         String objectType;
 
@@ -29,6 +30,8 @@ class Synchronizer {
             playerIndex = Integer.parseInt(Character.toString(line.charAt(1)));
             actionType = String.copyValueOf(line.toCharArray(), 4, 2);
             actionParam = Integer.parseInt(String.copyValueOf(line.toCharArray(), 7, 2));
+            if(actionType == "R")
+                actionParam2 = Integer.parseInt(String.copyValueOf(line.toCharArray(), 9, 2));
             objectType = Character.toString(line.charAt(11));
 
             switch (actionType){
@@ -36,7 +39,14 @@ class Synchronizer {
                     if(objectType.equals("S")) {
                         board.createSettlement(Board.getPlayers().get(playerIndex), Board.getLocations().get(actionParam));
                     }
+                    else if(objectType.equals("R")) {
+                        board.createRoad(Board.getPlayers().get(playerIndex), Board.getLocations().get(actionParam), Board.getLocations().get(actionParam2));
+                    }
+                    else if(objectType.equals("U")) {
+                        board.upgradeSettlementtoCity(Board.getPlayers().get(playerIndex), Board.getLocations().get(actionParam));
+                    }
                     break;
+
             }
         } catch (Exception e) {
             e.printStackTrace();

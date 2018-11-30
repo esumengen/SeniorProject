@@ -147,6 +147,25 @@ class Board {
         addLog("ACTION: A Settlement has been added on [Location " + location.getIndex() + "] by [Player " + player.getIndex() + "]");
     }
 
+    public void createRoad(Player player, Location location1, Location location2){
+        Road road = new Road(location1, location2, player);
+        structures.add(road);
+
+        addLog("ACTION: A Road has been added between [Location " + location1.getIndex() + " and Location " + location2.getIndex() + "] by [Player " + player.getIndex() + "]");
+    }
+
+    public void upgradeSettlementtoCity(Player player, Location location){
+        for (Structure structure : structures) {
+            if(structure instanceof Settlement){
+                City city = new City(location, structure.getPlayer());
+                structures.add(structures.indexOf(structure), city);
+            }
+        }
+
+        addLog("ACTION: A City has been added on [Location " + location + "] by [Player " + player.getIndex() + "]");
+    }
+
+
     public static ArrayList<Land> getLands() {
         return lands;
     }
