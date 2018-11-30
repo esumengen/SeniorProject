@@ -79,6 +79,22 @@ class Board {
         return sum;
     }
 
+    public static ArrayList<Land> getLands() {
+        return lands;
+    }
+
+    public static ArrayList<Location> getLocations() {
+        return locations;
+    }
+
+    public static ArrayList<Player> getPlayers() {
+        return players;
+    }
+
+    public static ArrayList<Structure> getStructures() {
+        return structures;
+    }
+
     private void load(ArrayList<Land> lands) {
         try {
             Wini ini = new Wini(new File(Global.get_working_path(Global.ENVIRONMENT_FILE)));
@@ -192,22 +208,6 @@ class Board {
                 player.getStructures().add(structure);
             }
         }
-    }
-
-    public static ArrayList<Land> getLands() {
-        return lands;
-    }
-
-    public static ArrayList<Location> getLocations() {
-        return locations;
-    }
-
-    public static ArrayList<Player> getPlayers() {
-        return players;
-    }
-
-    public static ArrayList<Structure> getStructures() {
-        return structures;
     }
 
     @Override
