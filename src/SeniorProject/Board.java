@@ -168,6 +168,22 @@ class Board {
         addLog("ACTION: A City has been added on [Location " + location + "] by [Player " + player.getIndex() + "]");
     }
 
+    public void tradeBank(int playerIndex, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB) {
+        if(((wheatB + woodB + woolB + stoneB + brickB)*4) == wheat + wood + wool + stone +brick){
+            players.get(playerIndex).setWheat(players.get(playerIndex).getWheat() - wheat);
+            players.get(playerIndex).setWood(players.get(playerIndex).getWood() - wood);
+            players.get(playerIndex).setWool(players.get(playerIndex).getWool() - wool);
+            players.get(playerIndex).setStone(players.get(playerIndex).getStone() - stone);
+            players.get(playerIndex).setBrick(players.get(playerIndex).getBrick() - brick);
+            addLog("ACTION: A Trade with Bank has been done by [Player " + playerIndex + "]");
+        }
+    }
+
+    public void tradePlayer(int playerIndex1, int playerIndex2, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB){
+        addLog("TODOACTION: A Trade with [Player " + playerIndex2 + " has been done by [Player " + playerIndex1 + "]");
+        // TODO: 30-Nov-18
+    }
+
     public void syncPlayer(Player player) {
         for (Structure structure : structures) {
             if (player == structure.getPlayer() && !player.getStructures().contains(structure)) {
