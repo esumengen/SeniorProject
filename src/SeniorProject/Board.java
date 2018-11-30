@@ -67,13 +67,13 @@ class Board {
 
         load(lands);
 
-        System.out.println("\n"+this);
+        System.out.println("\n" + this);
     }
 
     private static int calculateLocationCount() {
         int sum = 0;
 
-        for(int i = landCount_horizontal_max; i >= landCount_horizontal_min; i--) {
+        for (int i = landCount_horizontal_max; i >= landCount_horizontal_min; i--) {
             sum += 2 * (2 * i + 1);
         }
         return sum;
@@ -143,26 +143,37 @@ class Board {
     public void createSettlement(Player player, Location location) {
         Settlement settlement = new Settlement(location, player);
         structures.add(settlement);
+        synchPlayer(player);
 
         addLog("ACTION: A Settlement has been added on [Location " + location.getIndex() + "] by [Player " + player.getIndex() + "]");
     }
 
-    public void createRoad(Player player, Location location1, Location location2){
+    public void createRoad(Player player, Location location1, Location location2) {
         Road road = new Road(location1, location2, player);
         structures.add(road);
+        synchPlayer(player);
 
         addLog("ACTION: A Road has been added between [Location " + location1.getIndex() + " and Location " + location2.getIndex() + "] by [Player " + player.getIndex() + "]");
     }
 
-    public void upgradeSettlementtoCity(Player player, Location location){
+    public void upgradeSettlement(Player player, Location location) {
         for (Structure structure : structures) {
-            if(structure instanceof Settlement){
+            if (structure instanceof Settlement) {
                 City city = new City(location, structure.getPlayer());
                 structures.add(structures.indexOf(structure), city);
             }
         }
+        synchPlayer(player);
 
         addLog("ACTION: A City has been added on [Location " + location + "] by [Player " + player.getIndex() + "]");
+    }
+
+    public void synchPlayer(Player player) {
+        for (Structure structure : structures) {
+            if (player == structure.getPlayer() && !player.getStructures().contains(structure)) {
+                player.getStructures().add(structure);
+            }
+        }
     }
 
 
@@ -187,10 +198,10 @@ class Board {
         String string = "";
 
         for (int i = 0; i < lands.size(); i++) {
-            string += "[LAND " + lands.get(i).getIndex() + "]  \nType: "+lands.get(i).getType().toString()+"\nLocations: {";
+            string += "[LAND " + lands.get(i).getIndex() + "]  \nType: " + lands.get(i).getType().toString() + "\nLocations: {";
 
-            int j_max = lands.get(i).getAdjacentLocations().size()-1;
-            for (int j = 0; j < j_max+1; j++) {
+            int j_max = lands.get(i).getAdjacentLocations().size() - 1;
+            for (int j = 0; j < j_max + 1; j++) {
                 string += lands.get(i).getAdjacentLocations().get(j).index + (j == j_max ? "" : ", ");
             }
 

@@ -8,7 +8,7 @@ public class Player {
     private String name;
     private int index;
     private int AIType;
-    private ArrayList<Settlement> structures = new ArrayList<>();
+    private ArrayList<Structure> structures = new ArrayList<>();
 
     public Player (int index){
         this.index = index;
@@ -26,7 +26,7 @@ public class Player {
         return AIType;
     }
 
-    public ArrayList<Settlement> getStructures() {
+    public ArrayList<Structure> getStructures() {
         return structures;
     }
 }

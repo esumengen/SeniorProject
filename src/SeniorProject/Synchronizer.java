@@ -11,15 +11,15 @@ class Synchronizer {
         this.board = board;
 
         this.actions_file = new File(Global.get_working_path(Global.ACTIONS_FILE));
-        reader(actions_file);
+        sync(actions_file);
     }
 
-    private void reader(File file){
+    private void sync(File file){
         String line;
 
         int playerIndex;
         int actionParam;
-        int actionParam2 = 0;
+        int actionParam2;
         String actionType;
         String objectType;
 
@@ -30,8 +30,7 @@ class Synchronizer {
             playerIndex = Integer.parseInt(Character.toString(line.charAt(1)));
             actionType = String.copyValueOf(line.toCharArray(), 4, 2);
             actionParam = Integer.parseInt(String.copyValueOf(line.toCharArray(), 7, 2));
-            if(actionType == "R")
-                actionParam2 = Integer.parseInt(String.copyValueOf(line.toCharArray(), 9, 2));
+            actionParam2 = (actionType == "R") ? Integer.parseInt(String.copyValueOf(line.toCharArray(), 10, 2)) :0;
             objectType = Character.toString(line.charAt(11));
 
             switch (actionType){
@@ -43,10 +42,9 @@ class Synchronizer {
                         board.createRoad(Board.getPlayers().get(playerIndex), Board.getLocations().get(actionParam), Board.getLocations().get(actionParam2));
                     }
                     else if(objectType.equals("U")) {
-                        board.upgradeSettlementtoCity(Board.getPlayers().get(playerIndex), Board.getLocations().get(actionParam));
+                        board.upgradeSettlement(Board.getPlayers().get(playerIndex), Board.getLocations().get(actionParam));
                     }
                     break;
-
             }
         } catch (Exception e) {
             e.printStackTrace();
