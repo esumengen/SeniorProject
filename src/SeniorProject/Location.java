@@ -3,7 +3,7 @@ package SeniorProject;
 import java.util.ArrayList;
 
 class Location {
-    int index;
+    private int index;
     private ArrayList<Land> adjacentLands;
     private ArrayList<Road> connectedRoads;
     private ArrayList<Location> connectedLocations;

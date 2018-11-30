@@ -143,7 +143,7 @@ class Board {
     public void createSettlement(Player player, Location location) {
         Settlement settlement = new Settlement(location, player);
         structures.add(settlement);
-        synchPlayer(player);
+        syncPlayer(player);
 
         addLog("ACTION: A Settlement has been added on [Location " + location.getIndex() + "] by [Player " + player.getIndex() + "]");
     }
@@ -151,7 +151,7 @@ class Board {
     public void createRoad(Player player, Location location1, Location location2) {
         Road road = new Road(location1, location2, player);
         structures.add(road);
-        synchPlayer(player);
+        syncPlayer(player);
 
         addLog("ACTION: A Road has been added between [Location " + location1.getIndex() + " and Location " + location2.getIndex() + "] by [Player " + player.getIndex() + "]");
     }
@@ -163,19 +163,18 @@ class Board {
                 structures.add(structures.indexOf(structure), city);
             }
         }
-        synchPlayer(player);
+        syncPlayer(player);
 
         addLog("ACTION: A City has been added on [Location " + location + "] by [Player " + player.getIndex() + "]");
     }
 
-    public void synchPlayer(Player player) {
+    public void syncPlayer(Player player) {
         for (Structure structure : structures) {
             if (player == structure.getPlayer() && !player.getStructures().contains(structure)) {
                 player.getStructures().add(structure);
             }
         }
     }
-
 
     public static ArrayList<Land> getLands() {
         return lands;
@@ -202,7 +201,7 @@ class Board {
 
             int j_max = lands.get(i).getAdjacentLocations().size() - 1;
             for (int j = 0; j < j_max + 1; j++) {
-                string += lands.get(i).getAdjacentLocations().get(j).index + (j == j_max ? "" : ", ");
+                string += lands.get(i).getAdjacentLocations().get(j).getIndex() + (j == j_max ? "" : ", ");
             }
 
             string += "}\n\n";
