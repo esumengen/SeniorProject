@@ -2,6 +2,7 @@ package SeniorProject;
 
 import org.ini4j.Wini;
 
+import java.io.InputStream;
 import java.util.*;
 import java.io.File;
 
@@ -29,7 +30,15 @@ class Main {
                         ini.store();
                     }
 
+                    ProcessBuilder processBuilder = new ProcessBuilder("tasklist.exe");
+                    Process process = processBuilder.start();
+                    String tasksList = Stream_toString(process.getInputStream());
+
+                    if (!tasksList.contains("Catan.exe")) {
+                        System.exit(0);
+                    }
                 }
+
                 catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -37,5 +46,13 @@ class Main {
         };
 
         myTimer.schedule(task,0,100);
+    }
+
+    private static String Stream_toString(InputStream inputStream) {
+        Scanner scanner = new Scanner(inputStream, "UTF-8").useDelimiter("\\A");
+        String string = scanner.hasNext() ? scanner.next() : "";
+        scanner.close();
+
+        return string;
     }
 }
