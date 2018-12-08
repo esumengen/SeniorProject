@@ -20,6 +20,7 @@ class Board {
     private static ArrayList<Structure> structures = new ArrayList<>();
     private static ArrayList<Player> players = new ArrayList<>();
     private static int locationCount = calculateLocationCount();
+    private static Land robbedLand;
 
     public Board() {
         for (int i = 0; i < PLAYER_COUNT; i++)
@@ -132,6 +133,8 @@ class Board {
 
                 land.setType(LandType.valueOf(type_str.toUpperCase(Locale.ENGLISH)));
                 land.setDiceNo(diceNo);
+
+                if(land.getType() == LandType.DESERT) robbedLand = land;
             }
 
             addLog("SUCCESS: The game is loaded to the AI.");
@@ -203,6 +206,10 @@ class Board {
         addLog("ACTION: A City has been added on [Location " + location + "] by [Player " + player.getIndex() + "]");
     }
 
+    public void moveRobber(Player player, Land land) {
+        robbedLand = land;
+    }
+
     public void tradeBank(int playerIndex, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB) {
         if(((wheatB + woodB + woolB + stoneB + brickB)*4) == wheat + wood + wool + stone +brick){
             players.get(playerIndex).setWheat(players.get(playerIndex).getWheat() - wheat);
@@ -246,4 +253,10 @@ class Board {
 
         return string;
     }
+
+
+    public static Land getRobbedLand() {
+        return robbedLand;
+    }
+
 }

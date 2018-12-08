@@ -1,6 +1,8 @@
 package SeniorProject;
 
 import java.io.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 class Synchronizer {
@@ -18,8 +20,7 @@ class Synchronizer {
         String line;
 
         int playerIndex;
-        int actionParam;
-        int actionParam2;
+        ArrayList<Integer> actionParam = new ArrayList<>();
         String actionType;
         String objectType;
 
@@ -29,20 +30,40 @@ class Synchronizer {
 
             playerIndex = Integer.parseInt(Character.toString(line.charAt(1)));
             actionType = String.copyValueOf(line.toCharArray(), 4, 2);
-            actionParam = Integer.parseInt(String.copyValueOf(line.toCharArray(), 7, 2));
-            actionParam2 = (actionType == "R") ? Integer.parseInt(String.copyValueOf(line.toCharArray(), 10, 2)) :0;
-            objectType = Character.toString(line.charAt(11));
+
+            int value = 7;
+            while (value < line.length()-3) {
+                actionParam.add(Integer.parseInt(String.copyValueOf(line.toCharArray(), value, 2)));
+                value += 3;
+            }
+
+            objectType = Character.toString(line.length() - 1);
 
             switch (actionType){
                 case "CR":
                     if(objectType.equals("S")) {
-                        board.createSettlement(Board.getPlayers().get(playerIndex), Board.getLocations().get(actionParam));
+                        board.createSettlement(board.getPlayers().get(playerIndex), board.getLocations().get(actionParam.get(0)));
                     }
                     else if(objectType.equals("R")) {
-                        board.createRoad(Board.getPlayers().get(playerIndex), Board.getLocations().get(actionParam), Board.getLocations().get(actionParam2));
+                        board.createRoad(board.getPlayers().get(playerIndex), board.getLocations().get(actionParam.get(0)), board.getLocations().get(actionParam.get(1)));
                     }
-                    else if(objectType.equals("U")) {
-                        board.upgradeSettlement(Board.getPlayers().get(playerIndex), Board.getLocations().get(actionParam));
+                    break;
+                case "UP":
+                    if(objectType.equals("S")) {
+                        board.upgradeSettlement(board.getPlayers().get(playerIndex), board.getLocations().get(actionParam.get(0)));
+                    }
+                    break;
+                case "MO":
+                    if(objectType.equals("T")) {
+                        board.moveRobber(board.getPlayers().get(playerIndex), board.getLands().get(actionParam.get(0)));
+                    }
+                    break;
+                case "TR":
+                    if(objectType.equals("B")) {
+                        board.tradeBank(playerIndex, actionParam.get(0), actionParam.get(1), actionParam.get(2), actionParam.get(3), actionParam.get(4), actionParam.get(5), actionParam.get(6), actionParam.get(7), actionParam.get(8), actionParam.get(9));
+                    }
+                    else {
+                        board.tradePlayer(playerIndex, Integer.parseInt(objectType), actionParam.get(0), actionParam.get(1), actionParam.get(2), actionParam.get(3), actionParam.get(4), actionParam.get(5), actionParam.get(6), actionParam.get(7), actionParam.get(8), actionParam.get(9));
                     }
                     break;
             }

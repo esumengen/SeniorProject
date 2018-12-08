@@ -1,8 +1,5 @@
 package SeniorProject;
 
-import SeniorProject.Location;
-import SeniorProject.Player;
-
 public class Road extends Structure {
     private Location[] locations;
 

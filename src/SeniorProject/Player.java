@@ -1,7 +1,5 @@
 package SeniorProject;
 
-import SeniorProject.City;
-
 import java.util.ArrayList;
 
 public class Player {
