@@ -8,6 +8,7 @@ import java.io.File;
 
 class Main {
     public static void main(String[] args) {
+        //System.out.println(Global.fibonacci(3));
 
         Board board = new Board();
         Timer myTimer = new Timer();
@@ -38,9 +39,9 @@ class Main {
                         System.exit(0);
                     }
                 }
-
                 catch (Exception e) {
                     e.printStackTrace();
+                    System.exit(0);
                 }
             }
         };

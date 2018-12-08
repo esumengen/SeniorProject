@@ -7,12 +7,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 
 class Board {
     private static final int PLAYER_COUNT = 4;
-    private static final int landCount_horizontal_max = 5;
-    private static final int landCount_vertical = 5;
+    private static final int landCount_horizontal_max = 7;
+    private static final int landCount_vertical = 7;
     private static final int landCount_horizontal_min = landCount_horizontal_max - (int) Math.floor(landCount_vertical / 2);
     private static ArrayList<Land> lands = new ArrayList<>();
     private static ArrayList<Location> locations = new ArrayList<>();
@@ -45,13 +46,31 @@ class Board {
         }
 
         // Bind lands&locations
+        ArrayList<Integer> topLocationIndexes = new ArrayList<>();
+        topLocationIndexes.add(1);
+
         landIndex = 0;
         for (int i = 0; i < landCount_vertical; i++) {
             int landCount_horizontal = landCount_horizontal_max - Math.abs(i - (int) Math.floor(landCount_vertical / 2));
 
             for (int j = 0; j < landCount_horizontal; j++) {
                 Land land = lands.get(landIndex);
-                int result = 2 * landIndex + Global.fibonacci(i + 1);
+                int result = topLocationIndexes.get(0);
+
+                if (landIndex != 0) {
+                    result = topLocationIndexes.get(landIndex - 1) + 2;
+
+                    if (j == 0) {
+                        if (i == landCount_vertical / 2 + 1)
+                            result += 2;
+                        else if (i < landCount_vertical / 2 + 1)
+                            result += 1;
+                        else
+                            result += 3;
+                    }
+
+                    topLocationIndexes.add(result);
+                }
 
                 bind(land, locations.get(result - 1));
                 bind(land, locations.get(result));
