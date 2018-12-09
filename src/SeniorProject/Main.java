@@ -7,11 +7,23 @@ import java.util.*;
 import java.io.File;
 
 class Main {
+    private static int mainPlayer = 0;
+
     public static void main(String[] args) {
-        //System.out.println(Global.fibonacci(3));
 
         Board board = new Board();
         Timer myTimer = new Timer();
+
+        try {
+            Wini ini = new Wini(new File(Global.get_working_path(Global.ENVIRONMENT_FILE)));
+
+            String mainPlayer_str = ini.get("General", "MainPlayer", String.class);
+            mainPlayer = Integer.parseInt(mainPlayer_str);
+
+        }
+        catch (Exception e) {
+            System.out.println(e.getStackTrace());
+        }
 
         TimerTask task = new TimerTask() {
             @Override
@@ -56,5 +68,9 @@ class Main {
         scanner.close();
 
         return string;
+    }
+
+    public static int getMainPlayer() {
+        return mainPlayer;
     }
 }

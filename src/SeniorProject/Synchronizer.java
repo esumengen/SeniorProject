@@ -28,6 +28,7 @@ class Synchronizer {
             Scanner scanner = new Scanner(file);
             line = scanner.nextLine();
 
+
             playerIndex = Integer.parseInt(Character.toString(line.charAt(1)));
             actionType = String.copyValueOf(line.toCharArray(), 4, 2);
 
