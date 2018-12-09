@@ -153,7 +153,10 @@ class Board {
     public void createSettlement(Player player, Location location) {
         Settlement settlement = new Settlement(location, player);
         structures.add(settlement);
+        location.setOwnerIndex(player.getIndex());
+        location.setType(LocationType.SETTLEMENT);
         syncPlayer(player);
+
 
         Global.addLog("ACTION: A Settlement has been added on [Location " + location.getIndex() + "] by [Player " + player.getIndex() + "]");
     }
@@ -173,6 +176,7 @@ class Board {
                 structures.add(structures.indexOf(structure), city);
             }
         }
+        location.setType(LocationType.CITY);
         syncPlayer(player);
 
         Global.addLog("ACTION: A City has been added on [Location " + location + "] by [Player " + player.getIndex() + "]");
@@ -200,6 +204,17 @@ class Board {
     public void tradePlayer(int playerIndex1, int playerIndex2, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB){
         Global.addLog("TODOACTION: A Trade with [Player " + playerIndex2 + " has been done by [Player " + playerIndex1 + "]");
         // TODO: 30-Nov-18
+    }
+
+    public void rollDice(Player player, int dice1, int dice2) {
+        for (Land land: lands) {
+            if((land.getDiceNo() == dice1 + dice2) && land != robbedLand){
+                for (Location location: land.getAdjacentLocations()) {
+                    if (location.getOwnerIndex() != -1 )
+                        players.get(location.getOwnerIndex()).setResources(land.getType(), location.getType());
+                }
+            }
+        }
     }
 
     public void syncPlayer(Player player) {
@@ -232,5 +247,4 @@ class Board {
     public static Land getRobbedLand() {
         return robbedLand;
     }
-
 }

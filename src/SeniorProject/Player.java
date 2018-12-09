@@ -68,6 +68,24 @@ public class Player {
     public void setBrick(int brick) {
         this.brick = brick;
     }
+
+    public void setResources(LandType landType, LocationType locationType) {
+        int multiplier = 1;
+        if(locationType.equals(LocationType.CITY))
+            multiplier = 2;
+        switch (landType) {
+            case FIELDS:
+                setWheat(this.wheat + multiplier);
+            case FOREST:
+                setWood(this.wood + multiplier);
+            case HILLS:
+                setBrick(this.brick + multiplier);
+            case MOUNTAINS:
+                setStone(this.stone + multiplier);
+            case PASTURE:
+                setWool(this.wool + multiplier);
+        }
+    }
 }
 
 

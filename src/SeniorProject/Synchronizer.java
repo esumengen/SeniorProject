@@ -1,7 +1,6 @@
 package SeniorProject;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -67,6 +66,9 @@ class Synchronizer {
                         board.tradePlayer(playerIndex, Integer.parseInt(objectType), actionParam.get(0), actionParam.get(1), actionParam.get(2), actionParam.get(3), actionParam.get(4), actionParam.get(5), actionParam.get(6), actionParam.get(7), actionParam.get(8), actionParam.get(9));
                     }
                     break;
+                case "RD":
+                        board.rollDice(board.getPlayers().get(playerIndex), actionParam.get(0), actionParam.get(1));
+
             }
         } catch (Exception e) {
             e.printStackTrace();
