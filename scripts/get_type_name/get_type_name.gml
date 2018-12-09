@@ -10,5 +10,7 @@ else if (landType == ltype_hills)
 	return "Hills"
 else if (landType == ltype_mountains)
 	return "Mountains"
+else if (landType == ltype_sea)
+	return "Sea"
 
 return "Desert"

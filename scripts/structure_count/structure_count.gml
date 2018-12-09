@@ -1,10 +1,10 @@
 /// @param playerIndex
 /// @param structure
-/// @param location
+/// @param location*
 
 var count = 0
 
-with (argument[2]) {
+with (argument_count == 3 ? argument[2] : objLocation) {
 	for (var i = 0; i < ds_list_size(structures); i++) {
 		var structure = ds_list_find_value(structures, i)
 	

@@ -31,6 +31,14 @@
     },
     "resources": [
         {
+            "Key": "03d090b6-3f2f-42db-aeba-747a5413384f",
+            "Value": {
+                "id": "4cbdd8fb-f111-4ebf-a219-95cdfeab10ce",
+                "resourcePath": "sprites\\sprRobber\\sprRobber.yy",
+                "resourceType": "GMSprite"
+            }
+        },
+        {
             "Key": "0fcf52cd-a229-46d8-ae71-52303b5e863f",
             "Value": {
                 "id": "daeb7194-7f7d-40b1-829e-5156c5f98417",
@@ -191,6 +199,14 @@
             }
         },
         {
+            "Key": "5eee15f9-1d41-4077-bc4a-ab67b7c1451b",
+            "Value": {
+                "id": "39a15cf1-c4e8-479a-998e-65bc2960ce2d",
+                "resourcePath": "scripts\\action_write\\action_write.yy",
+                "resourceType": "GMScript"
+            }
+        },
+        {
             "Key": "615600c6-47f4-4e3e-ba2e-7a47fbba01ba",
             "Value": {
                 "id": "8ecb6d5c-ba15-46a6-8561-46a14bc0204f",
@@ -252,6 +268,22 @@
                 "id": "70c83fbc-448e-497e-a897-c2cdacc85ca1",
                 "resourcePath": "sprites\\sprSettlement\\sprSettlement.yy",
                 "resourceType": "GMSprite"
+            }
+        },
+        {
+            "Key": "8810fc45-2c2d-4751-9537-073892c92383",
+            "Value": {
+                "id": "cb8ddd8b-9d6a-4323-b08e-6ef8fae51da1",
+                "resourcePath": "objects\\objHexagon\\objHexagon.yy",
+                "resourceType": "GMObject"
+            }
+        },
+        {
+            "Key": "8d67907e-d0c9-4c65-a7ae-d5265c45cec6",
+            "Value": {
+                "id": "015b0751-48d7-4d32-b309-2e4e34f919c2",
+                "resourcePath": "scripts\\turn_end\\turn_end.yy",
+                "resourceType": "GMScript"
             }
         },
         {
@@ -351,6 +383,14 @@
             }
         },
         {
+            "Key": "ea9b89be-7f15-410c-8ee7-70abbd1c7d2d",
+            "Value": {
+                "id": "236f67e9-0c86-46e5-8a42-f4ce585b3feb",
+                "resourcePath": "datafiles_yy\\CatanAI.jar.yy",
+                "resourceType": "GMIncludedFile"
+            }
+        },
+        {
             "Key": "ecac0d65-1668-4e3d-a48d-5bacabc170c3",
             "Value": {
                 "id": "998e0389-e849-45c7-8260-7b12e27b863c",
@@ -400,7 +440,9 @@
         "77bd4693-9712-43ed-a14f-984c092e86b1",
         "152a2a26-f5f6-4d3e-8f35-57a91a979090",
         "6783fd7e-4f82-4948-9794-ed8803a71090",
-        "45fd7fdb-b6ec-4e85-a686-47dfb701cc44"
+        "45fd7fdb-b6ec-4e85-a686-47dfb701cc44",
+        "5eee15f9-1d41-4077-bc4a-ab67b7c1451b",
+        "8d67907e-d0c9-4c65-a7ae-d5265c45cec6"
     ],
     "tutorial": ""
 }

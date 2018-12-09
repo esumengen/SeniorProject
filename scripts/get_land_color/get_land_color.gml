@@ -13,7 +13,10 @@ else if (landType == ltype_hills) {
 	return c_brick
 }
 else if (landType == ltype_mountains) {
-	return c_dkgray
+	return c_gray
+}
+else if (landType == ltype_sea) {
+	return make_color_rgb(0, 0, 160)
 }
 
 return c_desert

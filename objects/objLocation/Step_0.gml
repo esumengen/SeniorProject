@@ -1,4 +1,9 @@
-dis = point_distance(x, y, mouse_x, mouse_y)
+if (global.addStructure_mode)
+	visible = true
+else
+	visible = false
+
+/*dis = point_distance(x, y, mouse_x, mouse_y)
 
 var near = dis < 120
 
@@ -13,4 +18,4 @@ else {
 		image_alpha -= 0.1
 	else
 		image_alpha = 0
-}
+}*/

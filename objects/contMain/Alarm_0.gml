@@ -1,9 +1,8 @@
-var fileName = "communication.txt"
-if (file_exists(fileName)) {
-	var file = file_text_open_read(fileName)
-	
-	var str = file_text_read_string(file)
-	show_message(str)
+if (period < 9) {
+	period += 1
+	alarm[0] = 5
 }
-else
-	show_message("Cannot find "+fileName)
+else {
+	period = 10
+	alarm[1] = 5
+}
