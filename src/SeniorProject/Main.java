@@ -2,7 +2,6 @@ package SeniorProject;
 
 import org.ini4j.Wini;
 
-import java.io.InputStream;
 import java.util.*;
 import java.io.File;
 
@@ -10,20 +9,21 @@ class Main {
     private static int mainPlayer = 0;
 
     public static void main(String[] args) {
-
-        Board board = new Board();
         Timer myTimer = new Timer();
 
         try {
             Wini ini = new Wini(new File(Global.get_working_path(Global.ENVIRONMENT_FILE)));
 
             String mainPlayer_str = ini.get("General", "MainPlayer", String.class);
-            mainPlayer = Integer.parseInt(mainPlayer_str);
+            mainPlayer_str = Global.getRidOf_quotationMarks(mainPlayer_str);
 
+            mainPlayer = Integer.parseInt(mainPlayer_str);
         }
         catch (Exception e) {
             System.out.println(e.getStackTrace());
         }
+
+        Board board = new Board();
 
         TimerTask task = new TimerTask() {
             @Override
@@ -43,32 +43,31 @@ class Main {
                         ini.store();
                     }
 
-                    ProcessBuilder processBuilder = new ProcessBuilder("tasklist.exe");
+                    /*ProcessBuilder processBuilder = new ProcessBuilder("tasklist.exe");
                     Process process = processBuilder.start();
                     String tasksList = Stream_toString(process.getInputStream());
 
                     if (!tasksList.contains("Catan.exe")) {
                         System.exit(0);
-                    }
+                    }*/
                 }
                 catch (Exception e) {
-                    System.out.println(e.getMessage());
                     e.printStackTrace();
                     System.exit(0);
                 }
             }
         };
 
-        myTimer.schedule(task,0,100);
+        myTimer.schedule(task,0,750);
     }
 
-    private static String Stream_toString(InputStream inputStream) {
+    /*private static String Stream_toString(InputStream inputStream) {
         Scanner scanner = new Scanner(inputStream, "UTF-8").useDelimiter("\\A");
         String string = scanner.hasNext() ? scanner.next() : "";
         scanner.close();
 
         return string;
-    }
+    }*/
 
     public static int getMainPlayer() {
         return mainPlayer;

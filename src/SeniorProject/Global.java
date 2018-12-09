@@ -1,5 +1,9 @@
 package SeniorProject;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
 class Global {
     static final OSType OS_TYPE = System.getProperty("os.name").toLowerCase().contains("windows") ? OSType.WINDOWS : OSType.MAC;
     static final String WORKING_PATH = OS_TYPE == OSType.WINDOWS ? System.getProperty("user.home") + "\\AppData\\Local\\Catan" : "/Users/emresumengen/Desktop/deneme";
@@ -29,5 +33,33 @@ class Global {
 
     static String getRidOf_quotationMarks(String string) {
         return String.copyValueOf(string.toCharArray(), 1, string.length() - 2);
+    }
+
+    static void addLog(String info) {
+        BufferedWriter bufferedWriter = null;
+        FileWriter fileWriter = null;
+
+        try {
+            fileWriter = new FileWriter(Global.get_working_path(Global.LOG_FILE), true);
+            bufferedWriter = new BufferedWriter(fileWriter);
+
+            bufferedWriter.write(info);
+            bufferedWriter.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (bufferedWriter != null)
+                    bufferedWriter.close();
+
+                if (fileWriter != null)
+                    fileWriter.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("Added a new log.");
+        }
     }
 }

@@ -38,7 +38,7 @@ class Synchronizer {
                 value += 3;
             }
 
-            objectType = Character.toString(line.length() - 1);
+            objectType = Character.toString(line.charAt(line.length() - 1));
 
             switch (actionType){
                 case "CR":

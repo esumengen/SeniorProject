@@ -137,39 +137,11 @@ class Board {
                 if(land.getType() == LandType.DESERT) robbedLand = land;
             }
 
-            addLog("SUCCESS: The game is loaded to the AI.");
+            Global.addLog("[P"+Main.getMainPlayer()+"] SUCCESS: The game is loaded to the AI.");
         } catch (Exception e) {
             System.out.println(e.getMessage());
 
-            addLog("ERROR: The game is not loaded to the AI.");
-        }
-    }
-
-    private void addLog(String info) {
-        BufferedWriter bufferedWriter = null;
-        FileWriter fileWriter = null;
-
-        try {
-            fileWriter = new FileWriter(Global.get_working_path(Global.LOG_FILE), true);
-            bufferedWriter = new BufferedWriter(fileWriter);
-
-            bufferedWriter.write(info);
-            bufferedWriter.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (bufferedWriter != null)
-                    bufferedWriter.close();
-
-                if (fileWriter != null)
-                    fileWriter.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            System.out.println("Added a new log.");
+            Global.addLog("[P"+Main.getMainPlayer()+"]ERROR: The game is not loaded to the AI.");
         }
     }
 
@@ -183,7 +155,7 @@ class Board {
         structures.add(settlement);
         syncPlayer(player);
 
-        addLog("ACTION: A Settlement has been added on [Location " + location.getIndex() + "] by [Player " + player.getIndex() + "]");
+        Global.addLog("ACTION: A Settlement has been added on [Location " + location.getIndex() + "] by [Player " + player.getIndex() + "]");
     }
 
     public void createRoad(Player player, Location location1, Location location2) {
@@ -191,7 +163,7 @@ class Board {
         structures.add(road);
         syncPlayer(player);
 
-        addLog("ACTION: A Road has been added between [Location " + location1.getIndex() + " and Location " + location2.getIndex() + "] by [Player " + player.getIndex() + "]");
+        Global.addLog("ACTION: A Road has been added between [Location " + location1.getIndex() + " and Location " + location2.getIndex() + "] by [Player " + player.getIndex() + "]");
     }
 
     public void upgradeSettlement(Player player, Location location) {
@@ -203,11 +175,13 @@ class Board {
         }
         syncPlayer(player);
 
-        addLog("ACTION: A City has been added on [Location " + location + "] by [Player " + player.getIndex() + "]");
+        Global.addLog("ACTION: A City has been added on [Location " + location + "] by [Player " + player.getIndex() + "]");
     }
 
     public void moveRobber(Player player, Land land) {
         robbedLand = land;
+
+        Global.addLog("ACTION: The Robber has been moved to [Land " + land.getIndex() + "] by [Player " + player.getIndex() + "]");
     }
 
     public void tradeBank(int playerIndex, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB) {
@@ -217,14 +191,14 @@ class Board {
             players.get(playerIndex).setWool(players.get(playerIndex).getWool() - wool);
             players.get(playerIndex).setStone(players.get(playerIndex).getStone() - stone);
             players.get(playerIndex).setBrick(players.get(playerIndex).getBrick() - brick);
-            addLog("ACTION: A Trade with Bank has been done by [Player " + playerIndex + "]");
+            Global.addLog("ACTION: A Trade with Bank has been done by [Player " + playerIndex + "]");
         }else {
-            addLog("ACTION: A Trade with Bank has been failed by [Player " + playerIndex + "]");
+            Global.addLog("ACTION: A Trade with Bank has been failed by [Player " + playerIndex + "]");
         }
     }
 
     public void tradePlayer(int playerIndex1, int playerIndex2, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB){
-        addLog("TODOACTION: A Trade with [Player " + playerIndex2 + " has been done by [Player " + playerIndex1 + "]");
+        Global.addLog("TODOACTION: A Trade with [Player " + playerIndex2 + " has been done by [Player " + playerIndex1 + "]");
         // TODO: 30-Nov-18
     }
 
