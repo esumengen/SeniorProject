@@ -59,14 +59,14 @@ class Synchronizer {
                     }
                     break;
                 case "TR":
-                    if(objectType.equals("B")) {
+                    if(objectType.equals("B")) {  //P0 [TR 35 35 35 35 35 35 35 35 35 35] B
                         board.tradeBank(playerIndex, actionParam.get(0), actionParam.get(1), actionParam.get(2), actionParam.get(3), actionParam.get(4), actionParam.get(5), actionParam.get(6), actionParam.get(7), actionParam.get(8), actionParam.get(9));
                     }
-                    else {
+                    else {  //P0 [TR 35 35 35 35 35 35 35 35 35 35] 1
                         board.tradePlayer(playerIndex, Integer.parseInt(objectType), actionParam.get(0), actionParam.get(1), actionParam.get(2), actionParam.get(3), actionParam.get(4), actionParam.get(5), actionParam.get(6), actionParam.get(7), actionParam.get(8), actionParam.get(9));
                     }
                     break;
-                case "RD":  //
+                case "RD":  //P0 [RD 06 03] X
                         board.rollDice(board.getPlayers().get(playerIndex), actionParam.get(0), actionParam.get(1));
 
             }
