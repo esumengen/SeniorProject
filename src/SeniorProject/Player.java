@@ -1,6 +1,7 @@
 package SeniorProject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 enum ResourceType {
@@ -17,11 +18,12 @@ public class Player {
 
     public Player (int index){
         this.index = index;
-        this.resources.put(ResourceType.BRICK, this.brick);
-        this.resources.put(ResourceType.STONE, this.stone);
-        this.resources.put(ResourceType.WHEAT, this.wheat);
-        this.resources.put(ResourceType.WOOD, this.wood);
-        this.resources.put(ResourceType.WOOL, this.wool);
+        resources = new HashMap<>();
+        resources.put(ResourceType.BRICK, this.brick);
+        resources.put(ResourceType.STONE, this.stone);
+        resources.put(ResourceType.WHEAT, this.wheat);
+        resources.put(ResourceType.WOOD, this.wood);
+        resources.put(ResourceType.WOOL, this.wool);
 
     }
 
@@ -85,7 +87,7 @@ public class Player {
         int multiplier = 1;
         if(locationType.equals(LocationType.CITY))
             multiplier = 2;
-        resources.replace(resourceType, resources.get(resourceType) + multiplier);
+        addResource(resourceType, resources.get(resourceType) + multiplier);
     }
 
     public Map<ResourceType, Integer> getResources() {
