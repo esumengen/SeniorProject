@@ -41,21 +41,21 @@ class Synchronizer {
 
             switch (actionType){
                 case "CR":
-                    if(objectType.equals("S")) {
+                    if(objectType.equals("S")) { //P1 [CR 16] S
                         board.createSettlement(board.getPlayers().get(playerIndex), board.getLocations().get(actionParam.get(0)));
                     }
-                    else if(objectType.equals("R")) {
+                    else if(objectType.equals("R")) { //P1 [CR 10 10] R
                         board.createRoad(board.getPlayers().get(playerIndex), board.getLocations().get(actionParam.get(0)), board.getLocations().get(actionParam.get(1)));
                     }
                     break;
                 case "UP":
-                    if(objectType.equals("S")) {
+                    if(objectType.equals("S")) { // P1 [UP 10 10] S
                         board.upgradeSettlement(board.getPlayers().get(playerIndex), board.getLocations().get(actionParam.get(0)));
                     }
                     break;
                 case "MO":
-                    if(objectType.equals("T")) {
-                        board.moveRobber(board.getPlayers().get(playerIndex), board.getLands().get(actionParam.get(0)));
+                    if(objectType.equals("T")) { //P1 [MO 11 01 01] T
+                        board.moveRobber(board.getPlayers().get(playerIndex), board.getLands().get(actionParam.get(0)), board.getPlayers().get(actionParam.get(1)), resourceType.values()[actionParam.get(2)]);
                     }
                     break;
                 case "TR":
@@ -66,7 +66,7 @@ class Synchronizer {
                         board.tradePlayer(playerIndex, Integer.parseInt(objectType), actionParam.get(0), actionParam.get(1), actionParam.get(2), actionParam.get(3), actionParam.get(4), actionParam.get(5), actionParam.get(6), actionParam.get(7), actionParam.get(8), actionParam.get(9));
                     }
                     break;
-                case "RD":
+                case "RD":  //
                         board.rollDice(board.getPlayers().get(playerIndex), actionParam.get(0), actionParam.get(1));
 
             }

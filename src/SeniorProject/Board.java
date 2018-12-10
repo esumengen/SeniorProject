@@ -2,13 +2,10 @@ package SeniorProject;
 
 import org.ini4j.Wini;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Locale;
+import java.util.Random;
 
 class Board {
     private static final int PLAYER_COUNT = 4;
@@ -182,10 +179,16 @@ class Board {
         Global.addLog("ACTION: A City has been added on [Location " + location + "] by [Player " + player.getIndex() + "]");
     }
 
-    public void moveRobber(Player player, Land land) {
+    public void moveRobber(Player robber, Land land, Player robbed, resourceType randomType) {
         robbedLand = land;
+        stealRandomResource(robber, robbed, randomType);
+        Global.addLog("ACTION: The Robber has been moved to [Land " + land.getIndex() + "] by [Player " + robber.getIndex() + "]");
+    }
 
-        Global.addLog("ACTION: The Robber has been moved to [Land " + land.getIndex() + "] by [Player " + player.getIndex() + "]");
+    private void stealRandomResource(Player robber, Player robbed, resourceType randomType) {
+            robbed.addResource(randomType, robbed.getResources().get(randomType) - 1);
+            robber.addResource(randomType, 1);
+            Global.addLog("ACTION: Robbery Performed to  [Player " + robbed.getIndex() + "] by [Player " + robber.getIndex() + "]");
     }
 
     public void tradeBank(int playerIndex, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB) {
@@ -211,7 +214,7 @@ class Board {
             if((land.getDiceNo() == dice1 + dice2) && land != robbedLand){
                 for (Location location: land.getAdjacentLocations()) {
                     if (location.getOwnerIndex() != -1 )
-                        players.get(location.getOwnerIndex()).setResources(land.getType(), location.getType());
+                        players.get(location.getOwnerIndex()).generateResource(land.getType(), location.getType());
                 }
             }
         }

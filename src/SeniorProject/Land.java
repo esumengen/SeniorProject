@@ -2,6 +2,15 @@ package SeniorProject;
 
 import java.util.ArrayList;
 
+enum LandType {
+    FOREST, FIELDS, HILLS, DESERT, PASTURE, MOUNTAINS, SEA, NONE;
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+}
+
 class Land {
     private int index;
     private LandType type;
