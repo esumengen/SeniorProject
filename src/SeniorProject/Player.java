@@ -1,14 +1,11 @@
 package SeniorProject;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
-enum resourceType {
+enum ResourceType {
     BRICK , STONE, WHEAT, WOOD, WOOL
 }
-
 
 public class Player {
     private String name;
@@ -16,15 +13,15 @@ public class Player {
     private int AIType;
     private ArrayList<Structure> structures = new ArrayList<>();
     private int wheat, wood, stone, wool, brick = 0;
-    private Map<resourceType, Integer> resources;
+    private Map<ResourceType, Integer> resources;
 
     public Player (int index){
         this.index = index;
-        this.resources.put(resourceType.BRICK, this.brick);
-        this.resources.put(resourceType.STONE, this.stone);
-        this.resources.put(resourceType.WHEAT, this.wheat);
-        this.resources.put(resourceType.WOOD, this.wood);
-        this.resources.put(resourceType.WOOL, this.wool);
+        this.resources.put(ResourceType.BRICK, this.brick);
+        this.resources.put(ResourceType.STONE, this.stone);
+        this.resources.put(ResourceType.WHEAT, this.wheat);
+        this.resources.put(ResourceType.WOOD, this.wood);
+        this.resources.put(ResourceType.WOOL, this.wool);
 
     }
 
@@ -84,29 +81,18 @@ public class Player {
         this.brick = brick;
     }
 
-    public void generateResource(LandType landType, LocationType locationType) {
+    public void generateResource(ResourceType resourceType, LocationType locationType) {
         int multiplier = 1;
         if(locationType.equals(LocationType.CITY))
             multiplier = 2;
-        switch (landType) {
-            case FIELDS:
-                setWheat(this.wheat + multiplier);
-            case FOREST:
-                setWood(this.wood + multiplier);
-            case HILLS:
-                setBrick(this.brick + multiplier);
-            case MOUNTAINS:
-                setStone(this.stone + multiplier);
-            case PASTURE:
-                setWool(this.wool + multiplier);
-        }
+        resources.replace(resourceType, resources.get(resourceType) + multiplier);
     }
 
-    public Map<resourceType, Integer> getResources() {
+    public Map<ResourceType, Integer> getResources() {
         return resources;
     }
 
-    public void addResource(resourceType resourceType, Integer value) {
+    public void addResource(ResourceType resourceType, Integer value) {
         resources.replace(resourceType, resources.get(resourceType) + value);
     }
 }

@@ -5,7 +5,6 @@ import org.ini4j.Wini;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Random;
 
 class Board {
     private static final int PLAYER_COUNT = 4;
@@ -179,13 +178,13 @@ class Board {
         Global.addLog("ACTION: A City has been added on [Location " + location + "] by [Player " + player.getIndex() + "]");
     }
 
-    public void moveRobber(Player robber, Land land, Player robbed, resourceType randomType) {
+    public void moveRobber(Player robber, Land land, Player robbed, ResourceType randomType) {
         robbedLand = land;
         stealRandomResource(robber, robbed, randomType);
         Global.addLog("ACTION: The Robber has been moved to [Land " + land.getIndex() + "] by [Player " + robber.getIndex() + "]");
     }
 
-    private void stealRandomResource(Player robber, Player robbed, resourceType randomType) {
+    private void stealRandomResource(Player robber, Player robbed, ResourceType randomType) {
             robbed.addResource(randomType, robbed.getResources().get(randomType) - 1);
             robber.addResource(randomType, 1);
             Global.addLog("ACTION: Robbery Performed to  [Player " + robbed.getIndex() + "] by [Player " + robber.getIndex() + "]");
@@ -219,7 +218,7 @@ class Board {
             if((land.getDiceNo() == diceNo) && land != robbedLand){
                 for (Location location: land.getAdjacentLocations()) {
                     if (location.getOwnerIndex() != -1 )
-                        players.get(location.getOwnerIndex()).generateResource(land.getType(), location.getType());
+                        players.get(location.getOwnerIndex()).generateResource(land.getType().toResourceType(), location.getType());
                 }
             }
         }

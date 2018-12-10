@@ -3,11 +3,15 @@ package SeniorProject;
 import java.util.ArrayList;
 
 enum LandType {
-    FOREST, FIELDS, HILLS, DESERT, PASTURE, MOUNTAINS, SEA, NONE;
+    HILLS, MOUNTAINS, FIELDS, FOREST, PASTURE, DESERT, SEA, NONE;
 
     @Override
     public String toString() {
         return super.toString();
+    }
+
+    public ResourceType toResourceType() {
+        return  ResourceType.values()[ordinal()];
     }
 }
 
