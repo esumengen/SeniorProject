@@ -210,14 +210,20 @@ class Board {
     }
 
     public void rollDice(Player player, int dice1, int dice2) {
+        generateResource(dice1 + dice2);
+        Global.addLog("ACTION: Dice " + dice1 + " " + dice2 +"by [Player " + player.getIndex() + "]");
+    }
+
+    private void generateResource(int diceNo) {
         for (Land land: lands) {
-            if((land.getDiceNo() == dice1 + dice2) && land != robbedLand){
+            if((land.getDiceNo() == diceNo) && land != robbedLand){
                 for (Location location: land.getAdjacentLocations()) {
                     if (location.getOwnerIndex() != -1 )
                         players.get(location.getOwnerIndex()).generateResource(land.getType(), location.getType());
                 }
             }
         }
+        Global.addLog(" Resources Generated. ");
     }
 
     public void syncPlayer(Player player) {
