@@ -4,18 +4,21 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import org.ini4j.Wini;
+
 class Synchronizer {
-    private File actions_file;
+    private Wini env_ini;
     private Board board;
 
-    public Synchronizer(Board board){
+    public Synchronizer(Board board) {
         this.board = board;
-
-        this.actions_file = new File(Global.get_working_path(Global.ACTIONS_FILE));
-        sync(actions_file);
+        try {
+            env_ini = new Wini(new File(Global.get_working_path(Global.ENVIRONMENT_FILE)));
+        } catch (Exception e) {
+        }
     }
 
-    private void sync(File file){
+    public void sync(File file){
         String line;
 
         int playerIndex;
@@ -28,11 +31,12 @@ class Synchronizer {
             while (scanner.hasNext()) {
                 line = scanner.nextLine();
 
+
                 playerIndex = Integer.parseInt(Character.toString(line.charAt(1)));
                 actionType = String.copyValueOf(line.toCharArray(), 4, 2);
 
                 int value = 7;
-                while (value < line.length()-3) {
+                while (value < line.length() - 3) {
                     actionParam.add(Integer.parseInt(String.copyValueOf(line.toCharArray(), value, 2)));
                     value += 3;
                 }
@@ -71,8 +75,25 @@ class Synchronizer {
                 }
             }
 
+            env_ini.put("General", "isSynchronized[" + Global.MAINPLAYER +"]", "\"true\"");
+            env_ini.store();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isSynchronized() {
+        String isSynchronized_str = "";
+        try{
+            env_ini = new Wini(new File(Global.get_working_path(Global.ENVIRONMENT_FILE)));
+            isSynchronized_str = env_ini.get("General", "isSynchronized[" + Global.MAINPLAYER + "]", String.class);
+            isSynchronized_str = Global.getRidOf_quotationMarks(isSynchronized_str);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        return isSynchronized_str.equals("true");
     }
 }

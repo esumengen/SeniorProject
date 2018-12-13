@@ -19,6 +19,7 @@ class Global {
     static final String ENVIRONMENT_FILE = "environment.ini";
     static final String ACTIONS_FILE = "actions.txt";
     static final String LOG_FILE = "log.txt";
+    static int MAINPLAYER;
 
     static String get_working_path(String filename) {
         String file_path = Global.WORKING_PATH;
@@ -52,7 +53,7 @@ class Global {
             fileWriter = new FileWriter(Global.get_working_path(Global.LOG_FILE), true);
             bufferedWriter = new BufferedWriter(fileWriter);
 
-            bufferedWriter.write(info);
+            bufferedWriter.write("P[" + MAINPLAYER +"]" + info);
             bufferedWriter.newLine();
         } catch (IOException e) {
             e.printStackTrace();

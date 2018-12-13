@@ -83,7 +83,7 @@ class Board {
 
         load(lands);
 
-        System.out.println("\n" + this);
+    //    System.out.println("\n" + this);
     }
 
     private static int calculateLocationCount() {
@@ -130,14 +130,14 @@ class Board {
                 land.setType(LandType.valueOf(type_str.toUpperCase(Locale.ENGLISH)));
                 land.setDiceNo(diceNo);
 
-                if(land.getType() == LandType.DESERT) robbedLand = land;
+                if (land.getType() == LandType.DESERT) robbedLand = land;
             }
 
-            Global.addLog("[P"+Main.getMainPlayer()+"] SUCCESS: The game is loaded to the AI.");
+            Global.addLog(" SUCCESS: The game is loaded to the AI.");
         } catch (Exception e) {
             System.out.println(e.getMessage());
 
-            Global.addLog("[P"+Main.getMainPlayer()+"]ERROR: The game is not loaded to the AI.");
+            Global.addLog(" ERROR: The game is not loaded to the AI.");
         }
     }
 
@@ -152,7 +152,6 @@ class Board {
         location.setOwnerIndex(player.getIndex());
         location.setType(LocationType.SETTLEMENT);
         syncPlayer(player);
-
 
         Global.addLog("ACTION: A Settlement has been added on [Location " + location.getIndex() + "] by [Player " + player.getIndex() + "]");
     }
@@ -185,39 +184,39 @@ class Board {
     }
 
     private void stealRandomResource(Player robber, Player robbed, ResourceType randomType) {
-            robbed.addResource(randomType, robbed.getResources().get(randomType) - 1);
-            robber.addResource(randomType, 1);
-            Global.addLog("ACTION: Robbery Performed to  [Player " + robbed.getIndex() + "] by [Player " + robber.getIndex() + "]");
+        robbed.addResource(randomType, robbed.getResources().get(randomType) - 1);
+        robber.addResource(randomType, 1);
+        Global.addLog("ACTION: Robbery Performed to  [Player " + robbed.getIndex() + "] by [Player " + robber.getIndex() + "]");
     }
 
     public void tradeBank(int playerIndex, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB) {
-        if(((wheatB + woodB + woolB + stoneB + brickB)*4) == wheat + wood + wool + stone +brick){
+        if (((wheatB + woodB + woolB + stoneB + brickB) * 4) == wheat + wood + wool + stone + brick) {
             players.get(playerIndex).setWheat(players.get(playerIndex).getWheat() - wheat);
             players.get(playerIndex).setWood(players.get(playerIndex).getWood() - wood);
             players.get(playerIndex).setWool(players.get(playerIndex).getWool() - wool);
             players.get(playerIndex).setStone(players.get(playerIndex).getStone() - stone);
             players.get(playerIndex).setBrick(players.get(playerIndex).getBrick() - brick);
             Global.addLog("ACTION: A Trade with Bank has been done by [Player " + playerIndex + "]");
-        }else {
+        } else {
             Global.addLog("ACTION: A Trade with Bank has been failed by [Player " + playerIndex + "]");
         }
     }
 
-    public void tradePlayer(int playerIndex1, int playerIndex2, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB){
+    public void tradePlayer(int playerIndex1, int playerIndex2, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB) {
         Global.addLog("TODOACTION: A Trade with [Player " + playerIndex2 + " has been done by [Player " + playerIndex1 + "]");
         // TODO: 30-Nov-18
     }
 
     public void rollDice(Player player, int dice1, int dice2) {
         generateResource(dice1 + dice2);
-        Global.addLog("ACTION: Dice " + dice1 + " " + dice2 +"by [Player " + player.getIndex() + "]");
+        Global.addLog("ACTION: Dice " + dice1 + " " + dice2 + "by [Player " + player.getIndex() + "]");
     }
 
     private void generateResource(int diceNo) {
-        for (Land land: lands) {
-            if((land.getDiceNo() == diceNo) && land != robbedLand){
-                for (Location location: land.getAdjacentLocations()) {
-                    if (location.getOwnerIndex() != -1 )
+        for (Land land : lands) {
+            if ((land.getDiceNo() == diceNo) && land != robbedLand) {
+                for (Location location : land.getAdjacentLocations()) {
+                    if (location.getOwnerIndex() != -1)
                         players.get(location.getOwnerIndex()).generateResource(land.getType().toResourceType(), location.getType());
                 }
             }
