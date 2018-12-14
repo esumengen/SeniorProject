@@ -80,7 +80,10 @@ class Synchronizer {
                 actionParam.clear();
             }
 
-            env_ini.put("General", "isSynchronized[" + Global.MAINPLAYER +"]", "\"true\"");
+            env_ini.put("General", "isSynchronized[" + 0 +"]", "\"true\"");
+            env_ini.put("General", "isSynchronized[" + 1 +"]", "\"true\"");
+            env_ini.put("General", "isSynchronized[" + 2 +"]", "\"true\"");
+            env_ini.put("General", "isSynchronized[" + 3 +"]", "\"true\"");
             env_ini.store();
 
         } catch (Exception e) {
@@ -95,7 +98,11 @@ class Synchronizer {
             File envFile = new File(Global.get_working_path(Global.ENVIRONMENT_FILE));
             if(envFile.exists()){
                 env_ini = new Wini(envFile);
-                isSynchronized_str = env_ini.get("General", "isSynchronized[" + Global.MAINPLAYER + "]", String.class);
+                isSynchronized_str = env_ini.get("General", "isSynchronized[" + 0 + "]", String.class);
+                isSynchronized_str = env_ini.get("General", "isSynchronized[" + 1 + "]", String.class);
+                isSynchronized_str = env_ini.get("General", "isSynchronized[" + 2 + "]", String.class);
+                isSynchronized_str = env_ini.get("General", "isSynchronized[" + 3 + "]", String.class);
+
                 isSynchronized_str = Global.getRidOf_quotationMarks(isSynchronized_str);
             }
         }

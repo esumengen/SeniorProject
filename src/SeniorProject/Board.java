@@ -65,7 +65,6 @@ class Board {
                         else
                             result += 3;
                     }
-
                     topLocationIndexes.add(result);
                 }
 
@@ -133,11 +132,11 @@ class Board {
                 if (land.getType() == LandType.DESERT) robbedLand = land;
             }
 
-            Global.addLog(" SUCCESS: The game is loaded to the AI.");
+            Global.addLog("SUCCESS: The game is loaded to the AI.");
         } catch (Exception e) {
             System.out.println(e.getMessage());
 
-            Global.addLog(" ERROR: The game is not loaded to the AI.");
+            Global.addLog("ERROR: The game is not loaded to the AI.");
         }
     }
 
@@ -221,7 +220,7 @@ class Board {
                 }
             }
         }
-        Global.addLog(" Resources Generated. ");
+        Global.addLog("Resources Generated. ");
     }
 
     public void syncPlayer(Player player) {

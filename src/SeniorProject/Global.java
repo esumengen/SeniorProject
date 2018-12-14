@@ -53,7 +53,7 @@ class Global {
             fileWriter = new FileWriter(Global.get_working_path(Global.LOG_FILE), true);
             bufferedWriter = new BufferedWriter(fileWriter);
 
-            bufferedWriter.write("P[" + MAINPLAYER +"]" + info);
+            bufferedWriter.write(info);
             bufferedWriter.newLine();
         } catch (IOException e) {
             e.printStackTrace();

@@ -14,7 +14,7 @@ public class Message extends JFrame {
         panel = new JPanel();
         panel.setLayout(new FlowLayout());
 
-        label = new JLabel("P[" + Global.MAINPLAYER +"]" +s);
+        label = new JLabel(s);
 
         panel.add(label);
 

@@ -1,20 +1,19 @@
 package SeniorProject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 enum ResourceType {
     BRICK , STONE, WHEAT, WOOD, WOOL
 }
 
-public class Player {
+public class Player extends TimerTask{
     private String name;
     private int index;
     private int AIType;
     private ArrayList<Structure> structures = new ArrayList<>();
     private int wheat, wood, stone, wool, brick = 0;
     private Map<ResourceType, Integer> resources;
+    Timer timer;
 
     public Player (int index){
         this.index = index;
@@ -24,6 +23,13 @@ public class Player {
         resources.put(ResourceType.WHEAT, this.wheat);
         resources.put(ResourceType.WOOD, this.wood);
         resources.put(ResourceType.WOOL, this.wool);
+        timer = new Timer();
+        timer.schedule(this,0, 250);
+
+    }
+
+    @Override
+    public void run() {
 
     }
 

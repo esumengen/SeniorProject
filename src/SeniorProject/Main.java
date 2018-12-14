@@ -34,36 +34,35 @@ class Main {
             public void run() {
 
                 try {
-
                     if (!synchronizer.isSynchronized() && !synchronizer.isWorking) {
                         synchronizer.isWorking = true;
                         File actionFile = new File(Global.get_working_path(Global.ACTIONS_FILE));
-                        if(actionFile.exists()){
+                        if (actionFile.exists()) {
                             synchronizer.sync(actionFile);
                         }
+                    }
+                    ProcessBuilder processBuilder = new ProcessBuilder("tasklist.exe");
+                    Process process = processBuilder.start();
+                    String tasksList = Stream_toString(process.getInputStream());
 
-                        ProcessBuilder processBuilder = new ProcessBuilder("tasklist.exe");
-                        Process process = processBuilder.start();
-                        String tasksList = Stream_toString(process.getInputStream());
-
-                        if (!tasksList.contains("Catan.exe")) {
-                            System.exit(0);
-                        }
+                    if (!tasksList.contains("Catan.exe")) {
+                        System.exit(0);
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
                 try {
 
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         };
         timer.schedule(task, 0, 250);
-
     }
-    private static String Stream_toString (InputStream inputStream){
+
+    private static String Stream_toString(InputStream inputStream) {
         Scanner scanner = new Scanner(inputStream, "UTF-8").useDelimiter("\\A");
         String string = scanner.hasNext() ? scanner.next() : "";
         scanner.close();
