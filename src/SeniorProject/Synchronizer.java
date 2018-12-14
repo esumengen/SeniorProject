@@ -19,8 +19,9 @@ class Synchronizer {
         }
     }
 
-    public void sync(File file){
+    public void sync(File file) throws IOException {
         isWorking = true;
+
         String line;
 
         int playerIndex;
@@ -29,12 +30,13 @@ class Synchronizer {
         String objectType;
 
         try {
+
             Scanner scanner = new Scanner(file);
             while (scanner.hasNext()) {
                 line = scanner.nextLine();
 
 
-                playerIndex = Integer.parseInt(Character.toString(line.charAt(1)));
+                playerIndex = Integer.parseInt(Character.toString(line.charAt(1))) - 1;
                 actionType = String.copyValueOf(line.toCharArray(), 4, 2);
 
                 int value = 7;
@@ -55,7 +57,7 @@ class Synchronizer {
                         }
                         break;
                     case "UP":
-                        if(objectType.equals("S")) { // P1 [UP 10 10] S
+                        if(objectType.equals("S")) { // P1 [UP 10] S
                             board.upgradeSettlement(board.getPlayers().get(playerIndex), board.getLocations().get(actionParam.get(0)));
                         }
                         break;
@@ -82,22 +84,25 @@ class Synchronizer {
             env_ini.store();
 
         } catch (Exception e) {
-            e.printStackTrace();
         }
         isWorking = false;
     }
 
     public boolean isSynchronized() {
-        String isSynchronized_str = "";
+        String isSynchronized_str = "true";
+
         try{
-            env_ini = new Wini(new File(Global.get_working_path(Global.ENVIRONMENT_FILE)));
-            isSynchronized_str = env_ini.get("General", "isSynchronized[" + Global.MAINPLAYER + "]", String.class);
-            isSynchronized_str = Global.getRidOf_quotationMarks(isSynchronized_str);
+            File envFile = new File(Global.get_working_path(Global.ENVIRONMENT_FILE));
+            if(envFile.exists()){
+                env_ini = new Wini(envFile);
+                isSynchronized_str = env_ini.get("General", "isSynchronized[" + Global.MAINPLAYER + "]", String.class);
+                isSynchronized_str = Global.getRidOf_quotationMarks(isSynchronized_str);
+            }
         }
         catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
 
-        return isSynchronized_str.equals("true");
+        return !isSynchronized_str.equals("false");
     }
 }
