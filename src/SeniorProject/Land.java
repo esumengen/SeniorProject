@@ -20,11 +20,13 @@ class Land {
     private LandType type;
     private ArrayList<Location> adjacentLocations;
     private int diceNo;
+    private double pickProbability;
 
     public Land(int index){
         this.adjacentLocations = new ArrayList<>();
         this.index = index;
         this.type = LandType.NONE;
+        this.pickProbability = calculateProbability();
     }
 
     public Land(int index, LandType type){
@@ -55,5 +57,20 @@ class Land {
 
     public void setType(LandType type) {
         this.type = type;
+    }
+
+    private double calculateProbability(){
+        int numerator = 0;
+        for(int i = 1; i <= 6; i++) {
+            for(int j = 1; i <=6; j++) {
+                if(i + j == diceNo)
+                    numerator++;
+            }
+        }
+        return numerator / (6 * 6);
+    }
+
+    public double getPickProbability() {
+        return pickProbability;
     }
 }
