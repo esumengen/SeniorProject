@@ -10,8 +10,6 @@ class Main {
 
 
     public static void main(String[] args) {
-        String a = "working";
-        System.out.println(a == "false");
 
         try {
             Wini ini = new Wini(new File(Global.get_working_path(Global.ENVIRONMENT_FILE)));
