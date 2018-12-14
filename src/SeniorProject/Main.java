@@ -30,7 +30,7 @@ class Main {
 
                 try {
 
-                    if (!synchronizer.isSynchronized()) {
+                    if (!synchronizer.isSynchronized() && !synchronizer.isWorking) {
                         synchronizer.sync(new File(Global.get_working_path(Global.ACTIONS_FILE)));
                     }
 
@@ -47,7 +47,7 @@ class Main {
                 }
             }
         };
-        timer.schedule(task, 0, 250);
+        timer.schedule(task, 0, 100);
     /*private static String Stream_toString(InputStream inputStream) {
         Scanner scanner = new Scanner(inputStream, "UTF-8").useDelimiter("\\A");
         String string = scanner.hasNext() ? scanner.next() : "";

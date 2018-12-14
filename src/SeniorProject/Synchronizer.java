@@ -9,6 +9,7 @@ import org.ini4j.Wini;
 class Synchronizer {
     private Wini env_ini;
     private Board board;
+    public boolean isWorking = false;
 
     public Synchronizer(Board board) {
         this.board = board;
@@ -19,6 +20,7 @@ class Synchronizer {
     }
 
     public void sync(File file){
+        isWorking = true;
         String line;
 
         int playerIndex;
@@ -73,6 +75,7 @@ class Synchronizer {
                     case "RD":  //P0 [RD 06 03] X q
                         board.rollDice(board.getPlayers().get(playerIndex), actionParam.get(0), actionParam.get(1));
                 }
+                actionParam.clear();
             }
 
             env_ini.put("General", "isSynchronized[" + Global.MAINPLAYER +"]", "\"true\"");
@@ -81,6 +84,7 @@ class Synchronizer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        isWorking = false;
     }
 
     public boolean isSynchronized() {
