@@ -208,7 +208,7 @@ class Board {
 
     public void rollDice(Player player, int dice1, int dice2) {
         generateResource(dice1 + dice2);
-        Global.addLog("ACTION: Dice " + dice1 + " " + dice2 + "by [Player " + (player.getIndex() + 1) + "]");
+        Global.addLog("ACTION: Dice rolled " + dice1 + " " + dice2 + " by [Player " + (player.getIndex() + 1) + "]");
     }
 
     private void generateResource(int diceNo) {
@@ -242,13 +242,10 @@ class Board {
             for (int j = 0; j < j_max + 1; j++) {
                 string += lands.get(i).getAdjacentLocations().get(j).getIndex() + (j == j_max ? "" : ", ");
             }
-
             string += "}\n\n";
         }
-
         return string;
     }
-
 
     public static Land getRobbedLand() {
         return robbedLand;

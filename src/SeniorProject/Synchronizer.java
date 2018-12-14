@@ -35,7 +35,6 @@ class Synchronizer {
             while (scanner.hasNext()) {
                 line = scanner.nextLine();
 
-
                 playerIndex = Integer.parseInt(Character.toString(line.charAt(1))) - 1;
                 actionType = String.copyValueOf(line.toCharArray(), 4, 2);
 

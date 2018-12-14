@@ -20,7 +20,7 @@ class Main {
             Global.MAINPLAYER = Integer.parseInt(mainPlayer_str);
             new Message(mainPlayer_str);
         } catch (Exception e) {
-            System.out.println(e.getStackTrace());
+            e.printStackTrace();
         }
 
         Board board = new Board();

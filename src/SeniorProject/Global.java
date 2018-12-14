@@ -34,13 +34,6 @@ class Global {
         return file_path;
     }
 
-    static int fibonacci(int n) {
-        if(n == 0 || n == 1)
-            return 1;
-
-        return fibonacci(n - 1) + fibonacci(n - 2);
-    }
-
     static String getRidOf_quotationMarks(String string) {
         return String.copyValueOf(string.toCharArray(), 1, string.length() - 2);
     }
@@ -68,8 +61,6 @@ class Global {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            System.out.println("Added a new log.");
         }
     }
 }

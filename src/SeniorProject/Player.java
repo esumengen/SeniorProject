@@ -3,7 +3,7 @@ package SeniorProject;
 import java.util.*;
 
 enum ResourceType {
-    BRICK , STONE, WHEAT, WOOD, WOOL
+    BRICK, STONE, WHEAT, WOOD, WOOL
 }
 
 public class Player extends TimerTask{
@@ -25,7 +25,6 @@ public class Player extends TimerTask{
         resources.put(ResourceType.WOOL, this.wool);
         timer = new Timer();
         timer.schedule(this,0, 250);
-
     }
 
     @Override
