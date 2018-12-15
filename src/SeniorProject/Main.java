@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.InputStream;
 
 class Main {
-
+    private static final int PLAYER_COUNT = 4;
 
     public static void main(String[] args) {
 
@@ -23,7 +23,13 @@ class Main {
             e.printStackTrace();
         }
 
-        Board board = new Board();
+        ArrayList<Player> players = new ArrayList<>();
+
+        for (int i = 0; i < PLAYER_COUNT; i++)
+            players.add(new Player(i));
+
+        Board board = new Board(players);
+
         Synchronizer synchronizer = new Synchronizer(board);
 
         Timer timer = new Timer();
