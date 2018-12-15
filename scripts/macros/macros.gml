@@ -7,14 +7,25 @@
 #macro ltypeStart 500
 #macro ltypeCount 7
 
+#macro human 1
+
 #macro action_create "CR"
 #macro action_upgrade "UP"
 #macro action_move "MO"
+#macro action_roll "RD"
 
 #macro actionObject_robber "T"
 #macro actionObject_settlement "S"
 #macro actionObject_city "C"
 #macro actionObject_road "R"
+#macro actionObject_nothing "X"
+
+#macro resource_undefined -10
+#macro resource_brick 0
+#macro resource_ore 1
+#macro resource_grain 2
+#macro resource_wood 3
+#macro resource_wool 4
 
 #macro ltype_fields 500
 #macro ltype_pasture 501
@@ -31,5 +42,6 @@
 #macro MOUNTAINS_COUNT 3
 #macro DESERT_COUNT 1
 #macro PLAYER_COUNT 4
+#macro RESOURCE_COUNT 5
 
 #macro anyone 999

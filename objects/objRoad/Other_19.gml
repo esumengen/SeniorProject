@@ -1,10 +1,18 @@
 /// @desc Condition Check
 
-nearestLocation[0] = instance_nearest(x, y, objLocation)
-nearestLocation[1] = instance_nth_nearest(x, y, objLocation, 2)
+var sameExists = false
+with (objRoad) {
+	if (id != other.id) {
+		if (other.location[0] == location[0] and other.location[1] == location[1]
+		or other.location[0] == location[1] and other.location[1] == location[0]) {
+			sameExists = true
+			break
+		}
+	}
+}
 
-nearestLocation[0] = instance_nearest(x, y, objLocation)
-nearestLocation[1] = instance_nth_nearest(x, y, objLocation, 2)
-
-condition = structure_count(anyone, objSettlement, nearestLocation[0]) > 0 or structure_count(anyone, objSettlement, nearestLocation[1]) > 0
-or structure_count(anyone, objRoad, nearestLocation[0]) > 0 or structure_count(anyone, objRoad, nearestLocation[1]) > 0
+condition = (structure_count(playerIndex, objSettlement, location[0]) > 0 or structure_count(playerIndex, objSettlement, location[1]) > 0
+or structure_count(playerIndex, objRoad, location[0]) > 0 or structure_count(playerIndex, objRoad, location[1]) > 0)
+and location[0].active and location[1].active
+and location[0] != location[1]
+and !sameExists

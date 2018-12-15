@@ -1,0 +1,1 @@
+drawLocations = global.addStructure_mode

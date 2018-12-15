@@ -5,16 +5,6 @@
     "name": "objRoad",
     "eventList": [
         {
-            "id": "539ef613-c95f-4c3a-8817-f53ed410e7e9",
-            "modelName": "GMEvent",
-            "mvc": "1.0",
-            "IsDnD": false,
-            "collisionObjectId": "00000000-0000-0000-0000-000000000000",
-            "enumb": 56,
-            "eventtype": 6,
-            "m_owner": "ccbbbc40-0409-44b8-b047-46d03f322e6d"
-        },
-        {
             "id": "6cc3c6fb-754a-46e7-b04c-a5ad43b17fbc",
             "modelName": "GMEvent",
             "mvc": "1.0",
@@ -41,16 +31,6 @@
             "IsDnD": false,
             "collisionObjectId": "00000000-0000-0000-0000-000000000000",
             "enumb": 19,
-            "eventtype": 7,
-            "m_owner": "ccbbbc40-0409-44b8-b047-46d03f322e6d"
-        },
-        {
-            "id": "338c9f91-da68-4fc3-b3f0-9e85867aa589",
-            "modelName": "GMEvent",
-            "mvc": "1.0",
-            "IsDnD": false,
-            "collisionObjectId": "00000000-0000-0000-0000-000000000000",
-            "enumb": 18,
             "eventtype": 7,
             "m_owner": "ccbbbc40-0409-44b8-b047-46d03f322e6d"
         }

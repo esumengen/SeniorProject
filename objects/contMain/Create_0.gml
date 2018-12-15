@@ -1,23 +1,34 @@
-random_set_seed(45)
-
-draw_set_font(fontMain)
-
-global.player = 1
 global.player_active = 1
 
 global.initialPhase = true
+global.turn_ready = 1
+global.turn = 1
+
+global.isDiceRolled = false
+global.diceTotal = 0
 
 global.locations = ds_list_create()
 global.lands = ds_list_create()
 global.robberLand = pointer_null
+
+global.debugMode = false
+
+global.resources = ds_grid_create(PLAYER_COUNT+1, RESOURCE_COUNT)
+for (var i = 1; i <= PLAYER_COUNT; i++) {
+	ds_grid_add(global.resources, i, resource_brick, 0)
+	ds_grid_add(global.resources, i, resource_ore, 0)
+	ds_grid_add(global.resources, i, resource_grain, 0)
+	ds_grid_add(global.resources, i, resource_wood, 0)
+	ds_grid_add(global.resources, i, resource_wool, 0)
+}
 
 #region CREATE BOARD
 var landCount_vertical = 7
 var landCount_horizontal_max = 7
 var landCount_horizontal_min = landCount_horizontal_max-floor(landCount_vertical/2)
 
-var landWidth = 121+17
-var landHeight = 140+17
+var landWidth = sprite_get_width(sprLand)+14
+var landHeight = sprite_get_height(sprLand)+14
 
 var middle_x = room_width/2-floor(landCount_horizontal_min/2)*landWidth+(landCount_horizontal_min%2 == 0)*landWidth/2
 var middle_y = room_height/2-floor(landCount_vertical/2)*landHeight*3/4
@@ -32,6 +43,7 @@ for (var i = 0; i < landCount_vertical; i++) {
 		
 		land.type = choose(ltype_forest, ltype_mountains, ltype_pasture, ltype_fields, ltype_hills)
 		
+		// Type Initialization and Customization
 		if (i == floor(landCount_vertical/2) and j == floor(landCount_horizontal_max/2)) {
 			land.type = ltype_desert
 			global.robberLand = land
@@ -45,58 +57,28 @@ for (var i = 0; i < landCount_vertical; i++) {
 		
 		land.image_blend = get_land_color(land.type)
 		
+		// Set lands' positions
 		land.x = middle_x+j*landWidth-(landCount_horizontal-ceil(landCount_horizontal_max/2))*landWidth/2
 		land.y = middle_y+i*landHeight*3/4
 		
 		land.index = landIndex
-		landIndex++;
-		
-		//if (land.type != ltype_sea) {
-			for (var angle = 30; angle < 360; angle += 60) {
-				var xx = land.x+lengthdir_x(landHeight/2, angle)
-				var yy = land.y+lengthdir_y(landHeight/2, angle)
-			
-				if (!position_meeting(xx, yy, objLocation)) {
-					var location = instance_create_layer(xx, yy, "lyRoad", objLocation)
-					location.index = land.index+(angle-30)/60
-					ds_list_add(global.locations, location)
-				}
-			}
-		//}
-	}
-}
-
-var landIndex = 0
-for (var i = 0; i < landCount_vertical; i++) {
-	var landCount_horizontal = landCount_horizontal_max-abs(i-floor(landCount_vertical/2))
-	for (var j = 0; j < landCount_horizontal; j++) {
-		var land = ds_list_find_value(global.lands, landIndex)
-		
-		with (land) {
-			var upsideLoc = ds_list_find_value(adjacentLocations, 1)
-			upsideLoc.index = 2*landIndex+fib(i+1)
-			
-			var land
-			land = ds_list_find_value(adjacentLocations, 2)
-			land.index = upsideLoc.index-1
-			
-			land = ds_list_find_value(adjacentLocations, 0)
-			land.index = upsideLoc.index+1
-			
-			var downsideLoc = ds_list_find_value(adjacentLocations, 4)
-			downsideLoc.index = upsideLoc.index+2*landCount_horizontal+2-(landCount_horizontal == landCount_horizontal_max)
-			
-			land = ds_list_find_value(adjacentLocations, 3)
-			land.index = downsideLoc.index-1
-			
-			land = ds_list_find_value(adjacentLocations, 5)
-			land.index = downsideLoc.index+1
-		}
-		
 		landIndex++
+		
+		// Create locations
+		for (var angle = 30; angle < 360; angle += 60) {
+			var xx = land.x+lengthdir_x(landHeight/2, angle)
+			var yy = land.y+lengthdir_y(landHeight/2, angle)
+			
+			if (!position_meeting(xx, yy, objLocation)) {
+				var location = instance_create_layer(xx, yy, "lyRoad", objLocation)
+				location.index = -1
+				ds_list_add(global.locations, location)
+			}
+		}
 	}
 }
 
+// Binding locations with lands
 var ds_size = ds_list_size(global.lands)
 for (var i = 0; i < ds_size; i++) {
 	var land = ds_list_find_value(global.lands, i)
@@ -113,6 +95,62 @@ for (var i = 0; i < ds_size; i++) {
 			nearestLocation.active = true
 	}
 }
+#endregion
+
+#region SET LOCATIONS' INDEXES
+var upsideLocs = ds_list_create()
+ds_list_add(upsideLocs, 1)
+
+var landIndex = 0
+for (var i = 0; i < landCount_vertical; i++) {
+	var landCount_horizontal = landCount_horizontal_max-abs(i-floor(landCount_vertical/2))
+	for (var j = 0; j < landCount_horizontal; j++) {
+		var land = ds_list_find_value(global.lands, landIndex)
+		
+		with (land) {
+			var upsideLoc = ds_list_find_value(adjacentLocations, 1)
+			
+			if (landIndex == 0)
+				upsideLoc.index = ds_list_find_value(upsideLocs, 0)
+			else {
+				upsideLoc.index = ds_list_find_value(upsideLocs, landIndex-1)+2
+
+				if (j == 0) {
+					var theIndex = floor(landCount_vertical/2)+1
+					
+					if (i == theIndex)
+						upsideLoc.index += 2
+					else if (i < theIndex)
+						upsideLoc.index += 1
+					else 
+						upsideLoc.index += 3
+				}
+				
+				ds_list_add(upsideLocs, upsideLoc.index)
+			}
+			
+			var location
+			location = ds_list_find_value(adjacentLocations, 2)
+			location.index = upsideLoc.index-1
+			
+			location = ds_list_find_value(adjacentLocations, 0)
+			location.index = upsideLoc.index+1
+			
+			var downsideLoc = ds_list_find_value(adjacentLocations, 4)
+			downsideLoc.index = upsideLoc.index+2*landCount_horizontal+2-(landCount_horizontal == landCount_horizontal_max)
+			
+			location = ds_list_find_value(adjacentLocations, 3)
+			location.index = downsideLoc.index-1
+			
+			location = ds_list_find_value(adjacentLocations, 5)
+			location.index = downsideLoc.index+1
+		}
+		
+		landIndex++
+	}
+}
+
+ds_list_destroy(upsideLocs)
 #endregion
 
 #region SET LAND TYPES
@@ -171,22 +209,35 @@ ini_open("environment.ini")
 ini_close()
 #endregion
 
+#region INIT FILES
+file_delete("environment.ini")
 ini_open("environment.ini")
-	ini_write_string("General", "isSynchronized", "true")
+		ini_write_string("General", "isSynchronized", "true")
 ini_close()
 
-setPlayer = 1
-alarm[2] = 1
+file_delete("actions.txt")
+var fileActions = file_text_open_write("actions.txt")
+	file_text_write_string(fileActions, "")
+file_text_close(fileActions)
+#endregion
 
+// Move Variables
 global.robberAddition_mode = false
 
 global.addStructure_mode = false
 global.addStructure_object = pointer_null
 
+// Period Loop
 period = 0
-alarm[0] = 5
+periodUp = true
+
+// AI Loop
+alarm[11] = 0.5*sec
+
+randomize()
+draw_set_font(fontMain)
 
 #region START Game
 global.addStructure_mode = true
-global.addStructure_object = actionObject_settlement
+global.addStructure_object = objSettlement
 #endregion
