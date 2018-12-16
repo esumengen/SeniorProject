@@ -7,27 +7,19 @@ import java.io.File;
 import java.io.InputStream;
 
 class Main {
-    private static final int PLAYER_COUNT = 4;
-
     public static void main(String[] args) {
+        // Create players
+        ArrayList<Player> players = new ArrayList<>();
+        for (int i = 0; i < Global.PLAYER_COUNT; i++) {
+            Player player = new Player(i);
 
-        try {
-            Wini ini = new Wini(new File(Global.get_working_path(Global.ENVIRONMENT_FILE)));
+            if (i == 0) player.setType(PlayerType.HUMAN);
+            else player.setType(PlayerType.AI);
 
-            String mainPlayer_str = ini.get("General", "MainPlayer", String.class);
-            mainPlayer_str = Global.getRidOf_quotationMarks(mainPlayer_str);
-
-            Global.MAINPLAYER = Integer.parseInt(mainPlayer_str);
-            new Message(mainPlayer_str);
-        } catch (Exception e) {
-            e.printStackTrace();
+            players.add(player);
         }
 
-        ArrayList<Player> players = new ArrayList<>();
-
-        for (int i = 0; i < PLAYER_COUNT; i++)
-            players.add(new Player(i));
-
+        // Create the board and add the players
         Board board = new Board(players);
 
         Synchronizer synchronizer = new Synchronizer(board);
@@ -36,37 +28,53 @@ class Main {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-
                 try {
-                    if (!synchronizer.isSynchronized() && !synchronizer.isWorking) {
-                        synchronizer.isWorking = true;
-                        File actionFile = new File(Global.get_working_path(Global.ACTIONS_FILE));
-                        if (actionFile.exists()) {
-                            synchronizer.sync(actionFile);
+                    if (!synchronizer.isSynchronized() && synchronizer.getState() == Synchronizer.State.WAITING) {
+                        File actionsFile = new File(Global.get_working_path(Global.ACTIONS_FILE));
+
+                        if (actionsFile.exists())
+                            synchronizer.sync(actionsFile);
+                    }
+
+                    File communication_file = new File(Global.get_working_path(Global.COMMUNICATION_FILE));
+                    if (communication_file.exists()) {
+                        Wini communication_ini = new Wini(communication_file);
+
+                        for (Player player : players) {
+                            if (player.getType() != PlayerType.HUMAN) {
+                                String turnMode = communication_ini.get("General", "turnMode[" + player.getIndex() + "]", String.class);
+                                turnMode = Global.getRidOf_quotationMarks(turnMode);
+
+                                if (turnMode.equals("waiting")) {
+                                    player.writeMove(false);
+
+                                    communication_ini.put("General", "turnMode[" + player.getIndex() + "]", "\"done\"");
+                                    communication_ini.store();
+                                    break;
+                                }
+                            }
                         }
                     }
+
+                    ///region Automatic Termination
                     ProcessBuilder processBuilder = new ProcessBuilder("tasklist.exe");
                     Process process = processBuilder.start();
-                    String tasksList = Stream_toString(process.getInputStream());
+                    String tasksList = stream_toString(process.getInputStream());
 
                     if (!tasksList.contains("Catan.exe")) {
                         System.exit(0);
                     }
+                    ///endregion
                 } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                try {
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    new Message(e.getMessage());
                 }
             }
         };
-        timer.schedule(task, 0, 250);
+
+        timer.schedule(task, 0, 333);
     }
 
-    private static String Stream_toString(InputStream inputStream) {
+    private static String stream_toString(InputStream inputStream) {
         Scanner scanner = new Scanner(inputStream, "UTF-8").useDelimiter("\\A");
         String string = scanner.hasNext() ? scanner.next() : "";
         scanner.close();

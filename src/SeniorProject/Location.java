@@ -2,63 +2,61 @@ package SeniorProject;
 
 import java.util.ArrayList;
 
-enum LocationType {
-    SETTLEMENT, CITY, EMPTY;
-}
-
 class Location {
     private int index;
     private ArrayList<Land> adjacentLands;
     private ArrayList<Road> connectedRoads;
     private ArrayList<Location> connectedLocations;
     private ArrayList<Structure> structures;
-    private int ownerIndex;
-    private LocationType type;
+    private Player owner;
 
-    public Location(int index) {
+    Location(int index) {
         this.adjacentLands = new ArrayList<>();
         this.connectedRoads = new ArrayList<>();
         this.connectedLocations = new ArrayList<>();
         this.structures = new ArrayList<>();
         this.index = index;
-        this.ownerIndex = -1;
-        this.type = LocationType.EMPTY;
 
     }
 
-    public int getIndex() {
+    int getIndex() {
         return index;
     }
 
-    public ArrayList<Land> getAdjacentLands() {
+    ArrayList<Land> getAdjacentLands() {
         return adjacentLands;
     }
 
-    public ArrayList<Location> getConnectedLocations() {
+    ArrayList<Location> getConnectedLocations() {
         return connectedLocations;
     }
 
-    public ArrayList<Structure> getStructures() {
+    ArrayList<Structure> getStructures() {
         return structures;
     }
 
-    public ArrayList<Road> getConnectedRoads() {
+    ArrayList<Road> getConnectedRoads() {
         return connectedRoads;
     }
 
-    public void setOwnerIndex(int ownerIndex) {
-        this.ownerIndex = ownerIndex;
+    void setOwner(Player owner) {
+        this.owner = owner;
     }
 
-    public int getOwnerIndex() {
-        return ownerIndex;
+    Player getOwner() {
+        return owner;
     }
 
-    public void setType(LocationType type) {
-        this.type = type;
+    boolean hasOwner () {
+        return owner != null;
     }
 
-    public LocationType getType() {
-        return type;
+    boolean hasCity () {
+        for (Structure structure:structures) {
+            if (structure instanceof City)
+                return true;
+        }
+
+        return false;
     }
 }

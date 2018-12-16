@@ -10,14 +10,14 @@ class Board {
     private static final int landCount_horizontal_max = 7;
     private static final int landCount_vertical = 7;
     private static final int landCount_horizontal_min = landCount_horizontal_max - (int) Math.floor(landCount_vertical / 2);
-    private static ArrayList<Land> lands = new ArrayList<>();
-    private static ArrayList<Location> locations = new ArrayList<>();
-    private static ArrayList<Structure> structures = new ArrayList<>();
-    private static ArrayList<Player> players = new ArrayList<>();
-    private static int locationCount = calculateLocationCount();
-    private static Land robbedLand;
+    private ArrayList<Land> lands = new ArrayList<>();
+    private ArrayList<Location> locations = new ArrayList<>();
+    private ArrayList<Structure> structures = new ArrayList<>();
+    private ArrayList<Player> players = new ArrayList<>();
+    private int locationCount = calculateLocationCount();
+    private Land robbedLand;
 
-    public Board(ArrayList<Player> players) {
+    Board(ArrayList<Player> players) {
         this.players = players;
 
         //region Initialization of Lands&Locations
@@ -116,55 +116,60 @@ class Board {
         location.getAdjacentLands().add(land);
     }
 
-    public void createSettlement(Player player, Location location) {
+    void createSettlement(Player player, Location location) {
         Settlement settlement = new Settlement(location, player);
         structures.add(settlement);
-        location.setOwnerIndex(player.getIndex());
-        location.setType(LocationType.SETTLEMENT);
-        syncPlayer(player);
+
+        location.setOwner(player);
 
         Global.addLog("ACTION: A settlement has been added on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
-    }
 
-    public void createRoad(Player player, Location location1, Location location2) {
-        Road road = new Road(location1, location2, player);
-        structures.add(road);
         syncPlayer(player);
-
-        Global.addLog("ACTION: A road has been added between [Location " + location1.getIndex() + " and Location " + location2.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
     }
 
-    public void upgradeSettlement(Player player, Location location) {
-        for (Structure structure : structures) {
+    void createRoad(Player player, Location location_first, Location location_second) {
+        Road road = new Road(location_first, location_second, player);
+        structures.add(road);
+
+        Global.addLog("ACTION: A road has been added between [Location " + location_first.getIndex() + " and Location " + location_second.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
+
+        syncPlayer(player);
+    }
+
+    void upgradeSettlement(Player player, Location location) {
+        for (Structure structure : location.getStructures()) {
             if (structure instanceof Settlement) {
                 City city = new City(location, structure.getPlayer());
                 structures.set(structures.indexOf(structure), city);
+                break;
             }
         }
-        location.setType(LocationType.CITY);
-        syncPlayer(player);
 
         Global.addLog("ACTION: A settlement has been upgraded on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
+
+        syncPlayer(player);
     }
 
-    public void moveRobber(Player robber, Land land, Player robbed, ResourceType randomType) {
+    void moveRobber(Player robber, Land land, Player victim, ResourceType resourceType) {
         robbedLand = land;
-        stealRandomResource(robber, robbed, randomType);
+        stealRandomResource(robber, victim, resourceType);
+
         Global.addLog("ACTION: The robber has been moved to [Land " + land.getIndex() + "] by [Player " + (robber.getIndex() + 1) + "]");
     }
 
     private void stealRandomResource(Player robber, Player robbed, ResourceType randomType) {
         robbed.addResource(randomType, robbed.getResources().get(randomType) - 1);
         robber.addResource(randomType, 1);
+
         Global.addLog("ACTION: [Player " + (robbed.getIndex() + 1) + "] is robbed by [Player " + (robber.getIndex() + 1) + "]");
     }
 
-    public void tradeBank(int playerIndex, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB) {
+    void tradeBank(int playerIndex, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB) {
         if (((wheatB + woodB + woolB + stoneB + brickB) * 4) == wheat + wood + wool + stone + brick) {
-            players.get(playerIndex).setWheat(players.get(playerIndex).getWheat() - wheat);
-            players.get(playerIndex).setWood(players.get(playerIndex).getWood() - wood);
+            players.get(playerIndex).setGrain(players.get(playerIndex).getGrain() - wheat);
+            players.get(playerIndex).setLumber(players.get(playerIndex).getLumber() - wood);
             players.get(playerIndex).setWool(players.get(playerIndex).getWool() - wool);
-            players.get(playerIndex).setStone(players.get(playerIndex).getStone() - stone);
+            players.get(playerIndex).setOre(players.get(playerIndex).getOre() - stone);
             players.get(playerIndex).setBrick(players.get(playerIndex).getBrick() - brick);
             Global.addLog("ACTION: A trade with bank has been done by [Player " + playerIndex + "]");
         } else {
@@ -172,31 +177,37 @@ class Board {
         }
     }
 
-    public void tradePlayer(int playerIndex1, int playerIndex2, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB) {
+    void tradePlayer(int playerIndex1, int playerIndex2, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB) {
         Global.addLog("TODOACTION: A trade with [Player " + playerIndex2 + 1 + " has been done by [Player " + (playerIndex1 + 1) + "]");
         // TODO: 30-Nov-18
     }
 
-    public void rollDice(Player player, int dice1, int dice2) {
+    void rollDice(Player player, int dice1, int dice2) {
         generateResource(dice1 + dice2);
         Global.addLog("ACTION: Dice are rolled " + dice1 + " " + dice2 + " by [Player " + (player.getIndex() + 1) + "]");
     }
 
     private void generateResource(int diceNo) {
         for (Land land : lands) {
-            if ((land.getDiceNo() == diceNo) && land != robbedLand) {
+            if (land.getDiceNo() == diceNo && land != robbedLand) {
                 for (Location location : land.getAdjacentLocations()) {
-                    if (location.getOwnerIndex() != -1)
-                        players.get(location.getOwnerIndex()).generateResource(land.getType().toResourceType(), location.getType());
+                    if (location.hasOwner()) {
+                        Player rewardedPlayer = location.getOwner();
+
+                        rewardedPlayer.addResource(land.getResourceType(), location.hasCity() ? 2 : 0);
+                    }
                 }
             }
         }
         Global.addLog("New resources are generated.");
     }
 
-    public void syncPlayer(Player player) {
+    void syncPlayer(Player player) {
+        player.getStructures().clear();
+
+        // Structure assignment
         for (Structure structure : structures) {
-            if (player == structure.getPlayer() && !player.getStructures().contains(structure)) {
+            if (player == structure.getPlayer()) {
                 player.getStructures().add(structure);
             }
         }
@@ -211,19 +222,19 @@ class Board {
         return sum;
     }
 
-    public static ArrayList<Land> getLands() {
+    ArrayList<Land> getLands() {
         return lands;
     }
 
-    public static ArrayList<Location> getLocations() {
+    ArrayList<Location> getLocations() {
         return locations;
     }
 
-    public static ArrayList<Player> getPlayers() {
+    ArrayList<Player> getPlayers() {
         return players;
     }
 
-    public static ArrayList<Structure> getStructures() {
+    ArrayList<Structure> getStructures() {
         return structures;
     }
 
@@ -243,7 +254,7 @@ class Board {
         return string;
     }
 
-    public static Land getRobbedLand() {
+    public Land getRobbedLand() {
         return robbedLand;
     }
 }

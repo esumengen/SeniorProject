@@ -1,9 +1,10 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="SeniorProject:jar">
-    <output-path>$USER_HOME$/OneDrive/Masaüstü/Catan</output-path>
+    <output-path>$PROJECT_DIR$/out/artifacts/SeniorProject_jar</output-path>
     <root id="archive" name="CatanAI.jar">
       <element id="module-output" name="SeniorProject" />
       <element id="extracted-dir" path="$PROJECT_DIR$/ini4j-0.5.1.jar" path-in-jar="/" />
+      <element id="library" level="project" name="ini4j-0.5.1" />
     </root>
   </artifact>
 </component>

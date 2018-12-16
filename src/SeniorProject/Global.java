@@ -14,12 +14,14 @@ enum OSType {
 }
 
 class Global {
+    static final int PLAYER_COUNT = 4;
+
     static final OSType OS_TYPE = System.getProperty("os.name").toLowerCase().contains("windows") ? OSType.WINDOWS : OSType.MAC;
     static final String WORKING_PATH = OS_TYPE == OSType.WINDOWS ? System.getProperty("user.home") + "\\AppData\\Local\\Catan" : "/Users/emresumengen/Desktop/deneme";
     static final String ENVIRONMENT_FILE = "environment.ini";
     static final String ACTIONS_FILE = "actions.txt";
     static final String LOG_FILE = "log.txt";
-    static int MAINPLAYER;
+    static final String COMMUNICATION_FILE = "communication.ini";
 
     static String get_working_path(String filename) {
         String file_path = Global.WORKING_PATH;
@@ -38,15 +40,19 @@ class Global {
         return String.copyValueOf(string.toCharArray(), 1, string.length() - 2);
     }
 
-    static void addLog(String info) {
+    static void addLog(String text) {
+        createTextFile(LOG_FILE, text);
+    }
+
+    static void createTextFile (String filename, String text) {
         BufferedWriter bufferedWriter = null;
         FileWriter fileWriter = null;
 
         try {
-            fileWriter = new FileWriter(Global.get_working_path(Global.LOG_FILE), true);
+            fileWriter = new FileWriter(Global.get_working_path(filename), true);
             bufferedWriter = new BufferedWriter(fileWriter);
 
-            bufferedWriter.write(info);
+            bufferedWriter.write(text);
             bufferedWriter.newLine();
         } catch (IOException e) {
             e.printStackTrace();
@@ -59,7 +65,7 @@ class Global {
                     fileWriter.close();
 
             } catch (IOException e) {
-                e.printStackTrace();
+                new Message(e.getMessage()+" - createTextFile");
             }
         }
     }

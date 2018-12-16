@@ -3,105 +3,108 @@ package SeniorProject;
 import java.util.*;
 
 enum ResourceType {
-    BRICK, STONE, WHEAT, WOOD, WOOL
+    BRICK, ORE, GRAIN, LUMBER, WOOL
 }
 
-public class Player extends TimerTask{
+enum PlayerType {
+    AI, HUMAN
+}
+
+public class Player {
     private String name;
     private int index;
-    private int AIType;
+    private PlayerType type;
     private ArrayList<Structure> structures = new ArrayList<>();
-    private int wheat, wood, stone, wool, brick = 0;
+    private int grain, lumber, ore, wool, brick = 0;
     private Map<ResourceType, Integer> resources;
     Timer timer;
 
-    public Player (int index){
+    Player (int index){
         this.index = index;
+        this.type = PlayerType.AI;
+
         resources = new HashMap<>();
         resources.put(ResourceType.BRICK, this.brick);
-        resources.put(ResourceType.STONE, this.stone);
-        resources.put(ResourceType.WHEAT, this.wheat);
-        resources.put(ResourceType.WOOD, this.wood);
+        resources.put(ResourceType.ORE, this.ore);
+        resources.put(ResourceType.GRAIN, this.grain);
+        resources.put(ResourceType.LUMBER, this.lumber);
         resources.put(ResourceType.WOOL, this.wool);
-        timer = new Timer();
-        timer.schedule(this,0, 250);
     }
 
-    @Override
-    public void run() {
-
-    }
-
-    public int getIndex() {
+    int getIndex() {
         return index;
     }
 
-    public String getName() {
+    void writeMove (boolean isInitial) {
+        /* TODO */
+
+        String actionList_str = "action text here";
+
+        String fileName = "actions_temp"+index+".txt";
+        Global.createTextFile(fileName, actionList_str);
+    }
+
+    String getName() {
         return name;
     }
 
-    public int getAIType() {
-        return AIType;
+    PlayerType getType() {
+        return type;
     }
 
-    public ArrayList<Structure> getStructures() {
+    void setType(PlayerType type) {
+        this.type = type;
+    }
+
+    ArrayList<Structure> getStructures() {
         return structures;
     }
 
-    public int getWheat() {
-        return wheat;
+    int getGrain() {
+        return grain;
     }
 
-    public void setWheat(int wheat) {
-        this.wheat = wheat;
+    void setGrain(int grain) {
+        this.grain = grain;
     }
 
-    public int getWood() {
-        return wood;
+    int getLumber() {
+        return lumber;
     }
 
-    public void setWood(int wood) {
-        this.wood = wood;
+    void setLumber(int lumber) {
+        this.lumber = lumber;
     }
 
-    public int getStone() {
-        return stone;
+    int getOre() {
+        return ore;
     }
 
-    public void setStone(int stone) {
-        this.stone = stone;
+    void setOre(int ore) {
+        this.ore = ore;
     }
 
-    public int getWool() {
+    int getWool() {
         return wool;
     }
 
-    public void setWool(int wool) {
+    void setWool(int wool) {
         this.wool = wool;
     }
 
-    public int getBrick() {
+    int getBrick() {
         return brick;
     }
 
-    public void setBrick(int brick) {
+    void setBrick(int brick) {
         this.brick = brick;
     }
 
-    public void generateResource(ResourceType resourceType, LocationType locationType) {
-        int multiplier = 1;
-        if(locationType.equals(LocationType.CITY))
-            multiplier = 2;
-        addResource(resourceType, resources.get(resourceType) + multiplier);
-    }
-
-    public Map<ResourceType, Integer> getResources() {
+    Map<ResourceType, Integer> getResources() {
         return resources;
     }
 
-    public void addResource(ResourceType resourceType, Integer value) {
+    void addResource(ResourceType resourceType, Integer value) {
         resources.replace(resourceType, resources.get(resourceType) + value);
     }
 }
-
-

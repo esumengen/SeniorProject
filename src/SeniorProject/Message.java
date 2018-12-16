@@ -3,13 +3,11 @@ package SeniorProject;
 import javax.swing.*;
 import java.awt.*;
 
-public class Message extends JFrame {
-
+class Message extends JFrame {
     private JPanel panel;
     private JLabel label;
 
-    public Message (String s) {
-
+    Message(String s) {
         super("");
         panel = new JPanel();
         panel.setLayout(new FlowLayout());

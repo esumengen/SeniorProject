@@ -11,7 +11,7 @@ enum LandType {
     }
 
     public ResourceType toResourceType() {
-        return  ResourceType.values()[ordinal()];
+        return ResourceType.values()[ordinal()];
     }
 }
 
@@ -22,54 +22,58 @@ class Land {
     private int diceNo;
     private double diceChance = 0;
 
-    public Land(int index){
+    Land(int index) {
         this.adjacentLocations = new ArrayList<>();
         this.index = index;
         this.type = LandType.NONE;
     }
 
-    public Land(int index, LandType type){
+    Land(int index, LandType type) {
         this.adjacentLocations = new ArrayList<>();
         this.index = index;
         this.type = type;
     }
 
-    public ArrayList<Location> getAdjacentLocations() {
+    ArrayList<Location> getAdjacentLocations() {
         return adjacentLocations;
     }
 
-    public int getDiceNo() {
+    int getDiceNo() {
         return diceNo;
     }
 
-    public LandType getType() {
-        return type;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setDiceNo(int diceNo) {
+    void setDiceNo(int diceNo) {
         this.diceNo = diceNo;
         diceChance = calculateDiceChance();
     }
 
-    private double calculateDiceChance(){
+    LandType getType() {
+        return type;
+    }
+
+    ResourceType getResourceType () {
+        return type.toResourceType();
+    }
+
+    void setType(LandType type) {
+        this.type = type;
+    }
+
+    int getIndex() {
+        return index;
+    }
+
+    private double calculateDiceChance() {
         int numerator = 0;
-        for(int i = 1; i <= 6; i++) {
-            for(int j = 1; j <= 6; j++) {
-                if(i + j == diceNo) numerator ++;
+        for (int i = 1; i <= 6; i++) {
+            for (int j = 1; j <= 6; j++) {
+                if (i + j == diceNo) numerator++;
             }
         }
-        return numerator / (6 * 6);
+        return numerator / 36;
     }
 
     public double getDiceChance() {
         return diceChance;
-    }
-
-    public void setType(LandType type) {
-        this.type = type;
     }
 }
