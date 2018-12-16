@@ -1,14 +1,14 @@
 package SeniorProject;
 
 
-public abstract class Structure {
+abstract class Structure {
     private Player player;
 
-    public Structure(Player player){
+    Structure(Player player){
         this.player = player;
     }
 
-    public Player getPlayer() {
+    Player getPlayer() {
         return player;
     }
 }

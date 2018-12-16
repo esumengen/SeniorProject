@@ -13,7 +13,7 @@ class Board {
     private ArrayList<Land> lands = new ArrayList<>();
     private ArrayList<Location> locations = new ArrayList<>();
     private ArrayList<Structure> structures = new ArrayList<>();
-    private ArrayList<Player> players = new ArrayList<>();
+    private ArrayList<Player> players;
     private int locationCount = calculateLocationCount();
     private Land robbedLand;
 
@@ -240,18 +240,18 @@ class Board {
 
     @Override
     public String toString() {
-        String string = "";
+        StringBuilder string = new StringBuilder();
 
         for (int i = 0; i < lands.size(); i++) {
-            string += "[LAND " + lands.get(i).getIndex() + "]  \nType: " + lands.get(i).getType().toString() + "\nLocations: {";
+            string.append("[LAND ").append(lands.get(i).getIndex()).append("]  \nType: ").append(lands.get(i).getType().toString()).append("\nLocations: {");
 
             int j_max = lands.get(i).getAdjacentLocations().size() - 1;
             for (int j = 0; j < j_max + 1; j++) {
-                string += lands.get(i).getAdjacentLocations().get(j).getIndex() + (j == j_max ? "" : ", ");
+                string.append(lands.get(i).getAdjacentLocations().get(j).getIndex()).append(j == j_max ? "" : ", ");
             }
-            string += "}\n\n";
+            string.append("}\n\n");
         }
-        return string;
+        return string.toString();
     }
 
     public Land getRobbedLand() {

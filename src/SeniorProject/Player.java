@@ -17,7 +17,6 @@ public class Player {
     private ArrayList<Structure> structures = new ArrayList<>();
     private int grain, lumber, ore, wool, brick = 0;
     private Map<ResourceType, Integer> resources;
-    Timer timer;
 
     Player (int index){
         this.index = index;

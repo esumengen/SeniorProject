@@ -6,12 +6,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+enum SynchronizerState {
+    RUNNING, WAITING
+}
+
 class Synchronizer {
-    private State state;
+    private SynchronizerState state;
     private Wini communication_ini;
     private Board board;
+
     Synchronizer(Board board) {
-        this.state = State.WAITING;
+        this.state = SynchronizerState.WAITING;
         this.board = board;
 
         try {
@@ -22,7 +27,7 @@ class Synchronizer {
     }
 
     void sync(File file) {
-        setState(State.RUNNING);
+        setState(SynchronizerState.RUNNING);
 
         String line;
 
@@ -86,7 +91,7 @@ class Synchronizer {
             new Message(e.getMessage());
         }
 
-        setState(State.WAITING);
+        setState(SynchronizerState.WAITING);
     }
 
     boolean isSynchronized() {
@@ -107,15 +112,12 @@ class Synchronizer {
         return !isSynchronized_str.equals("false");
     }
 
-    State getState() {
+    SynchronizerState getState() {
         return state;
     }
 
-    void setState(State state) {
+    void setState(SynchronizerState state) {
         this.state = state;
     }
 
-    enum State {
-        RUNNING, WAITING
-    }
 }

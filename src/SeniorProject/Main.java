@@ -8,18 +8,8 @@ import java.io.InputStream;
 
 class Main {
     public static void main(String[] args) {
-        // Create players
-        ArrayList<Player> players = new ArrayList<>();
-        for (int i = 0; i < Global.PLAYER_COUNT; i++) {
-            Player player = new Player(i);
+        ArrayList<Player> players = createPlayers();
 
-            if (i == 0) player.setType(PlayerType.HUMAN);
-            else player.setType(PlayerType.AI);
-
-            players.add(player);
-        }
-
-        // Create the board and add the players
         Board board = new Board(players);
 
         Synchronizer synchronizer = new Synchronizer(board);
@@ -29,7 +19,7 @@ class Main {
             @Override
             public void run() {
                 try {
-                    if (!synchronizer.isSynchronized() && synchronizer.getState() == Synchronizer.State.WAITING) {
+                    if (!synchronizer.isSynchronized() && synchronizer.getState() == SynchronizerState.WAITING) {
                         File actionsFile = new File(Global.get_working_path(Global.ACTIONS_FILE));
 
                         if (actionsFile.exists())
@@ -72,6 +62,19 @@ class Main {
         };
 
         timer.schedule(task, 0, 333);
+    }
+
+    private static ArrayList<Player> createPlayers() {
+        ArrayList<Player> players = new ArrayList<>();
+        for (int i = 0; i < Global.PLAYER_COUNT; i++) {
+            Player player = new Player(i);
+
+            if (i == 0) player.setType(PlayerType.HUMAN);
+            else player.setType(PlayerType.AI);
+
+            players.add(player);
+        }
+        return players;
     }
 
     private static String stream_toString(InputStream inputStream) {
