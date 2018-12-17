@@ -2,7 +2,7 @@ package SeniorProject;
 
 import java.util.ArrayList;
 
-class Location {
+public class Location {
     private int index;
     private ArrayList<Land> adjacentLands;
     private ArrayList<Road> connectedRoads;
@@ -10,7 +10,7 @@ class Location {
     private ArrayList<Structure> structures;
     private Player owner;
 
-    Location(int index) {
+    public Location(int index) {
         this.adjacentLands = new ArrayList<>();
         this.connectedRoads = new ArrayList<>();
         this.connectedLocations = new ArrayList<>();

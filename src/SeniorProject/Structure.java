@@ -1,7 +1,7 @@
 package SeniorProject;
 
 
-abstract class Structure {
+public abstract class Structure {
     private Player player;
 
     Structure(Player player){

@@ -3,7 +3,7 @@ package SeniorProject;
 public class Road extends Structure {
     private Location[] locations;
 
-    Road(Location startLocation, Location endLocation, Player player){
+    public Road(Location startLocation, Location endLocation, Player player){
         super(player);
 
         this.locations = new Location[2];

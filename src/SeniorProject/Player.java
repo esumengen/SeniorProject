@@ -18,7 +18,7 @@ public class Player {
     private int grain, lumber, ore, wool, brick = 0;
     private Map<ResourceType, Integer> resources;
 
-    Player (int index){
+    public Player (int index){
         this.index = index;
         this.type = PlayerType.AI;
 
