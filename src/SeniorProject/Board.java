@@ -66,19 +66,38 @@ class Board {
                     topLocationIndexes.add(result);
                 }
 
+                makeAdjacents(locations.get(result - 1), locations.get(result));
+                makeAdjacents(locations.get(result + 1), locations.get(result));
                 bind(land, locations.get(result - 1));
                 bind(land, locations.get(result));
                 bind(land, locations.get(result + 1));
+
+                int oldResult = result;
                 result += 2 * landCount_horizontal + 2 - ((landCount_horizontal == landCount_horizontal_max) ? 1 : 0);
+
+                makeAdjacents(locations.get(result), locations.get(result-1));
+                makeAdjacents(locations.get(result), locations.get(result+1));
                 bind(land, locations.get(result - 1));
                 bind(land, locations.get(result));
                 bind(land, locations.get(result + 1));
+
+                makeAdjacents(locations.get(oldResult-1), locations.get(result-1));
+                makeAdjacents(locations.get(oldResult+1), locations.get(result+1));
+
                 landIndex++;
             }
         }
         //endregion
 
         load(lands);
+    }
+
+    private void makeAdjacents (Location location1, Location location2) {
+        if (!location1.getAdjacentLocations().contains(location2))
+            location1.addAdjacentLocations(location2);
+
+        if (!location2.getAdjacentLocations().contains(location1))
+            location2.addAdjacentLocations(location1);
     }
 
     private void load(ArrayList<Land> lands) {
@@ -114,6 +133,8 @@ class Board {
     private void bind(Land land, Location location) {
         land.getAdjacentLocations().add(location);
         location.getAdjacentLands().add(land);
+        if(land.getType() != LandType.SEA)
+            location.setActive(true);
     }
 
     void createSettlement(Player player, Location location) {
@@ -148,6 +169,31 @@ class Board {
         Global.addLog("ACTION: A settlement has been upgraded on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
 
         syncPlayer(player);
+    }
+
+    boolean isValidStructure(Structure structure, Player player) {
+        if(structure instanceof Road) {
+            Road road = (Road) structure;
+            Location end = road.getEndLocation();
+            Location start = road.getStartLocation();
+            if (end.isActive() && start.isActive() &&  start.getAdjacentLocations().contains(end)) {
+                if (countStructures("Road", start, player) + countStructures("Road", end, player) > 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    int countStructures(String type, Location location, Player player) {
+        int count = 0;
+        if(type.equals("Road")) {
+            for (Structure structure: location.getStructures()) {
+                if(structure.getPlayer() == player)
+                    count++;
+            }
+        }
+        return count;
     }
 
     void moveRobber(Player robber, Land land, Player victim, ResourceType resourceType) {

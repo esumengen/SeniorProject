@@ -5,18 +5,18 @@ import java.util.ArrayList;
 class Location {
     private int index;
     private ArrayList<Land> adjacentLands;
+    private ArrayList<Location> adjacentLocations;
     private ArrayList<Road> connectedRoads;
-    private ArrayList<Location> connectedLocations;
     private ArrayList<Structure> structures;
     private Player owner;
+    private boolean isActive = false;
 
     Location(int index) {
         this.adjacentLands = new ArrayList<>();
+        this.adjacentLocations = new ArrayList<>();
         this.connectedRoads = new ArrayList<>();
-        this.connectedLocations = new ArrayList<>();
         this.structures = new ArrayList<>();
         this.index = index;
-
     }
 
     int getIndex() {
@@ -25,10 +25,6 @@ class Location {
 
     ArrayList<Land> getAdjacentLands() {
         return adjacentLands;
-    }
-
-    ArrayList<Location> getConnectedLocations() {
-        return connectedLocations;
     }
 
     ArrayList<Structure> getStructures() {
@@ -58,5 +54,21 @@ class Location {
         }
 
         return false;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public ArrayList<Location> getAdjacentLocations() {
+        return adjacentLocations;
+    }
+
+    public void addAdjacentLocations(Location location) {
+        adjacentLocations.add(location);
     }
 }

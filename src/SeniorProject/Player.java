@@ -17,10 +17,12 @@ public class Player {
     private ArrayList<Structure> structures = new ArrayList<>();
     private int grain, lumber, ore, wool, brick = 0;
     private Map<ResourceType, Integer> resources;
+    private AI ai;
 
     Player (int index){
         this.index = index;
         this.type = PlayerType.AI;
+        this.ai = new AI(this);
 
         resources = new HashMap<>();
         resources.put(ResourceType.BRICK, this.brick);
@@ -35,11 +37,10 @@ public class Player {
     }
 
     void writeMove (boolean isInitial) {
-        /* TODO */
 
-        String actionList_str = "action text here";
+        String actionList_str = ai.createMoves(isInitial);
 
-        String fileName = "actions_temp"+index+".txt";
+        String fileName = "actions_temp" + index + ".txt";
         Global.createTextFile(fileName, actionList_str);
     }
 
