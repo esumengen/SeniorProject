@@ -286,18 +286,20 @@ class Board {
 
     @Override
     public String toString() {
-        StringBuilder string = new StringBuilder();
-
+        String string = "";
         for (int i = 0; i < lands.size(); i++) {
-            string.append("[LAND ").append(lands.get(i).getIndex()).append("]  \nType: ").append(lands.get(i).getType().toString()).append("\nLocations: {");
-
+            string += "[LAND " + lands.get(i).getIndex() + "]\nScore: " + lands.get(i).getDiceChance() + "\nType: " + lands.get(i).getType().toString() + "\nLocations: {";
             int j_max = lands.get(i).getAdjacentLocations().size() - 1;
             for (int j = 0; j < j_max + 1; j++) {
-                string.append(lands.get(i).getAdjacentLocations().get(j).getIndex()).append(j == j_max ? "" : ", ");
+                string += lands.get(i).getAdjacentLocations().get(j).getIndex() + (j == j_max ? "" : ", ");
             }
-            string.append("}\n\n");
+            string += "}\n\n";
         }
-        return string.toString();
+
+        for (Player player : players) {
+            string += "[PLAYER " + player.getIndex() + "]";
+        }
+        return string;
     }
 
     public Land getRobbedLand() {

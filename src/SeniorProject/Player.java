@@ -18,11 +18,11 @@ public class Player {
     private int grain, lumber, ore, wool, brick = 0;
     private Map<ResourceType, Integer> resources;
     private AI ai;
+    private Board board;
 
     public Player (int index){
         this.index = index;
         this.type = PlayerType.AI;
-        this.ai = new AI(this);
 
         resources = new HashMap<>();
         resources.put(ResourceType.BRICK, this.brick);
@@ -107,4 +107,11 @@ public class Player {
     void addResource(ResourceType resourceType, Integer value) {
         resources.replace(resourceType, resources.get(resourceType) + value);
     }
+
+    void createAI(Board board) {
+        this.board = board;
+        this.ai = new AI(this, board);
+    }
+
+
 }

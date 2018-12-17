@@ -12,6 +12,10 @@ class Main {
 
         Board board = new Board(players);
 
+        for (Player player : players) {
+            player.createAI(board);
+        }
+
         Synchronizer synchronizer = new Synchronizer(board);
 
         Timer timer = new Timer();
@@ -36,7 +40,7 @@ class Main {
                                 turnMode = Global.getRidOf_quotationMarks(turnMode);
 
                                 if (turnMode.equals("waiting")) {
-                                    player.writeMove(false);
+                                    player.writeMove(true);
 
                                     communication_ini.put("General", "turnMode[" + player.getIndex() + "]", "\"done\"");
                                     communication_ini.store();
