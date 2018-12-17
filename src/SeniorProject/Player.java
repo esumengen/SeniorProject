@@ -19,7 +19,7 @@ public class Player {
     private Map<ResourceType, Integer> resources;
     private AI ai;
 
-    Player (int index){
+    public Player (int index){
         this.index = index;
         this.type = PlayerType.AI;
         this.ai = new AI(this);

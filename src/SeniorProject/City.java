@@ -1,6 +1,6 @@
 package SeniorProject;
 
-class City extends Building {
+public class City extends Building {
 
     private static final BuildingType TYPE = BuildingType.CITY;
 

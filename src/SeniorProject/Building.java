@@ -1,6 +1,6 @@
 package SeniorProject;
 
-abstract class Building extends Structure {
+public abstract class Building extends Structure {
     private Location location;
     private BuildingType type;
 
