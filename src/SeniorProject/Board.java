@@ -171,13 +171,13 @@ class Board {
         syncPlayer(player);
     }
 
-    boolean isValidStructure(Structure structure, Player player) {
+    boolean isValid(Structure structure) {
         if(structure instanceof Road) {
             Road road = (Road) structure;
             Location end = road.getEndLocation();
             Location start = road.getStartLocation();
             if (end.isActive() && start.isActive() &&  start.getAdjacentLocations().contains(end)) {
-                if (countStructures("Road", start, player) + countStructures("Road", end, player) > 0) {
+                if (countStructures("Road", start, structure.getPlayer()) + countStructures("Road", end, structure.getPlayer()) > 0) {
                     return true;
                 }
             }

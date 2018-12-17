@@ -31,8 +31,9 @@ public class AI implements I_AI{
             double maxScore = 0.0;
             boolean containsBrick = false;
             for (Location location : board.getLocations()) {
+                Settlement settlement = new Settlement(selectedLocation, owner);
                 double score = 0.0;
-                if(!location.hasOwner()){
+                if(board.isValid(settlement)){
                     for (Land land : location.getAdjacentLands()) {
                         score += land.getDiceChance();
                         if(land.getType().equals(LandType.HILLS))
