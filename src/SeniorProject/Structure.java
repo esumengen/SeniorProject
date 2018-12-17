@@ -8,7 +8,7 @@ public abstract class Structure {
         this.player = player;
     }
 
-    Player getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 }

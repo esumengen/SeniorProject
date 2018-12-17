@@ -31,7 +31,7 @@ public class Location {
         return connectedLocations;
     }
 
-    ArrayList<Structure> getStructures() {
+    public ArrayList<Structure> getStructures() {
         return structures;
     }
 
