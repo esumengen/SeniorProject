@@ -66,8 +66,8 @@ class Board {
                     topLocationIndexes.add(result);
                 }
 
-                makeAdjacents(locations.get(result - 1), locations.get(result));
-                makeAdjacents(locations.get(result + 1), locations.get(result));
+                makeAdjacent(locations.get(result - 1), locations.get(result));
+                makeAdjacent(locations.get(result + 1), locations.get(result));
                 bind(land, locations.get(result - 1));
                 bind(land, locations.get(result));
                 bind(land, locations.get(result + 1));
@@ -75,14 +75,14 @@ class Board {
                 int oldResult = result;
                 result += 2 * landCount_horizontal + 2 - ((landCount_horizontal == landCount_horizontal_max) ? 1 : 0);
 
-                makeAdjacents(locations.get(result), locations.get(result-1));
-                makeAdjacents(locations.get(result), locations.get(result+1));
+                makeAdjacent(locations.get(result), locations.get(result-1));
+                makeAdjacent(locations.get(result), locations.get(result+1));
                 bind(land, locations.get(result - 1));
                 bind(land, locations.get(result));
                 bind(land, locations.get(result + 1));
 
-                makeAdjacents(locations.get(oldResult-1), locations.get(result-1));
-                makeAdjacents(locations.get(oldResult+1), locations.get(result+1));
+                makeAdjacent(locations.get(oldResult-1), locations.get(result-1));
+                makeAdjacent(locations.get(oldResult+1), locations.get(result+1));
 
                 landIndex++;
             }
@@ -92,7 +92,7 @@ class Board {
         load(lands);
     }
 
-    private void makeAdjacents (Location location1, Location location2) {
+    private void makeAdjacent(Location location1, Location location2) {
         if (!location1.getAdjacentLocations().contains(location2))
             location1.addAdjacentLocations(location2);
 
@@ -172,6 +172,12 @@ class Board {
     }
 
     boolean isValid(Structure structure) {
+        return isValid(structure, false);
+    }
+
+    boolean isValid(Structure structure, boolean isInitial) {
+        boolean isValid = true;
+
         if(structure instanceof Road) {
             Road road = (Road) structure;
             Location end = road.getEndLocation();
@@ -182,7 +188,23 @@ class Board {
                 }
             }
         }
-        return false;
+        else if (structure instanceof  Settlement) {
+            for (Location location:((Settlement) structure).getLocation().getAdjacentLocations()) {
+                if (location.getOwner() != null) {
+                    isValid = false;
+                    break;
+                }
+            }
+
+            if (((Settlement) structure).getLocation().getOwner() != null)
+                isValid = false;
+
+            if (!isInitial) {
+
+            }
+        }
+
+        return isValid;
     }
 
     int countStructures(String type, Location location, Player player) {

@@ -2,7 +2,7 @@ package SeniorProject;
 
 import java.util.Random;
 
-public class AI implements I_AI{
+public class AI implements IAI{
     private Player owner;
     private Board board;
 
@@ -17,10 +17,10 @@ public class AI implements I_AI{
             Location selectedLocation = selectSettlementLocation(isInitial);
             moves += "P" + (owner.getIndex() + 1) + " [CR " + ((selectedLocation.getIndex()< 10) ? ("0" + selectedLocation.getIndex())
                     : selectedLocation.getIndex()) + "] S\n";
-            Road selectedRoad = initialSelectedRoad(selectedLocation);
+            /*Road selectedRoad = initialSelectedRoad(selectedLocation);
             int roadStart = selectedRoad.getStartLocation().getIndex();
             int roadEnd = selectedRoad.getEndLocation().getIndex();
-            moves += "P" + (owner.getIndex() + 1) + " [CR " + ((roadStart< 10) ? ("0" + roadStart) : roadStart) + " " + ((roadEnd< 10) ? ("0" + roadEnd) : roadEnd) +"] R\n";
+            moves += "P" + (owner.getIndex() + 1) + " [CR " + ((roadStart< 10) ? ("0" + roadStart) : roadStart) + " " + ((roadEnd< 10) ? ("0" + roadEnd) : roadEnd) +"] R\n";*/
         }
         return moves;
     }
@@ -33,7 +33,7 @@ public class AI implements I_AI{
             for (Location location : board.getLocations()) {
                 Settlement settlement = new Settlement(selectedLocation, owner);
                 double score = 0.0;
-                if(board.isValid(settlement)){
+                if(board.isValid(settlement, true)){
                     for (Land land : location.getAdjacentLands()) {
                         score += land.getDiceChance();
                         if(land.getType().equals(LandType.HILLS))

@@ -1,5 +1,5 @@
 package SeniorProject;
 
-public interface I_AI {
+public interface IAI {
 
 }
