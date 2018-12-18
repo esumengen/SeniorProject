@@ -2,7 +2,7 @@ package SeniorProject;
 
 import org.ini4j.Wini;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -66,8 +66,8 @@ class Board {
                     topLocationIndexes.add(result);
                 }
 
-                makeAdjacents(locations.get(result - 1), locations.get(result));
-                makeAdjacents(locations.get(result + 1), locations.get(result));
+                makeAdjacent(locations.get(result - 1), locations.get(result));
+                makeAdjacent(locations.get(result + 1), locations.get(result));
                 bind(land, locations.get(result - 1));
                 bind(land, locations.get(result));
                 bind(land, locations.get(result + 1));
@@ -75,14 +75,14 @@ class Board {
                 int oldResult = result;
                 result += 2 * landCount_horizontal + 2 - ((landCount_horizontal == landCount_horizontal_max) ? 1 : 0);
 
-                makeAdjacents(locations.get(result), locations.get(result-1));
-                makeAdjacents(locations.get(result), locations.get(result+1));
+                makeAdjacent(locations.get(result), locations.get(result-1));
+                makeAdjacent(locations.get(result), locations.get(result+1));
                 bind(land, locations.get(result - 1));
                 bind(land, locations.get(result));
                 bind(land, locations.get(result + 1));
 
-                makeAdjacents(locations.get(oldResult-1), locations.get(result-1));
-                makeAdjacents(locations.get(oldResult+1), locations.get(result+1));
+                makeAdjacent(locations.get(oldResult-1), locations.get(result-1));
+                makeAdjacent(locations.get(oldResult+1), locations.get(result+1));
 
                 landIndex++;
             }
@@ -92,7 +92,22 @@ class Board {
         load(lands);
     }
 
-    private void makeAdjacents(Location location1, Location location2) {
+    public static Board deepCopy(Object object) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ObjectOutputStream outputStrm = new ObjectOutputStream(outputStream);
+            outputStrm.writeObject(object);
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+            ObjectInputStream objInputStream = new ObjectInputStream(inputStream);
+            return (Board) objInputStream.readObject();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void makeAdjacent(Location location1, Location location2) {
         if (!location1.getAdjacentLocations().contains(location2))
             location1.addAdjacentLocations(location2);
 
@@ -124,7 +139,7 @@ class Board {
 
             Global.addLog("SUCCESS: The game is loaded to the AI.");
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            new Message(e.getMessage()+" - 7");
 
             Global.addLog("ERROR: The game is not loaded to the AI.");
         }
@@ -176,88 +191,104 @@ class Board {
     }
 
     boolean isValid(Structure structure, boolean isInitial) {
-        if (structure instanceof Settlement){
-            Settlement settlement = (Settlement) structure;
-
-            if (!settlement.getLocation().isActive())
-                return false;
-            if (!radiusCheck(settlement.getLocation()))
-                return false;
-            if (settlement.getLocation().hasOwner())
-                return false;
-            if(isInitial){
-                return true;
-            }
-            else {
-                for (Structure road : settlement.getPlayer().getStructures()) {
-                    if(road instanceof Road) {
-                        if(!((Road) road).getStartLocation().hasOwner() && radiusCheck(((Road) road).getStartLocation()))
-                            return true;
-                        else if(!((Road) road).getEndLocation().hasOwner() && radiusCheck(((Road) road).getEndLocation()))
-                            return true;
-                    }
-                }
-            }
-        }
-        else if (structure instanceof Road){
+        if(structure instanceof Road) {
             Road road = (Road) structure;
             Location end = road.getEndLocation();
             Location start = road.getStartLocation();
+            boolean isBothLocationsActive =  start.isActive() && end.isActive();
 
-            if (!start.isActive() || !end.isActive())
+            // İki ucu aktif olmak zorunda.
+            if (!isBothLocationsActive)
                 return false;
+
+            // İki ucu komşu olmak zorunda.
+            if (!start.getAdjacentLocations().contains(end))
+                return false;
+
+            // Aynı yoldan başka olmamalı.
             if (roadExits(road))
                 return false;
 
-            if(isInitial){
-                if (end.isActive() && start.isActive() &&  start.getAdjacentLocations().contains(end)) {
-                    if (countStructures("Road", start, structure.getPlayer()) + countStructures("Road", end, structure.getPlayer()) > 0) {
-                        return true;
-                    }
-                }
+            // Herhangi bir ucunda rakip bina olmamalı. (?)
+            if (countStructures("Settlement", start) - countStructures("Settlement", start, road.getPlayer())
+                    + countStructures("Settlement", end)  - countStructures("Settlement", end, road.getPlayer()) > 0)
+                return false;
+
+            // İki ucunda en az bir tane kendi yapısı olmalı.
+            if (countStructures("Road", start, structure.getPlayer()) + countStructures("Road", end, structure.getPlayer())
+                    + countStructures("Settlement", start, structure.getPlayer()) + countStructures("Settlement", end, structure.getPlayer()) == 0)
+                return false;
+        }
+        else if (structure instanceof Building) {
+            Building settlement = (Building) structure;
+
+            // Bu location aktif olmalı.
+            if (!settlement.getLocation().isActive())
+                return false;
+
+            // Etrafında bina olmamalı.
+            if (!radiusCheck(settlement.getLocation()))
+                return false;
+
+            // Başlangıç durumu değilse, tam o location'a bağlı en az bir yol bulunmalı.
+            if (!isInitial) {
+                if (countStructures("Road", settlement.getLocation(), settlement.getPlayer()) == 0)
+                    return false;
             }
-            else {
-                if ((end.getOwner() != null) && end.getOwner().getIndex() == road.getPlayer().getIndex())
-                    return true;
-                if ((start.getOwner() != null) && start.getOwner().getIndex() == road.getPlayer().getIndex())
-                    return true;
-                for (Road connectedRoad : start.getConnectedRoads()) {
-                    if (connectedRoad.getPlayer().getIndex() == road.getPlayer().getIndex())
-                        return true;
-                }
-                for (Road connectedRoad : end.getConnectedRoads()) {
-                    if (connectedRoad.getPlayer().getIndex() == road.getPlayer().getIndex())
-                        return true;
-                }
-            }
+
+            return true;
         }
 
         return false;
     }
 
-    boolean radiusCheck (Location location) {
-        for(Location adjacentLocation : location.getAdjacentLocations()) {
-            if(adjacentLocation.hasOwner())
-                return false;
-        }
-        return true;
-    }
     boolean roadExits (Road newRoad) {
         for (Road road : newRoad.getStartLocation().getConnectedRoads()) {
             if ((road.getStartLocation() == newRoad.getStartLocation() && (road.getEndLocation() == newRoad.getEndLocation())) || ((road.getStartLocation() == newRoad.getEndLocation()) && (road.getEndLocation() == road.getStartLocation())))
                 return false;
         }
+
         return true;
+    }
+
+    boolean radiusCheck (Location location) {
+        if (location.hasOwner())
+            return false;
+
+        for(Location adjacentLocation : location.getAdjacentLocations()) {
+            if(adjacentLocation.hasOwner())
+                return false;
+        }
+
+        return true;
+    }
+
+    int countStructures(String type, Location location) {
+        return countStructures(type, location, null);
     }
 
     int countStructures(String type, Location location, Player player) {
         int count = 0;
+
         if(type.equals("Road")) {
             for (Structure structure: location.getStructures()) {
-                if(structure.getPlayer() == player)
+                if(structure instanceof Road && (player == null || structure.getPlayer() == player))
                     count++;
             }
         }
+        else if(type.equals("Settlement")) {
+            for (Structure structure: location.getStructures()) {
+                if(structure instanceof Settlement && (player == null || structure.getPlayer() == player))
+                    count++;
+            }
+        }
+        else if(type.equals("City")) {
+            for (Structure structure: location.getStructures()) {
+                if(structure instanceof City && (player == null || structure.getPlayer() == player))
+                    count++;
+            }
+        }
+
         return count;
     }
 

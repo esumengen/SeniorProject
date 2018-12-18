@@ -55,12 +55,12 @@ class Main {
                     Process process = processBuilder.start();
                     String tasksList = stream_toString(process.getInputStream());
 
-                    if (!tasksList.contains("Catan.exe")) {
+                    if (!tasksList.contains("Catan.exe") && !tasksList.contains("Runner.exe")) {
                         System.exit(0);
                     }
                     ///endregion
                 } catch (Exception e) {
-                    new Message(e.getMessage());
+                    new Message(e.getMessage()+" - 1");
                 }
             }
         };

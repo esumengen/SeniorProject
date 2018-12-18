@@ -55,7 +55,7 @@ class Global {
             bufferedWriter.write(text);
             bufferedWriter.newLine();
         } catch (IOException e) {
-            e.printStackTrace();
+            new Message(e.getMessage()+" - 5");
         } finally {
             try {
                 if (bufferedWriter != null)
@@ -65,7 +65,7 @@ class Global {
                     fileWriter.close();
 
             } catch (IOException e) {
-                new Message(e.getMessage()+" - createTextFile");
+                new Message(e.getMessage()+" - 6");
             }
         }
     }
