@@ -17,42 +17,48 @@ public class AI implements IAI{
             Location selectedLocation = selectSettlementLocation(isInitial);
             moves += "P" + (owner.getIndex() + 1) + " [CR " + ((selectedLocation.getIndex()< 10) ? ("0" + selectedLocation.getIndex())
                     : selectedLocation.getIndex()) + "] S\n";
-            /*Road selectedRoad = initialSelectedRoad(selectedLocation);
+            Road selectedRoad = initialSelectedRoad(selectedLocation);
             int roadStart = selectedRoad.getStartLocation().getIndex();
             int roadEnd = selectedRoad.getEndLocation().getIndex();
-            moves += "P" + (owner.getIndex() + 1) + " [CR " + ((roadStart< 10) ? ("0" + roadStart) : roadStart) + " " + ((roadEnd< 10) ? ("0" + roadEnd) : roadEnd) +"] R\n";*/
+            moves += "P" + (owner.getIndex() + 1) + " [CR " + ((roadStart< 10) ? ("0" + roadStart) : roadStart) + " " + ((roadEnd< 10) ? ("0" + roadEnd) : roadEnd) +"] R\n";
         }
         return moves;
     }
 
     private Location selectSettlementLocation(boolean isInitial) {
         Location selectedLocation = new Location(-1);
-        if(isInitial && isPHMove(isInitial)){
+        if(isInitial && isPHMove(isInitial)) {
             double maxScore = 0.0;
-            boolean containsBrick = false;
             for (Location location : board.getLocations()) {
-                Settlement settlement = new Settlement(selectedLocation, owner);
+                Settlement settlement = new Settlement(location, owner);
                 double score = 0.0;
-                if(board.isValid(settlement, true)){
+
+                boolean hasBrickLand = false;
+                for (Land land:settlement.getLocation().getAdjacentLands()) {
+                    if (land.getType() == LandType.HILLS) {
+                        hasBrickLand = true;
+                        break;
+                    }
+                }
+
+                if(board.isValid(settlement, true) && hasBrickLand) {
                     for (Land land : location.getAdjacentLands()) {
                         score += land.getDiceChance();
-                        if(land.getType().equals(LandType.HILLS))
-                            containsBrick = true;
                     }
-                    if (score > maxScore && containsBrick) {
+                    if (score > maxScore) {
                         maxScore = score;
                         selectedLocation = location;
                     }
-                    containsBrick = false;
                 }
             }
             return selectedLocation;
         }
-        else if(isInitial)   {
+        else if(isInitial) {
             double maxScore = 0.0;
             for (Location location : board.getLocations()) {
+                Settlement settlement = new Settlement(location, owner);
                 double score = 0.0;
-                if(!location.hasOwner()){
+                if(board.isValid(settlement, true)){
                     for (Land land : location.getAdjacentLands()) {
                         score += land.getDiceChance();
                     }
