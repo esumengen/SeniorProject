@@ -176,41 +176,78 @@ class Board {
     }
 
     boolean isValid(Structure structure, boolean isInitial) {
-        boolean isValid = true;
+        if (structure instanceof Settlement){
+            Settlement settlement = (Settlement) structure;
 
-        if(structure instanceof Road) {
-            if (!((Road) structure).getStartLocation().isActive() || !((Road) structure).getEndLocation().isActive())
+            if (!settlement.getLocation().isActive())
                 return false;
-
+            if (!radiusCheck(settlement.getLocation()))
+                return false;
+            if (settlement.getLocation().hasOwner())
+                return false;
+            if(isInitial){
+                return true;
+            }
+            else {
+                for (Structure road : settlement.getPlayer().getStructures()) {
+                    if(road instanceof Road) {
+                        if(!((Road) road).getStartLocation().hasOwner() && radiusCheck(((Road) road).getStartLocation()))
+                            return true;
+                        else if(!((Road) road).getEndLocation().hasOwner() && radiusCheck(((Road) road).getEndLocation()))
+                            return true;
+                    }
+                }
+            }
+        }
+        else if (structure instanceof Road){
             Road road = (Road) structure;
             Location end = road.getEndLocation();
             Location start = road.getStartLocation();
-            if (end.isActive() && start.isActive() &&  start.getAdjacentLocations().contains(end)) {
-                if (countStructures("Road", start, structure.getPlayer()) + countStructures("Road", end, structure.getPlayer()) > 0) {
-                    return true;
-                }
-            }
-        }
-        else if (structure instanceof  Settlement) {
-            if (!((Settlement) structure).getLocation().isActive())
+
+            if (!start.isActive() || !end.isActive())
+                return false;
+            if (roadExits(road))
                 return false;
 
-            for (Location location:((Settlement) structure).getLocation().getAdjacentLocations()) {
-                if (location.getOwner() != null) {
-                    isValid = false;
-                    break;
+            if(isInitial){
+                if (end.isActive() && start.isActive() &&  start.getAdjacentLocations().contains(end)) {
+                    if (countStructures("Road", start, structure.getPlayer()) + countStructures("Road", end, structure.getPlayer()) > 0) {
+                        return true;
+                    }
                 }
             }
-
-            if (((Settlement) structure).getLocation().getOwner() != null)
-                isValid = false;
-
-            if (!isInitial) {
-
+            else {
+                if ((end.getOwner() != null) && end.getOwner().getIndex() == road.getPlayer().getIndex())
+                    return true;
+                if ((start.getOwner() != null) && start.getOwner().getIndex() == road.getPlayer().getIndex())
+                    return true;
+                for (Road connectedRoad : start.getConnectedRoads()) {
+                    if (connectedRoad.getPlayer().getIndex() == road.getPlayer().getIndex())
+                        return true;
+                }
+                for (Road connectedRoad : end.getConnectedRoads()) {
+                    if (connectedRoad.getPlayer().getIndex() == road.getPlayer().getIndex())
+                        return true;
+                }
             }
         }
 
-        return isValid;
+        return false;
+    }
+
+    boolean radiusCheck (Location location) {
+        for(Location adjacentLocation : location.getAdjacentLocations()) {
+            if(adjacentLocation.hasOwner())
+                return false;
+        }
+        return true;
+    }
+    boolean roadExits (Road newRoad) {
+        for (Road road : newRoad.getStartLocation().getConnectedRoads()) {
+            if ((road.getStartLocation() == newRoad.getStartLocation() && (road.getEndLocation() == newRoad.getEndLocation())) || ((road.getStartLocation() == newRoad.getEndLocation()) && (road.getEndLocation() == road.getStartLocation())))
+                return false;
+        }
+        return true;
     }
 
     int countStructures(String type, Location location, Player player) {
