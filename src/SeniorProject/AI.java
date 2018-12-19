@@ -9,6 +9,7 @@ public class AI implements IAI{
     private Board board;
     private String result = "";
     private Board virtualBoard;
+    private ArrayList<Boolean> canAfford;
 
     private Random randomizer = new Random();
 
@@ -16,18 +17,67 @@ public class AI implements IAI{
         this.owner = player;
         this.board = board;
         this.virtualBoard = Board.deepCopy(board);
+        this.canAfford = new ArrayList<>();
+
+        for(int i = 0; i < MoveType.values().length; i++) {
+            canAfford.add(false);
+        }
     }
 
     enum MoveType {
-        CreateSettlement, CreateRoad
+        CreateSettlement, CreateRoad, UpgradeSettlement, DevelopmentCard, Trade, KnightCard, etc;
+
     }
+
+    boolean isAffordable (MoveType type) {
+        switch (type) {
+            case CreateSettlement: {
+                if(owner.getResources().get(ResourceType.BRICK) >= 1 && owner.getResources().get(ResourceType.GRAIN) >= 1
+                    && owner.getResources().get(ResourceType.WOOL) >= 1 && owner.getResources().get(ResourceType.LUMBER) >= 1){
+                    return true;
+                }
+                    return false;
+            }
+            case CreateRoad: {
+                if(owner.getResources().get(ResourceType.BRICK) >= 1 && owner.getResources().get(ResourceType.LUMBER) >= 1){
+                    return true;
+                }
+                return false;
+            }
+            case UpgradeSettlement: {
+                if(owner.getResources().get(ResourceType.ORE) >= 3 && owner.getResources().get(ResourceType.GRAIN) >= 2){
+                    return true;
+                }
+                return false;
+            }
+            case DevelopmentCard: {
+                if(owner.getResources().get(ResourceType.GRAIN) >= 1 && owner.getResources().get(ResourceType.WOOL) >= 1
+                        && owner.getResources().get(ResourceType.ORE) >= 1){
+                    return true;
+                }
+                return false;
+            }
+            case KnightCard: {
+                if (owner.getKnight() > 0)
+                    return true;
+                return false;
+
+            }
+
+        }
+        return canAfford.get(type.ordinal());
+    }
+
 
     public String createMoves(boolean isInitial) {
         ArrayList<MoveType> moves = new ArrayList<>();
 
         if (isInitial) {
             moves.add(MoveType.CreateSettlement);
-            //moves.add(MoveType.CreateRoad);
+            moves.add(MoveType.CreateRoad);
+        }
+        else {
+
         }
 
         for (MoveType move : moves) {
@@ -43,6 +93,22 @@ public class AI implements IAI{
                     }
                     else
                         createRoad_move();
+                }
+
+                case UpgradeSettlement: {
+                    upgradeSettlement_move();
+                }
+
+                case DevelopmentCard: {
+
+                }
+
+                case Trade: {
+
+                }
+
+                case KnightCard: {
+
                 }
             }
         }
@@ -64,6 +130,25 @@ public class AI implements IAI{
 
         return false;
     }
+
+    private boolean upgradeSettlement_move () {
+        int count = 0;
+        while (count < 100) {
+            Structure structure = owner.getStructures().get(randomizer.nextInt(owner.getStructures().size()));
+            if(structure instanceof Settlement) {
+                result += "P" + (owner.getIndex() + 1) + " [CR " + ((((Settlement) structure).getLocation().getIndex() < 10) ? ("0" + ((Settlement) structure).getLocation().getIndex()) : ((Settlement) structure).getLocation().getIndex()) + "] S\n";
+                virtualBoard.createSettlement(virtualBoard.getPlayers().get(owner.getIndex()), virtualBoard.getLocations().get(((Settlement) structure).getLocation().getIndex()));
+                return true;
+            }
+            count++;
+        }
+        return false;
+    }
+
+    private boolean developmentCard_Move () {
+        return false;
+    }
+
 
     private Location getMostValuableLocation() {
         return getMostValuableLocation(false);
