@@ -2,7 +2,6 @@ package SeniorProject;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ArrayBlockingQueue;
 
 public class AI implements IAI{
     private Player owner;

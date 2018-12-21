@@ -42,6 +42,7 @@ public class Player {
 
         String fileName = "actions_temp" + index + ".txt";
         Global.createTextFile(fileName, actionList_str);
+
     }
 
     String getName() {
