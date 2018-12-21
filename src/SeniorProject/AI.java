@@ -3,11 +3,12 @@ package SeniorProject;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class AI implements IAI{
+public class AI implements IAI {
     private Player owner;
     private Board board;
     private String result = "";
     private Board virtualBoard;
+    private ArrayList<Boolean> canAfford;
 
     private Random randomizer = new Random();
 
@@ -15,18 +16,64 @@ public class AI implements IAI{
         this.owner = player;
         this.board = board;
         this.virtualBoard = Board.deepCopy(board);
+        this.canAfford = new ArrayList<>();
+        for (int i = 0; i < MoveType.values().length; i++) {
+            canAfford.add(false);
+        }
     }
 
     enum MoveType {
-        CreateSettlement, CreateRoad
+        CreateSettlement, CreateRoad, UpgradeSettlement, DevelopmentCard, Trade, KnightCard, etc;
+
     }
+
+    void isAffordable(MoveType type) {
+        Player virtualOwner = virtualBoard.getPlayers().get(owner.getIndex());
+        switch (type) {
+            case CreateSettlement: {
+                if (virtualOwner.getResources().get(ResourceType.BRICK) >= 1 && virtualOwner.getResources().get(ResourceType.GRAIN) >= 1
+                        && virtualOwner.getResources().get(ResourceType.WOOL) >= 1 && virtualOwner.getResources().get(ResourceType.LUMBER) >= 1) {
+                    canAfford.set(type.ordinal(), true);
+                }
+                canAfford.set(type.ordinal(), false);
+            }
+            case CreateRoad: {
+                if (virtualOwner.getResources().get(ResourceType.BRICK) >= 1 && virtualOwner.getResources().get(ResourceType.LUMBER) >= 1) {
+                    canAfford.set(type.ordinal(), true);
+                }
+                canAfford.set(type.ordinal(), false);
+            }
+            case UpgradeSettlement: {
+                if (virtualOwner.getResources().get(ResourceType.ORE) >= 3 && virtualOwner.getResources().get(ResourceType.GRAIN) >= 2) {
+                    canAfford.set(type.ordinal(), true);
+                }
+                canAfford.set(type.ordinal(), false);
+            }
+            case DevelopmentCard: {
+                if (virtualOwner.getResources().get(ResourceType.GRAIN) >= 1 && virtualOwner.getResources().get(ResourceType.WOOL) >= 1
+                        && owner.getResources().get(ResourceType.ORE) >= 1) {
+                    canAfford.set(type.ordinal(), true);
+                }
+                canAfford.set(type.ordinal(), false);
+            }
+            case KnightCard: {
+                if (virtualOwner.getKnight() > 0)
+                    canAfford.set(type.ordinal(), true);
+
+                canAfford.set(type.ordinal(), false);
+            }
+        }
+    }
+
 
     public String createMoves(boolean isInitial) {
         ArrayList<MoveType> moves = new ArrayList<>();
 
         if (isInitial) {
             moves.add(MoveType.CreateSettlement);
-            //moves.add(MoveType.CreateRoad);
+            moves.add(MoveType.CreateRoad);
+        } else {
+
         }
 
         for (MoveType move : moves) {
@@ -38,10 +85,25 @@ public class AI implements IAI{
                 case CreateRoad: {
                     if (isInitial) {
                         Player virtualSelf = virtualBoard.getPlayers().get(owner.getIndex());
-                        createRoad_move(((Settlement) virtualSelf.getStructures().get(virtualSelf.getStructures().size()-1)).getLocation());
-                    }
-                    else
+                        createRoad_move(((Settlement) virtualSelf.getStructures().get(virtualSelf.getStructures().size() - 1)).getLocation());
+                    } else
                         createRoad_move();
+                }
+
+                case UpgradeSettlement: {
+                    upgradeSettlement_move();
+                }
+
+                case DevelopmentCard: {
+
+                }
+
+                case Trade: {
+
+                }
+
+                case KnightCard: {
+
                 }
             }
         }
@@ -64,6 +126,25 @@ public class AI implements IAI{
         return false;
     }
 
+    private boolean upgradeSettlement_move() {
+        int count = 0;
+        while (count < 100) {
+            Structure structure = owner.getStructures().get(randomizer.nextInt(owner.getStructures().size()));
+            if (structure instanceof Settlement) {
+                result += "P" + (owner.getIndex() + 1) + " [CR " + ((((Settlement) structure).getLocation().getIndex() < 10) ? ("0" + ((Settlement) structure).getLocation().getIndex()) : ((Settlement) structure).getLocation().getIndex()) + "] S\n";
+                virtualBoard.createSettlement(virtualBoard.getPlayers().get(owner.getIndex()), virtualBoard.getLocations().get(((Settlement) structure).getLocation().getIndex()));
+                return true;
+            }
+            count++;
+        }
+        return false;
+    }
+
+    private boolean developmentCard_Move() {
+        return false;
+    }
+
+
     private Location getMostValuableLocation() {
         return getMostValuableLocation(false);
     }
@@ -76,7 +157,7 @@ public class AI implements IAI{
             Settlement settlement_temp = new Settlement(location, owner);
 
             double value = 0;
-            if(virtualBoard.isValid(settlement_temp, isInitial)) {
+            if (virtualBoard.isValid(settlement_temp, isInitial)) {
                 for (Land land : location.getAdjacentLands()) {
                     value += land.getDiceChance();
                 }
@@ -91,7 +172,7 @@ public class AI implements IAI{
         return mostValuableLocation;
     }
 
-    private boolean createRoad_move () {
+    private boolean createRoad_move() {
         Road road_temp = null;
 
         int count = 0;
@@ -123,7 +204,7 @@ public class AI implements IAI{
         return false;
     }
 
-    private boolean createRoad_move (Location location) {
+    private boolean createRoad_move(Location location) {
         Road road_temp = null;
 
         while (true) {

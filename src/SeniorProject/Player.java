@@ -17,6 +17,7 @@ public class Player {
     private ArrayList<Structure> structures = new ArrayList<>();
     private int grain, lumber, ore, wool, brick = 0;
     private Map<ResourceType, Integer> resources;
+    private int knight = 0;
     private AI ai;
     private Board board;
 
@@ -114,5 +115,7 @@ public class Player {
         this.ai = new AI(this, board);
     }
 
-
+    public int getKnight() {
+        return knight;
+    }
 }

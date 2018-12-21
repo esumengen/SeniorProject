@@ -94,6 +94,14 @@ public class TestBoard {
         }
 
         @Test
+        public void testIsValidForRoad(){
+            Player player = new Player(1);
+            Location start = new Location(1);
+            Location end = new Location(2);
+            Structure structure = new Road(start,end,player);
+        }
+
+        @Test
         public void testMoveRobber(){
 
         }
