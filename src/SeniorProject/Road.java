@@ -1,6 +1,8 @@
 package SeniorProject;
 
-public class Road extends Structure {
+import java.io.Serializable;
+
+public class Road extends Structure implements Serializable {
     private Location[] locations;
 
     public Road(Location startLocation, Location endLocation, Player player){

@@ -9,7 +9,8 @@ class Message extends JFrame {
 
     Message(String s) {
         super("");
-        panel = new JPanel();
+        Global.createTextFile("messages.txt", s);
+        /*panel = new JPanel();
         panel.setLayout(new FlowLayout());
 
         label = new JLabel(s);
@@ -18,8 +19,8 @@ class Message extends JFrame {
 
         super.add(panel);
         super.setSize(500, 100);
-        super.setLocation(500, 350);
-        super.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        super.setVisible(true);
+        super.setLocation(500, 350);*/
+        /*super.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        super.setVisible(true);*/
     }
 }

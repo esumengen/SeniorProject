@@ -1,8 +1,9 @@
 package SeniorProject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-enum LandType {
+enum LandType implements Serializable {
     HILLS, MOUNTAINS, FIELDS, FOREST, PASTURE, DESERT, SEA, NONE;
 
     @Override
@@ -15,7 +16,7 @@ enum LandType {
     }
 }
 
-class Land {
+class Land implements Serializable {
     private int index;
     private LandType type;
     private ArrayList<Location> adjacentLocations;

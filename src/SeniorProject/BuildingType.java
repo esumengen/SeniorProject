@@ -1,6 +1,8 @@
 package SeniorProject;
 
-enum BuildingType {
+import java.io.Serializable;
+
+enum BuildingType implements Serializable {
     SETTLEMENT, CITY;
 
     @Override

@@ -1,6 +1,8 @@
 package SeniorProject;
 
-public abstract class Building extends Structure {
+import java.io.Serializable;
+
+public abstract class Building extends Structure implements Serializable {
     private Location location;
     private BuildingType type;
 

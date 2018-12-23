@@ -1,21 +1,23 @@
 package SeniorProject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class AI implements IAI {
+public class AI implements IAI, Serializable {
     private Player owner;
     private Board board;
     private String result = "";
     private Board virtualBoard;
     private ArrayList<Boolean> canAfford;
 
-    private Random randomizer = new Random();
+    private Random randomGenerator = new Random();
 
     public AI(Player player, Board board) {
         this.owner = player;
         this.board = board;
         this.virtualBoard = Board.deepCopy(board);
+
         this.canAfford = new ArrayList<>();
         for (int i = 0; i < MoveType.values().length; i++) {
             canAfford.add(false);
@@ -23,8 +25,7 @@ public class AI implements IAI {
     }
 
     enum MoveType {
-        CreateSettlement, CreateRoad, UpgradeSettlement, DevelopmentCard, Trade, KnightCard, etc;
-
+        CreateSettlement, CreateRoad, UpgradeSettlement, DevelopmentCard, Trade, KnightCard, etc
     }
 
     void isAffordable(MoveType type) {
@@ -67,6 +68,8 @@ public class AI implements IAI {
 
 
     public String createMoves(boolean isInitial) {
+        this.virtualBoard = Board.deepCopy(board);
+
         ArrayList<MoveType> moves = new ArrayList<>();
 
         if (isInitial) {
@@ -76,36 +79,38 @@ public class AI implements IAI {
 
         }
 
-        for (MoveType move : moves) {
-            switch (move) {
-                case CreateSettlement: {
-                    createSettlement_move(isInitial);
-                }
+        for (int i = 0; i < moves.size(); i++) {
+            MoveType move = moves.get(i);
 
-                case CreateRoad: {
+            switch (move) {
+                case CreateSettlement:
+                    createSettlement_move(isInitial);
+                break;
+
+                case CreateRoad:
                     if (isInitial) {
                         Player virtualSelf = virtualBoard.getPlayers().get(owner.getIndex());
                         createRoad_move(((Settlement) virtualSelf.getStructures().get(virtualSelf.getStructures().size() - 1)).getLocation());
                     } else
                         createRoad_move();
-                }
+                    break;
 
-                case UpgradeSettlement: {
+                case UpgradeSettlement:
                     upgradeSettlement_move();
-                }
+                    break;
 
-                case DevelopmentCard: {
+                case DevelopmentCard:
+                    break;
 
-                }
+                case Trade:
+                    break;
 
-                case Trade: {
-
-                }
-
-                case KnightCard: {
-
-                }
+                case KnightCard:
+                    break;
             }
+
+            moves.remove(i);
+            i--;
         }
 
         return result;
@@ -117,7 +122,7 @@ public class AI implements IAI {
         targetLocation = getMostValuableLocation(isInitial);
 
         if (targetLocation != null) {
-            result += "P" + (owner.getIndex() + 1) + " [CR " + ((targetLocation.getIndex() < 10) ? ("0" + targetLocation.getIndex()) : targetLocation.getIndex()) + "] S\n";
+            result += "P" + (owner.getIndex() + 1) + " [CR " + ((targetLocation.getIndex() < 10) ? ("0" + targetLocation.getIndex()) : targetLocation.getIndex()) + "] S\r\n";
             virtualBoard.createSettlement(virtualBoard.getPlayers().get(owner.getIndex()), virtualBoard.getLocations().get(targetLocation.getIndex()));
 
             return true;
@@ -129,9 +134,9 @@ public class AI implements IAI {
     private boolean upgradeSettlement_move() {
         int count = 0;
         while (count < 100) {
-            Structure structure = owner.getStructures().get(randomizer.nextInt(owner.getStructures().size()));
+            Structure structure = owner.getStructures().get(Math.abs(randomGenerator.nextInt(owner.getStructures().size())));
             if (structure instanceof Settlement) {
-                result += "P" + (owner.getIndex() + 1) + " [CR " + ((((Settlement) structure).getLocation().getIndex() < 10) ? ("0" + ((Settlement) structure).getLocation().getIndex()) : ((Settlement) structure).getLocation().getIndex()) + "] S\n";
+                result += "P" + (owner.getIndex() + 1) + " [CR " + ((((Settlement) structure).getLocation().getIndex() < 10) ? ("0" + ((Settlement) structure).getLocation().getIndex()) : ((Settlement) structure).getLocation().getIndex()) + "] S\r\n";
                 virtualBoard.createSettlement(virtualBoard.getPlayers().get(owner.getIndex()), virtualBoard.getLocations().get(((Settlement) structure).getLocation().getIndex()));
                 return true;
             }
@@ -177,11 +182,11 @@ public class AI implements IAI {
 
         int count = 0;
         while (count < 250) {
-            Location startLocation = virtualBoard.getLocations().get(randomizer.nextInt() % virtualBoard.getLocations().size());
+            Location startLocation = virtualBoard.getLocations().get(Math.abs(randomGenerator.nextInt()) % virtualBoard.getLocations().size());
             if (!startLocation.isActive() && startLocation.getOwner() != owner)
                 break;
 
-            Location endLocation = startLocation.getAdjacentLocations().get(randomizer.nextInt() % startLocation.getAdjacentLocations().size());
+            Location endLocation = startLocation.getAdjacentLocations().get(Math.abs(randomGenerator.nextInt()) % startLocation.getAdjacentLocations().size());
 
             road_temp = new Road(startLocation, endLocation, owner);
             if (virtualBoard.isValid(road_temp)) {
@@ -195,7 +200,7 @@ public class AI implements IAI {
         int roadEnd = road_temp.getEndLocation().getIndex();
 
         if (road_temp != null) {
-            result += "P" + (owner.getIndex() + 1) + " [CR " + ((roadStart < 10) ? ("0" + roadStart) : roadStart) + " " + ((roadEnd < 10) ? ("0" + roadEnd) : roadEnd) + "] R\n";
+            result += "P" + (owner.getIndex() + 1) + " [CR " + ((roadStart < 10) ? ("0" + roadStart) : roadStart) + " " + ((roadEnd < 10) ? ("0" + roadEnd) : roadEnd) + "] R\r\n";
             virtualBoard.createRoad(virtualBoard.getPlayers().get(owner.getIndex()), virtualBoard.getLocations().get(roadStart), virtualBoard.getLocations().get(roadEnd));
 
             return true;
@@ -209,7 +214,7 @@ public class AI implements IAI {
 
         while (true) {
             ArrayList<Location> adjacentList = location.getAdjacentLocations();
-            Location secondLocation = adjacentList.get(randomizer.nextInt() % adjacentList.size());
+            Location secondLocation = adjacentList.get(Math.abs(randomGenerator.nextInt()) % adjacentList.size());
 
             if (!secondLocation.hasOwner()) {
                 road_temp = new Road(location, secondLocation, owner);
@@ -221,7 +226,7 @@ public class AI implements IAI {
         int roadEnd = road_temp.getEndLocation().getIndex();
 
         if (road_temp != null) {
-            result += "P" + (owner.getIndex() + 1) + " [CR " + ((roadStart < 10) ? ("0" + roadStart) : roadStart) + " " + ((roadEnd < 10) ? ("0" + roadEnd) : roadEnd) + "] R\n";
+            result += "P" + (owner.getIndex() + 1) + " [CR " + ((roadStart < 10) ? ("0" + roadStart) : roadStart) + " " + ((roadEnd < 10) ? ("0" + roadEnd) : roadEnd) + "] R\r\n";
             return true;
         }
 

@@ -6,11 +6,12 @@ import java.util.*;
 import java.io.File;
 import java.io.InputStream;
 
-class Main {
+public class Main {
     public static void main(String[] args) {
         ArrayList<Player> players = createPlayers();
 
         Board board = new Board(players);
+        board.setActive(true);
 
         for (Player player : players) {
             player.createAI(board);
@@ -37,10 +38,13 @@ class Main {
                         for (Player player : players) {
                             if (player.getType() != PlayerType.HUMAN) {
                                 String turnMode = communication_ini.get("General", "turnMode[" + player.getIndex() + "]", String.class);
+                                boolean isInitial = communication_ini.get("Game State", "isInitial", String.class).equals("\"true\"");
                                 turnMode = Global.getRidOf_quotationMarks(turnMode);
 
-                                if (turnMode.equals("waiting")) {
-                                    player.writeMove(true);
+                                if (turnMode.equals("waiting") && player.getState() != PlayerState.THINKING) {
+                                    player.setState(PlayerState.THINKING);
+
+                                    player.writeMove(isInitial);
 
                                     communication_ini.put("General", "turnMode[" + player.getIndex() + "]", "\"done\"");
                                     communication_ini.store();
@@ -68,7 +72,7 @@ class Main {
         timer.schedule(task, 0, 333);
     }
 
-    private static ArrayList<Player> createPlayers() {
+    public static ArrayList<Player> createPlayers() {
         ArrayList<Player> players = new ArrayList<>();
         for (int i = 0; i < Global.PLAYER_COUNT; i++) {
             Player player = new Player(i);

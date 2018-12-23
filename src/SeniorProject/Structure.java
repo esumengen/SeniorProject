@@ -1,7 +1,9 @@
 package SeniorProject;
 
 
-public abstract class Structure {
+import java.io.Serializable;
+
+public abstract class Structure implements Serializable {
     private Player player;
 
     Structure(Player player){

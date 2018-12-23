@@ -1,16 +1,21 @@
 package SeniorProject;
 
+import java.io.Serializable;
 import java.util.*;
 
-enum ResourceType {
+enum ResourceType implements Serializable {
     BRICK, ORE, GRAIN, LUMBER, WOOL
 }
 
-enum PlayerType {
+enum PlayerType implements Serializable {
     AI, HUMAN
 }
 
-public class Player {
+enum PlayerState implements Serializable {
+    THINKING, READY
+}
+
+public class Player implements Serializable {
     private String name;
     private int index;
     private PlayerType type;
@@ -20,6 +25,7 @@ public class Player {
     private int knight = 0;
     private AI ai;
     private Board board;
+    private PlayerState state = PlayerState.READY;
 
     public Player (int index){
         this.index = index;
@@ -38,12 +44,21 @@ public class Player {
     }
 
     void writeMove (boolean isInitial) {
-
         String actionList_str = ai.createMoves(isInitial);
 
         String fileName = "actions_temp" + index + ".txt";
         Global.createTextFile(fileName, actionList_str);
+        Global.createTextFile(System.nanoTime()+fileName, actionList_str);
 
+        setState(PlayerState.READY);
+    }
+
+    void setState (PlayerState state) {
+        this.state = state;
+    }
+
+    PlayerState getState () {
+        return state;
     }
 
     String getName() {

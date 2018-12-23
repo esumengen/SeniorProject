@@ -8,6 +8,18 @@ import java.util.ArrayList;
 
 
 public class TestBoard {
+        @Test
+        public void copyTest() {
+            ArrayList<Player> players = Main.createPlayers();
+
+            Board board = new Board(players);
+            Board boardCopy = Board.deepCopy(board);
+
+            board.toString();
+            boardCopy.toString();
+
+            Assert.assertEquals(board.toString(), boardCopy.toString());
+        }
 
         @Test
         public void testRoad(){

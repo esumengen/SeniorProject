@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Locale;
 
-class Board {
+public class Board implements Serializable {
     private static final int landCount_horizontal_max = 7;
     private static final int landCount_vertical = 7;
     private static final int landCount_horizontal_min = landCount_horizontal_max - (int) Math.floor(landCount_vertical / 2);
@@ -16,8 +16,11 @@ class Board {
     private ArrayList<Player> players;
     private int locationCount = calculateLocationCount();
     private Land robbedLand;
+    private boolean isActive;
 
-    Board(ArrayList<Player> players) {
+    public Board(ArrayList<Player> players) {
+        this.isActive = false;
+
         this.players = players;
 
         //region Initialization of Lands&Locations
@@ -342,6 +345,19 @@ class Board {
             }
         }
         Global.addLog("New resources are generated.");
+    }
+
+    void addLog (String log) {
+        if (isActive)
+            Global.addLog(log);
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public boolean isActive() {
+        return isActive;
     }
 
     void syncPlayer(Player player) {

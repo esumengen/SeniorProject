@@ -1,6 +1,8 @@
 package SeniorProject;
 
-public class City extends Building {
+import java.io.Serializable;
+
+public class City extends Building implements Serializable {
 
     private static final BuildingType TYPE = BuildingType.CITY;
 

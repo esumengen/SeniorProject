@@ -1,8 +1,9 @@
 package SeniorProject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Location {
+public class Location implements Serializable {
     private int index;
     private ArrayList<Land> adjacentLands;
     private ArrayList<Location> adjacentLocations;
