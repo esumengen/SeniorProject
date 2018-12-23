@@ -39,7 +39,7 @@ public class Player implements Serializable {
         resources.put(ResourceType.WOOL, this.wool);
     }
 
-    int getIndex() {
+    public int getIndex() {
         return index;
     }
 
@@ -61,7 +61,7 @@ public class Player implements Serializable {
         return state;
     }
 
-    String getName() {
+    public String getName() {
         return name;
     }
 
@@ -73,47 +73,47 @@ public class Player implements Serializable {
         this.type = type;
     }
 
-    ArrayList<Structure> getStructures() {
+    public ArrayList<Structure> getStructures() {
         return structures;
     }
 
-    int getGrain() {
+    public int getGrain() {
         return grain;
     }
 
-    void setGrain(int grain) {
+    public void setGrain(int grain) {
         this.grain = grain;
     }
 
-    int getLumber() {
+    public int getLumber() {
         return lumber;
     }
 
-    void setLumber(int lumber) {
+    public void setLumber(int lumber) {
         this.lumber = lumber;
     }
 
-    int getOre() {
+    public int getOre() {
         return ore;
     }
 
-    void setOre(int ore) {
+    public void setOre(int ore) {
         this.ore = ore;
     }
 
-    int getWool() {
+    public int getWool() {
         return wool;
     }
 
-    void setWool(int wool) {
+    public void setWool(int wool) {
         this.wool = wool;
     }
 
-    int getBrick() {
+    public int getBrick() {
         return brick;
     }
 
-    void setBrick(int brick) {
+    public void setBrick(int brick) {
         this.brick = brick;
     }
 
@@ -132,5 +132,9 @@ public class Player implements Serializable {
 
     public int getKnight() {
         return knight;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

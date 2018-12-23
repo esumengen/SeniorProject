@@ -16,14 +16,14 @@ enum LandType implements Serializable {
     }
 }
 
-class Land implements Serializable {
+public class Land implements Serializable {
     private int index;
     private LandType type;
     private ArrayList<Location> adjacentLocations;
     private int diceNo;
     private double diceChance = 0;
 
-    Land(int index) {
+    public Land(int index) {
         this.adjacentLocations = new ArrayList<>();
         this.index = index;
         this.type = LandType.NONE;

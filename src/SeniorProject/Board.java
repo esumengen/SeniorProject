@@ -155,7 +155,7 @@ public class Board implements Serializable {
             location.setActive(true);
     }
 
-    void createSettlement(Player player, Location location) {
+    public void createSettlement(Player player, Location location) {
         Settlement settlement = new Settlement(location, player);
         structures.add(settlement);
 
@@ -388,11 +388,11 @@ public class Board implements Serializable {
         return locations;
     }
 
-    ArrayList<Player> getPlayers() {
+    public ArrayList<Player> getPlayers() {
         return players;
     }
 
-    ArrayList<Structure> getStructures() {
+    public ArrayList<Structure> getStructures() {
         return structures;
     }
 
