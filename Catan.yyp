@@ -39,6 +39,14 @@
             }
         },
         {
+            "Key": "059a1a75-1cab-4273-817d-cafdd5ef30da",
+            "Value": {
+                "id": "f0e9e7d5-59da-4d13-92ca-6f8a7cd98414",
+                "resourcePath": "scripts\\get_player_position\\get_player_position.yy",
+                "resourceType": "GMScript"
+            }
+        },
+        {
             "Key": "0fcf52cd-a229-46d8-ae71-52303b5e863f",
             "Value": {
                 "id": "daeb7194-7f7d-40b1-829e-5156c5f98417",
@@ -167,6 +175,14 @@
             }
         },
         {
+            "Key": "4453b1fe-5c4a-4b9b-abed-9c0d42767013",
+            "Value": {
+                "id": "4077c9ad-b353-4a70-a7a1-cfa8540ea9bb",
+                "resourcePath": "datafiles_yy\\CatanAI.jar.yy",
+                "resourceType": "GMIncludedFile"
+            }
+        },
+        {
             "Key": "45fd7fdb-b6ec-4e85-a686-47dfb701cc44",
             "Value": {
                 "id": "8bb41d85-b503-4837-9e58-2ac75df827b4",
@@ -187,6 +203,14 @@
             "Value": {
                 "id": "acc7ca97-a04b-4918-9689-088606a318a0",
                 "resourcePath": "sprites\\sprLocation\\sprLocation.yy",
+                "resourceType": "GMSprite"
+            }
+        },
+        {
+            "Key": "4b5a5956-b1a8-473c-97c0-7f776ac14830",
+            "Value": {
+                "id": "39bf0eb6-535d-4795-9943-9b003d441c4d",
+                "resourcePath": "sprites\\sprTurnLine\\sprTurnLine.yy",
                 "resourceType": "GMSprite"
             }
         },
@@ -311,6 +335,14 @@
             }
         },
         {
+            "Key": "8427047f-9ef8-4c77-89f3-9c20623d07b6",
+            "Value": {
+                "id": "cc727aa9-0b17-4723-9eab-b31974db1bb3",
+                "resourcePath": "options\\ios\\options_ios.yy",
+                "resourceType": "GMiOSOptions"
+            }
+        },
+        {
             "Key": "85e666a3-79ca-432e-8f32-9bbb0bf0fc74",
             "Value": {
                 "id": "70c83fbc-448e-497e-a897-c2cdacc85ca1",
@@ -359,6 +391,14 @@
             }
         },
         {
+            "Key": "a128950b-5063-4876-b4a6-b99dbd2ea6d1",
+            "Value": {
+                "id": "191c0da8-7988-411f-90bf-61cc110e8e26",
+                "resourcePath": "options\\amazonfire\\options_amazonfire.yy",
+                "resourceType": "GMAmazonFireOptions"
+            }
+        },
+        {
             "Key": "a16cdc86-8eda-4cf3-a6c6-a276b6cc401d",
             "Value": {
                 "id": "4c87107c-0f8a-4769-80d7-41fca0d40f74",
@@ -383,14 +423,6 @@
             }
         },
         {
-            "Key": "acd90830-ab44-4c47-bd7f-d7485b124f18",
-            "Value": {
-                "id": "d80bba27-2324-4202-9729-cae9e782f222",
-                "resourcePath": "datafiles_yy\\CatanAI.jar.yy",
-                "resourceType": "GMIncludedFile"
-            }
-        },
-        {
             "Key": "b458f113-d899-4f90-8836-09ead9f0c481",
             "Value": {
                 "id": "8077d0e4-595c-45f2-b65e-dfc8ab9348a7",
@@ -407,11 +439,43 @@
             }
         },
         {
+            "Key": "b7a16610-62f4-42f8-9f28-61b861e8cb9e",
+            "Value": {
+                "id": "e6a7d45f-13f4-4ec6-a9bf-bb2ce6cdc441",
+                "resourcePath": "scripts\\make_adjacents\\make_adjacents.yy",
+                "resourceType": "GMScript"
+            }
+        },
+        {
             "Key": "b91f25bc-7503-4576-8333-aa364bd7b097",
             "Value": {
                 "id": "e8fceee4-4da0-4f98-8e29-526cd1cb3a5e",
                 "resourcePath": "sprites\\sprRoad\\sprRoad.yy",
                 "resourceType": "GMSprite"
+            }
+        },
+        {
+            "Key": "bb9673d9-8892-4b59-9698-2fc2e3eedb04",
+            "Value": {
+                "id": "39b14bd1-2920-4ca3-a7ec-271e5257c046",
+                "resourcePath": "sprites\\sprResourceCard\\sprResourceCard.yy",
+                "resourceType": "GMSprite"
+            }
+        },
+        {
+            "Key": "c4a51ab8-7495-4769-bc10-fdfd7eaa3bb6",
+            "Value": {
+                "id": "d365260e-3bdb-4570-a413-8290df88aae3",
+                "resourcePath": "objects\\contBelowFloor\\contBelowFloor.yy",
+                "resourceType": "GMObject"
+            }
+        },
+        {
+            "Key": "c750c516-9d35-4bc0-b35d-412bac599a01",
+            "Value": {
+                "id": "b9d410dc-bcc7-449b-9263-daebe70b03a2",
+                "resourcePath": "scripts\\roll_dice\\roll_dice.yy",
+                "resourceType": "GMScript"
             }
         },
         {
@@ -463,6 +527,14 @@
             }
         },
         {
+            "Key": "cf3a8a2c-3cd7-4547-b42d-97b2bba24e5b",
+            "Value": {
+                "id": "bf8e887b-0c67-4a26-a55d-e038e89b83da",
+                "resourcePath": "scripts\\get_resource_color\\get_resource_color.yy",
+                "resourceType": "GMScript"
+            }
+        },
+        {
             "Key": "cffe3980-0a67-4053-b7f6-541a7810f1ec",
             "Value": {
                 "id": "b95ec437-6b6d-4b8e-bc9f-4b83bc7e2531",
@@ -495,6 +567,14 @@
             }
         },
         {
+            "Key": "e42bf5cc-3f46-4d67-a6d0-a4885a11ac3f",
+            "Value": {
+                "id": "ca3598dc-030e-4c48-93ae-5b3ed39ed29c",
+                "resourcePath": "options\\android\\options_android.yy",
+                "resourceType": "GMAndroidOptions"
+            }
+        },
+        {
             "Key": "ecac0d65-1668-4e3d-a48d-5bacabc170c3",
             "Value": {
                 "id": "998e0389-e849-45c7-8260-7b12e27b863c",
@@ -519,14 +599,6 @@
             }
         },
         {
-            "Key": "fbcc6110-ebad-4949-a9b4-f7b3cb5e6b55",
-            "Value": {
-                "id": "15cc654f-7c89-40b0-b953-cde793db688c",
-                "resourcePath": "scripts\\get_nearest_locations\\get_nearest_locations.yy",
-                "resourceType": "GMScript"
-            }
-        },
-        {
             "Key": "fe754ccb-131c-4b4c-93e3-c337984e0850",
             "Value": {
                 "id": "14bf6cf1-9eec-484d-b511-cb8214e62d1b",
@@ -547,6 +619,7 @@
         "fe754ccb-131c-4b4c-93e3-c337984e0850",
         "332692c1-53fc-4273-8e17-bcb898f9a2e4",
         "3461ef3c-2d4b-4dd2-8f0f-ca02caf80281",
+        "cf3a8a2c-3cd7-4547-b42d-97b2bba24e5b",
         "45fd7fdb-b6ec-4e85-a686-47dfb701cc44",
         "ccb2d430-7e7c-4088-bb69-97228b65f846",
         "a16cdc86-8eda-4cf3-a6c6-a276b6cc401d",
@@ -557,14 +630,16 @@
         "ce2bc652-e511-40ca-8d51-3ee977f55b6c",
         "ce47b7cc-d5f0-4f12-b888-8bf79944742e",
         "28396e54-d9ee-46ca-a14a-be91f711b1bf",
-        "fbcc6110-ebad-4949-a9b4-f7b3cb5e6b55",
         "5faaac40-396a-4b06-b0a8-6aeb514545ca",
         "19d1cacb-9796-49e0-b9bc-149f85bde809",
         "24d5ef23-4165-4a2a-bf28-de7def465abf",
         "74bc6dfb-5b2a-4e18-9003-82ce5108755d",
         "b458f113-d899-4f90-8836-09ead9f0c481",
         "dbe497cf-ee24-4d7a-8f95-560df9659084",
-        "94a19750-40fd-4362-a2d1-04f8965aa77b"
+        "94a19750-40fd-4362-a2d1-04f8965aa77b",
+        "c750c516-9d35-4bc0-b35d-412bac599a01",
+        "059a1a75-1cab-4273-817d-cafdd5ef30da",
+        "b7a16610-62f4-42f8-9f28-61b861e8cb9e"
     ],
     "tutorial": ""
 }

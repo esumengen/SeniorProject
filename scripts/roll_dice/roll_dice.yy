@@ -1,8 +1,8 @@
 {
-    "id": "fbcc6110-ebad-4949-a9b4-f7b3cb5e6b55",
+    "id": "c750c516-9d35-4bc0-b35d-412bac599a01",
     "modelName": "GMScript",
     "mvc": "1.0",
-    "name": "get_nearest_locations",
+    "name": "roll_dice",
     "IsCompatibility": false,
     "IsDnD": false
 }

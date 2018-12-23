@@ -17,3 +17,9 @@ var fileActions = file_text_open_append("actions.txt")
 		fileActions, "P"+string(playerIndex)+" ["+actionType+" "+paramPart+"] "+actionObject+"\n"
 	)
 file_text_close(fileActions)
+
+var fileActions_fromClient = file_text_open_append("actions_from_client.txt")
+	file_text_write_string(
+		fileActions_fromClient, "P"+string(playerIndex)+" ["+actionType+" "+paramPart+"] "+actionObject+"\n"
+	)
+file_text_close(fileActions_fromClient)

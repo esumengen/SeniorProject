@@ -13,13 +13,17 @@ global.robberLand = pointer_null
 
 global.debugMode = false
 
+global.actionWriting_mode = true
+
 global.resources = ds_grid_create(PLAYER_COUNT+1, RESOURCE_COUNT)
 for (var i = 1; i <= PLAYER_COUNT; i++) {
 	ds_grid_add(global.resources, i, resource_brick, 0)
 	ds_grid_add(global.resources, i, resource_ore, 0)
 	ds_grid_add(global.resources, i, resource_grain, 0)
-	ds_grid_add(global.resources, i, resource_wood, 0)
+	ds_grid_add(global.resources, i, resource_lumber, 0)
 	ds_grid_add(global.resources, i, resource_wool, 0)
+	
+	global.playerScore[i] = 0
 }
 
 #region CREATE BOARD
@@ -50,8 +54,8 @@ for (var i = 0; i < landCount_vertical; i++) {
 		}
 		else if (i == 0 or i == landCount_vertical-1 or j == 0 or j == landCount_horizontal-1) {
 			land.type = ltype_sea
-			land.image_xscale += 0.14
-			land.image_yscale += 0.14
+			land.image_xscale += 0.17
+			land.image_yscale += 0.17
 			land.image_alpha = 1
 		}
 		
@@ -72,7 +76,7 @@ for (var i = 0; i < landCount_vertical; i++) {
 			if (!position_meeting(xx, yy, objLocation)) {
 				var location = instance_create_layer(xx, yy, "lyRoad", objLocation)
 				location.index = -1
-				ds_list_add(global.locations, location)
+				//ds_list_add(global.locations, location)
 			}
 		}
 	}
@@ -92,7 +96,7 @@ for (var i = 0; i < ds_size; i++) {
 		ds_list_add(land.adjacentLocations, nearestLocation)
 		
 		if (land.type != ltype_sea)
-			nearestLocation.active = true
+			nearestLocation.isActive = true
 	}
 }
 #endregion
@@ -129,21 +133,28 @@ for (var i = 0; i < landCount_vertical; i++) {
 				ds_list_add(upsideLocs, upsideLoc.index)
 			}
 			
-			var location
-			location = ds_list_find_value(adjacentLocations, 2)
-			location.index = upsideLoc.index-1
+			var locationUL
+			locationUL = ds_list_find_value(adjacentLocations, 2)
+			locationUL.index = upsideLoc.index-1
+			make_adjacents(locationUL, upsideLoc)
 			
-			location = ds_list_find_value(adjacentLocations, 0)
-			location.index = upsideLoc.index+1
+			var locationUR = ds_list_find_value(adjacentLocations, 0)
+			locationUR.index = upsideLoc.index+1
+			make_adjacents(locationUR, upsideLoc)
 			
 			var downsideLoc = ds_list_find_value(adjacentLocations, 4)
 			downsideLoc.index = upsideLoc.index+2*landCount_horizontal+2-(landCount_horizontal == landCount_horizontal_max)
 			
-			location = ds_list_find_value(adjacentLocations, 3)
-			location.index = downsideLoc.index-1
+			var locationDL = ds_list_find_value(adjacentLocations, 3)
+			locationDL.index = downsideLoc.index-1
+			make_adjacents(locationDL, downsideLoc)
 			
-			location = ds_list_find_value(adjacentLocations, 5)
-			location.index = downsideLoc.index+1
+			var locationDR = ds_list_find_value(adjacentLocations, 5)
+			locationDR.index = downsideLoc.index+1
+			make_adjacents(locationDR, downsideLoc)
+			
+			make_adjacents(locationUR, locationDR)
+			make_adjacents(locationUL, locationDL)
 		}
 		
 		landIndex++
@@ -151,6 +162,39 @@ for (var i = 0; i < landCount_vertical; i++) {
 }
 
 ds_list_destroy(upsideLocs)
+#endregion
+
+#region ADD LOCATIONS TO THE LIST
+	while (ds_list_size(global.locations) != instance_number(objLocation)) {
+		with (objLocation) {
+			if (index == ds_list_size(global.locations))
+				ds_list_add(global.locations, id)
+		}
+	}
+#endregion
+
+#region INIT FILES
+file_delete("environment.ini")
+
+file_delete("communication.ini")
+ini_open("communication.ini")
+	ini_write_string("General", "isSynchronized", "true")
+	
+	for (var i = 1; i < PLAYER_COUNT; i++)
+		ini_write_string("General", "turnMode["+string(i)+"]", "normal")
+		
+	ini_write_string("Game State", "isInitial", global.initialPhase ? "true" : "false")
+ini_close()
+
+file_delete("actions.txt")
+var fileActions = file_text_open_write("actions.txt")
+	file_text_write_string(fileActions, "")
+file_text_close(fileActions)
+
+file_delete("log.txt")
+
+for (var i = 1; i < PLAYER_COUNT; i++)
+	file_delete("actions_temp"+string(i)+".txt")
 #endregion
 
 #region SET LAND TYPES
@@ -209,18 +253,6 @@ ini_open("environment.ini")
 ini_close()
 #endregion
 
-#region INIT FILES
-file_delete("environment.ini")
-ini_open("environment.ini")
-		ini_write_string("General", "isSynchronized", "true")
-ini_close()
-
-file_delete("actions.txt")
-var fileActions = file_text_open_write("actions.txt")
-	file_text_write_string(fileActions, "")
-file_text_close(fileActions)
-#endregion
-
 // Move Variables
 global.robberAddition_mode = false
 
@@ -241,3 +273,5 @@ draw_set_font(fontMain)
 global.addStructure_mode = true
 global.addStructure_object = objSettlement
 #endregion
+
+alarm[9] = sec

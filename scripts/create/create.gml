@@ -34,7 +34,8 @@ if (argument[1] == objRoad) {
 		ds_list_add(argument[2].structures, roadObject)
 		ds_list_add(argument[3].structures, roadObject)
 		
-		action_write(argument[0], action_create, argument[2].index, argument[3].index, actionObject_road)
+		if (global.actionWriting_mode)
+			action_write(argument[0], action_create, argument[2].index, argument[3].index, actionObject_road)
 	}
 	else
 		instance_destroy(roadObject)
@@ -58,7 +59,20 @@ else if (argument[1] == objSettlement) {
 		
 		ds_list_add(argument[2].structures, settlementObject)
 		
-		action_write(argument[0], action_create, argument[2].index, actionObject_settlement)
+		if (global.initialPhase and structure_count(global.player_active, objSettlement) == 2) {
+			with (settlementObject.location) {
+				for (var i = 0; i < ds_list_size(adjacentLands); i++) {
+					var land = ds_list_find_value(adjacentLands, i)
+					
+					add_resource(settlementObject.playerIndex, get_resource(land.type), 1)
+				}
+			}
+		}
+		
+		if (global.actionWriting_mode)
+			action_write(argument[0], action_create, argument[2].index, actionObject_settlement)
+			
+		global.playerScore[global.player_active] += 1
 	}
 	else
 		instance_destroy(settlementObject)

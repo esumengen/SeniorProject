@@ -1,0 +1,1 @@
+ExecuteShell("CatanAI.jar", false)

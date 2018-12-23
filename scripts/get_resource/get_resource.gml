@@ -5,7 +5,7 @@ if (argument[0] == ltype_fields)
 else if (argument[0] == ltype_pasture)
 	return resource_wool
 else if (argument[0] == ltype_forest)
-	return resource_wood
+	return resource_lumber
 else if (argument[0] == ltype_mountains)
 	return resource_ore
 else if (argument[0] == ltype_hills)

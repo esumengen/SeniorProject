@@ -12,7 +12,7 @@ else
 draw_sprite_ext(sprite_index, isSea*2, x, y, image_xscale, image_yscale, 0, image_blend, image_alpha)
 
 if (!isSea and !mouseOn)
-	draw_sprite_ext(sprite_index, 0, x, y, image_xscale, image_yscale, 0, c_black, image_alpha*0.3)
+	draw_sprite_ext(sprite_index, 0, x, y, image_xscale, image_yscale, 0, c_black, image_alpha*0.4)
 
 if (isSea)
 	gpu_set_texfilter(true)

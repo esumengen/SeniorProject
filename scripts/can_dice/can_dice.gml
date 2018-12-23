@@ -1,1 +1,1 @@
-return global.player_active == 1 and !global.isDiceRolled and !global.initialPhase
+return !global.isDiceRolled and !global.initialPhase

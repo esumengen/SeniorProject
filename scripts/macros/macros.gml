@@ -3,6 +3,7 @@
 #macro c_fields c_yellow
 #macro c_desert make_color_rgb(238, 232, 170)
 #macro c_brick make_color_rgb(207, 16, 32)
+#macro c_default c_black
 
 #macro ltypeStart 500
 #macro ltypeCount 7
@@ -24,7 +25,7 @@
 #macro resource_brick 0
 #macro resource_ore 1
 #macro resource_grain 2
-#macro resource_wood 3
+#macro resource_lumber 3
 #macro resource_wool 4
 
 #macro ltype_fields 500

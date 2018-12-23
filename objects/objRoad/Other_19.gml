@@ -13,6 +13,6 @@ with (objRoad) {
 
 condition = (structure_count(playerIndex, objSettlement, location[0]) > 0 or structure_count(playerIndex, objSettlement, location[1]) > 0
 or structure_count(playerIndex, objRoad, location[0]) > 0 or structure_count(playerIndex, objRoad, location[1]) > 0)
-and location[0].active and location[1].active
+and location[0].isActive and location[1].isActive
 and location[0] != location[1]
 and !sameExists
