@@ -137,6 +137,11 @@ public class Player implements Serializable {
         this.ai = new AI(this, board);
     }
 
+    public AI getAi() {
+        return ai;
+    }
+
+
     public int getKnight() {
         return knight;
     }

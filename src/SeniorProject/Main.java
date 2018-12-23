@@ -22,6 +22,8 @@ public class Main {
 
         Synchronizer synchronizer = new Synchronizer(board);
 
+        AIFrame aiFrame = new AIFrame(board);
+
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
             @Override

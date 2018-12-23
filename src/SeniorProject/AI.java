@@ -238,11 +238,16 @@ public class AI implements IAI, Serializable {
         return false;
     }
 
+    public ArrayList<Boolean> getCanAfford() {
+        return canAfford;
+    }
+
     public boolean isPHMove() {
         return owner.getStructures().size() == 2;
     }
 
-    enum MoveType {
-        CreateSettlement, CreateRoad, UpgradeSettlement, DevelopmentCard, Trade, KnightCard, etc
+    public enum MoveType {
+        CreateSettlement, CreateRoad, UpgradeSettlement, DevelopmentCard, Trade, KnightCard, etc;
     }
+
 }
