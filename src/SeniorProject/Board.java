@@ -20,8 +20,6 @@ public class Board implements Serializable {
     private boolean isActive;
 
     public Board(ArrayList<Player> players) {
-        new Message("cons");
-
         this.isActive = false;
 
         this.players = players;

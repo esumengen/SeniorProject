@@ -46,7 +46,6 @@ public class Main {
 
                                 if (turnMode.equals("waiting") && player.getState() != PlayerState.THINKING) {
                                     player.setState(PlayerState.THINKING);
-                                    Global.addLog("        Player " + (player.getIndex() + 1) + " has started thinking.");
 
                                     player.writeMove(isInitial);
 
