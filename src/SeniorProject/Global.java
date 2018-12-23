@@ -1,8 +1,11 @@
 package SeniorProject;
 
+import org.apache.commons.lang3.SerializationUtils;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Serializable;
 
 enum OSType {
     WINDOWS, MAC;
@@ -40,11 +43,35 @@ class Global {
         return String.copyValueOf(string.toCharArray(), 1, string.length() - 2);
     }
 
+    public static Board deepCopy(Serializable object) {
+        Board copy = (Board) SerializationUtils.clone(object);
+        return copy;
+
+        /*try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ObjectOutputStream outputStrm = new ObjectOutputStream(outputStream);
+
+            outputStrm.writeObject(object);
+
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+            ObjectInputStream objInputStream = new ObjectInputStream(inputStream);
+
+            Global.addLog("DC2");
+
+            return (Board) objInputStream.readObject();
+        }
+        catch (Exception e) {
+            Global.addLog("DC ER");
+            e.printStackTrace();
+            return null;
+        }*/
+    }
+
     static void addLog(String text) {
         createTextFile(LOG_FILE, text);
     }
 
-    static void createTextFile (String filename, String text) {
+    static void createTextFile(String filename, String text) {
         BufferedWriter bufferedWriter = null;
         FileWriter fileWriter = null;
 
@@ -55,7 +82,7 @@ class Global {
             bufferedWriter.write(text);
             bufferedWriter.newLine();
         } catch (IOException e) {
-            new Message(e.getMessage()+" - 5");
+            new Message(e.getMessage() + " - 5");
         } finally {
             try {
                 if (bufferedWriter != null)
@@ -65,7 +92,7 @@ class Global {
                     fileWriter.close();
 
             } catch (IOException e) {
-                new Message(e.getMessage()+" - 6");
+                new Message(e.getMessage() + " - 6");
             }
         }
     }

@@ -16,16 +16,11 @@ public class AI implements IAI, Serializable {
     public AI(Player player, Board board) {
         this.owner = player;
         this.board = board;
-        this.virtualBoard = Board.deepCopy(board);
 
         this.canAfford = new ArrayList<>();
         for (int i = 0; i < MoveType.values().length; i++) {
             canAfford.add(false);
         }
-    }
-
-    enum MoveType {
-        CreateSettlement, CreateRoad, UpgradeSettlement, DevelopmentCard, Trade, KnightCard, etc
     }
 
     void isAffordable(MoveType type) {
@@ -66,17 +61,25 @@ public class AI implements IAI, Serializable {
         }
     }
 
+    public void clearVirtualBoards() {
+        virtualBoard = null;
+        System.gc();
+    }
 
     public String createMoves(boolean isInitial) {
-        this.virtualBoard = Board.deepCopy(board);
+        clearVirtualBoards();
+        this.virtualBoard = Global.deepCopy(board);
+        virtualBoard.setActive(false);
+        result = "";
 
         ArrayList<MoveType> moves = new ArrayList<>();
+        Global.addLog("CM3");
 
         if (isInitial) {
             moves.add(MoveType.CreateSettlement);
             moves.add(MoveType.CreateRoad);
         } else {
-
+            Global.addLog("CM4");
         }
 
         for (int i = 0; i < moves.size(); i++) {
@@ -85,7 +88,7 @@ public class AI implements IAI, Serializable {
             switch (move) {
                 case CreateSettlement:
                     createSettlement_move(isInitial);
-                break;
+                    break;
 
                 case CreateRoad:
                     if (isInitial) {
@@ -108,10 +111,13 @@ public class AI implements IAI, Serializable {
                 case KnightCard:
                     break;
             }
+            Global.addLog("CM5");
 
             moves.remove(i);
             i--;
         }
+
+        Global.addLog("CMEND");
 
         return result;
     }
@@ -135,8 +141,8 @@ public class AI implements IAI, Serializable {
         int count = 0;
         while (count < 100) {
             Structure structure = owner.getStructures().get(Math.abs(randomGenerator.nextInt(owner.getStructures().size())));
-            if (structure instanceof Settlement) {
-                result += "P" + (owner.getIndex() + 1) + " [CR " + ((((Settlement) structure).getLocation().getIndex() < 10) ? ("0" + ((Settlement) structure).getLocation().getIndex()) : ((Settlement) structure).getLocation().getIndex()) + "] S\r\n";
+
+            if (structure instanceof Settlement) { result += "P" + (owner.getIndex() + 1) + " [CR " + ((((Settlement) structure).getLocation().getIndex() < 10) ? ("0" + ((Settlement) structure).getLocation().getIndex()) : ((Settlement) structure).getLocation().getIndex()) + "] S\r\n";
                 virtualBoard.createSettlement(virtualBoard.getPlayers().get(owner.getIndex()), virtualBoard.getLocations().get(((Settlement) structure).getLocation().getIndex()));
                 return true;
             }
@@ -148,7 +154,6 @@ public class AI implements IAI, Serializable {
     private boolean developmentCard_Move() {
         return false;
     }
-
 
     private Location getMostValuableLocation() {
         return getMostValuableLocation(false);
@@ -235,5 +240,9 @@ public class AI implements IAI, Serializable {
 
     public boolean isPHMove() {
         return owner.getStructures().size() == 2;
+    }
+
+    enum MoveType {
+        CreateSettlement, CreateRoad, UpgradeSettlement, DevelopmentCard, Trade, KnightCard, etc
     }
 }

@@ -52,12 +52,12 @@ public class Land implements Serializable {
         return type;
     }
 
-    ResourceType getResourceType () {
-        return type.toResourceType();
-    }
-
     void setType(LandType type) {
         this.type = type;
+    }
+
+    ResourceType getResourceType() {
+        return type.toResourceType();
     }
 
     int getIndex() {

@@ -2,7 +2,8 @@ package SeniorProject;
 
 import org.ini4j.Wini;
 
-import java.io.*;
+import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -19,6 +20,8 @@ public class Board implements Serializable {
     private boolean isActive;
 
     public Board(ArrayList<Player> players) {
+        new Message("cons");
+
         this.isActive = false;
 
         this.players = players;
@@ -78,14 +81,14 @@ public class Board implements Serializable {
                 int oldResult = result;
                 result += 2 * landCount_horizontal + 2 - ((landCount_horizontal == landCount_horizontal_max) ? 1 : 0);
 
-                makeAdjacent(locations.get(result), locations.get(result-1));
-                makeAdjacent(locations.get(result), locations.get(result+1));
+                makeAdjacent(locations.get(result), locations.get(result - 1));
+                makeAdjacent(locations.get(result), locations.get(result + 1));
                 bind(land, locations.get(result - 1));
                 bind(land, locations.get(result));
                 bind(land, locations.get(result + 1));
 
-                makeAdjacent(locations.get(oldResult-1), locations.get(result-1));
-                makeAdjacent(locations.get(oldResult+1), locations.get(result+1));
+                makeAdjacent(locations.get(oldResult - 1), locations.get(result - 1));
+                makeAdjacent(locations.get(oldResult + 1), locations.get(result + 1));
 
                 landIndex++;
             }
@@ -95,19 +98,13 @@ public class Board implements Serializable {
         load(lands);
     }
 
-    public static Board deepCopy(Object object) {
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            ObjectOutputStream outputStrm = new ObjectOutputStream(outputStream);
-            outputStrm.writeObject(object);
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
-            ObjectInputStream objInputStream = new ObjectInputStream(inputStream);
-            return (Board) objInputStream.readObject();
+    private static int calculateLocationCount() {
+        int sum = 0;
+
+        for (int i = landCount_horizontal_max; i >= landCount_horizontal_min; i--) {
+            sum += 2 * (2 * i + 1);
         }
-        catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return sum;
     }
 
     private void makeAdjacent(Location location1, Location location2) {
@@ -142,7 +139,7 @@ public class Board implements Serializable {
 
             Global.addLog("SUCCESS: The game is loaded to the AI.");
         } catch (Exception e) {
-            new Message(e.getMessage()+" - 7");
+            new Message(e.getMessage() + " - 7");
 
             Global.addLog("ERROR: The game is not loaded to the AI.");
         }
@@ -151,7 +148,7 @@ public class Board implements Serializable {
     private void bind(Land land, Location location) {
         land.getAdjacentLocations().add(location);
         location.getAdjacentLands().add(land);
-        if(land.getType() != LandType.SEA)
+        if (land.getType() != LandType.SEA)
             location.setActive(true);
     }
 
@@ -161,7 +158,7 @@ public class Board implements Serializable {
 
         location.setOwner(player);
 
-        Global.addLog("ACTION: A settlement has been added on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
+        addLog("ACTION: A settlement has been added on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
 
         syncPlayer(player);
     }
@@ -170,7 +167,7 @@ public class Board implements Serializable {
         Road road = new Road(location_first, location_second, player);
         structures.add(road);
 
-        Global.addLog("ACTION: A road has been added between [Location " + location_first.getIndex() + " and Location " + location_second.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
+        addLog("ACTION: A road has been added between [Location " + location_first.getIndex() + " and Location " + location_second.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
 
         syncPlayer(player);
     }
@@ -184,7 +181,7 @@ public class Board implements Serializable {
             }
         }
 
-        Global.addLog("ACTION: A settlement has been upgraded on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
+        addLog("ACTION: A settlement has been upgraded on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
 
         syncPlayer(player);
     }
@@ -194,11 +191,11 @@ public class Board implements Serializable {
     }
 
     boolean isValid(Structure structure, boolean isInitial) {
-        if(structure instanceof Road) {
+        if (structure instanceof Road) {
             Road road = (Road) structure;
             Location end = road.getEndLocation();
             Location start = road.getStartLocation();
-            boolean isBothLocationsActive =  start.isActive() && end.isActive();
+            boolean isBothLocationsActive = start.isActive() && end.isActive();
 
             // İki ucu aktif olmak zorunda.
             if (!isBothLocationsActive)
@@ -214,15 +211,14 @@ public class Board implements Serializable {
 
             // Herhangi bir ucunda rakip bina olmamalı. (?)
             if (countStructures("Settlement", start) - countStructures("Settlement", start, road.getPlayer())
-                    + countStructures("Settlement", end)  - countStructures("Settlement", end, road.getPlayer()) > 0)
+                    + countStructures("Settlement", end) - countStructures("Settlement", end, road.getPlayer()) > 0)
                 return false;
 
             // İki ucunda en az bir tane kendi yapısı olmalı.
             if (countStructures("Road", start, structure.getPlayer()) + countStructures("Road", end, structure.getPlayer())
                     + countStructures("Settlement", start, structure.getPlayer()) + countStructures("Settlement", end, structure.getPlayer()) == 0)
                 return false;
-        }
-        else if (structure instanceof Building) {
+        } else if (structure instanceof Building) {
             Building settlement = (Building) structure;
 
             // Bu location aktif olmalı.
@@ -245,7 +241,7 @@ public class Board implements Serializable {
         return false;
     }
 
-    boolean roadExits (Road newRoad) {
+    boolean roadExits(Road newRoad) {
         for (Road road : newRoad.getStartLocation().getConnectedRoads()) {
             if ((road.getStartLocation() == newRoad.getStartLocation() && (road.getEndLocation() == newRoad.getEndLocation())) || ((road.getStartLocation() == newRoad.getEndLocation()) && (road.getEndLocation() == road.getStartLocation())))
                 return false;
@@ -254,12 +250,12 @@ public class Board implements Serializable {
         return true;
     }
 
-    boolean radiusCheck (Location location) {
+    boolean radiusCheck(Location location) {
         if (location.hasOwner())
             return false;
 
-        for(Location adjacentLocation : location.getAdjacentLocations()) {
-            if(adjacentLocation.hasOwner())
+        for (Location adjacentLocation : location.getAdjacentLocations()) {
+            if (adjacentLocation.hasOwner())
                 return false;
         }
 
@@ -273,21 +269,19 @@ public class Board implements Serializable {
     int countStructures(String type, Location location, Player player) {
         int count = 0;
 
-        if(type.equals("Road")) {
-            for (Structure structure: location.getStructures()) {
-                if(structure instanceof Road && (player == null || structure.getPlayer() == player))
+        if (type.equals("Road")) {
+            for (Structure structure : location.getStructures()) {
+                if (structure instanceof Road && (player == null || structure.getPlayer() == player))
                     count++;
             }
-        }
-        else if(type.equals("Settlement")) {
-            for (Structure structure: location.getStructures()) {
-                if(structure instanceof Settlement && (player == null || structure.getPlayer() == player))
+        } else if (type.equals("Settlement")) {
+            for (Structure structure : location.getStructures()) {
+                if (structure instanceof Settlement && (player == null || structure.getPlayer() == player))
                     count++;
             }
-        }
-        else if(type.equals("City")) {
-            for (Structure structure: location.getStructures()) {
-                if(structure instanceof City && (player == null || structure.getPlayer() == player))
+        } else if (type.equals("City")) {
+            for (Structure structure : location.getStructures()) {
+                if (structure instanceof City && (player == null || structure.getPlayer() == player))
                     count++;
             }
         }
@@ -299,14 +293,14 @@ public class Board implements Serializable {
         robbedLand = land;
         stealRandomResource(robber, victim, resourceType);
 
-        Global.addLog("ACTION: The robber has been moved to [Land " + land.getIndex() + "] by [Player " + (robber.getIndex() + 1) + "]");
+        addLog("ACTION: The robber has been moved to [Land " + land.getIndex() + "] by [Player " + (robber.getIndex() + 1) + "]");
     }
 
     private void stealRandomResource(Player robber, Player robbed, ResourceType randomType) {
         robbed.addResource(randomType, robbed.getResources().get(randomType) - 1);
         robber.addResource(randomType, 1);
 
-        Global.addLog("ACTION: [Player " + (robbed.getIndex() + 1) + "] is robbed by [Player " + (robber.getIndex() + 1) + "]");
+        addLog("ACTION: [Player " + (robbed.getIndex() + 1) + "] is robbed by [Player " + (robber.getIndex() + 1) + "]");
     }
 
     void tradeBank(int playerIndex, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB) {
@@ -316,20 +310,20 @@ public class Board implements Serializable {
             players.get(playerIndex).setWool(players.get(playerIndex).getWool() - wool);
             players.get(playerIndex).setOre(players.get(playerIndex).getOre() - stone);
             players.get(playerIndex).setBrick(players.get(playerIndex).getBrick() - brick);
-            Global.addLog("ACTION: A trade with bank has been done by [Player " + playerIndex + "]");
+            addLog("ACTION: A trade with bank has been done by [Player " + playerIndex + "]");
         } else {
-            Global.addLog("ACTION: A trade with bank has been failed by [Player " + playerIndex + "]");
+            addLog("ACTION: A trade with bank has been failed by [Player " + playerIndex + "]");
         }
     }
 
     void tradePlayer(int playerIndex1, int playerIndex2, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB) {
-        Global.addLog("TODOACTION: A trade with [Player " + playerIndex2 + 1 + " has been done by [Player " + (playerIndex1 + 1) + "]");
+        addLog("TODOACTION: A trade with [Player " + playerIndex2 + 1 + " has been done by [Player " + (playerIndex1 + 1) + "]");
         // TODO: 30-Nov-18
     }
 
     void rollDice(Player player, int dice1, int dice2) {
         generateResource(dice1 + dice2);
-        Global.addLog("ACTION: Dice are rolled " + dice1 + " " + dice2 + " by [Player " + (player.getIndex() + 1) + "]");
+        addLog("ACTION: Dice are rolled " + dice1 + " " + dice2 + " by [Player " + (player.getIndex() + 1) + "]");
     }
 
     private void generateResource(int diceNo) {
@@ -339,25 +333,26 @@ public class Board implements Serializable {
                     if (location.hasOwner()) {
                         Player rewardedPlayer = location.getOwner();
 
-                        rewardedPlayer.addResource(land.getResourceType(), location.hasCity() ? 2 : 0);
+                        rewardedPlayer.addResource(land.getResourceType(), location.hasCity() ? 2 : 1);
                     }
                 }
             }
         }
-        Global.addLog("New resources are generated.");
+
+        addLog("New resources are generated.");
     }
 
-    void addLog (String log) {
+    void addLog(String log) {
         if (isActive)
             Global.addLog(log);
     }
 
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
     public boolean isActive() {
         return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     void syncPlayer(Player player) {
@@ -369,15 +364,6 @@ public class Board implements Serializable {
                 player.getStructures().add(structure);
             }
         }
-    }
-
-    private static int calculateLocationCount() {
-        int sum = 0;
-
-        for (int i = landCount_horizontal_max; i >= landCount_horizontal_min; i--) {
-            sum += 2 * (2 * i + 1);
-        }
-        return sum;
     }
 
     ArrayList<Land> getLands() {

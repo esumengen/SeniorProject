@@ -88,7 +88,7 @@ class Synchronizer {
             communication_ini.store();
 
         } catch (Exception e) {
-            new Message(e.getMessage()+" - 2");
+            new Message(e.getMessage() + " - 2");
         }
 
         setState(SynchronizerState.WAITING);
@@ -106,7 +106,7 @@ class Synchronizer {
                 isSynchronized_str = Global.getRidOf_quotationMarks(isSynchronized_str);
             }
         } catch (Exception e) {
-            new Message(e.getMessage()+" - 3");
+            new Message(e.getMessage() + " - 3");
         }
 
         return !isSynchronized_str.equals("false");

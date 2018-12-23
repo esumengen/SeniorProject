@@ -2,9 +2,12 @@ package SeniorProject;
 
 import org.ini4j.Wini;
 
-import java.util.*;
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Main {
     public static void main(String[] args) {
@@ -43,6 +46,7 @@ public class Main {
 
                                 if (turnMode.equals("waiting") && player.getState() != PlayerState.THINKING) {
                                     player.setState(PlayerState.THINKING);
+                                    Global.addLog("        Player " + (player.getIndex() + 1) + " has started thinking.");
 
                                     player.writeMove(isInitial);
 
@@ -64,7 +68,7 @@ public class Main {
                     }
                     ///endregion
                 } catch (Exception e) {
-                    new Message(e.getMessage()+" - 1");
+                    new Message(e.getMessage() + " - 1");
                 }
             }
         };

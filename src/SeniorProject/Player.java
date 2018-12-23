@@ -1,17 +1,19 @@
 package SeniorProject;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-enum ResourceType implements Serializable {
+enum ResourceType {
     BRICK, ORE, GRAIN, LUMBER, WOOL
 }
 
-enum PlayerType implements Serializable {
+enum PlayerType {
     AI, HUMAN
 }
 
-enum PlayerState implements Serializable {
+enum PlayerState {
     THINKING, READY
 }
 
@@ -27,7 +29,7 @@ public class Player implements Serializable {
     private Board board;
     private PlayerState state = PlayerState.READY;
 
-    public Player (int index){
+    public Player(int index) {
         this.index = index;
         this.type = PlayerType.AI;
 
@@ -43,26 +45,31 @@ public class Player implements Serializable {
         return index;
     }
 
-    void writeMove (boolean isInitial) {
+    void writeMove(boolean isInitial) {
         String actionList_str = ai.createMoves(isInitial);
+        ai.clearVirtualBoards();
 
         String fileName = "actions_temp" + index + ".txt";
         Global.createTextFile(fileName, actionList_str);
-        Global.createTextFile(System.nanoTime()+fileName, actionList_str);
+        Global.createTextFile(System.nanoTime() + fileName, actionList_str);
 
         setState(PlayerState.READY);
     }
 
-    void setState (PlayerState state) {
-        this.state = state;
+    PlayerState getState() {
+        return state;
     }
 
-    PlayerState getState () {
-        return state;
+    void setState(PlayerState state) {
+        this.state = state;
     }
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     PlayerType getType() {
@@ -132,9 +139,5 @@ public class Player implements Serializable {
 
     public int getKnight() {
         return knight;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }

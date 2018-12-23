@@ -36,20 +36,20 @@ public class Location implements Serializable {
         return connectedRoads;
     }
 
-    void setOwner(Player owner) {
-        this.owner = owner;
-    }
-
     Player getOwner() {
         return owner;
     }
 
-    boolean hasOwner () {
+    void setOwner(Player owner) {
+        this.owner = owner;
+    }
+
+    boolean hasOwner() {
         return owner != null;
     }
 
-    boolean hasCity () {
-        for (Structure structure:structures) {
+    boolean hasCity() {
+        for (Structure structure : structures) {
             if (structure instanceof City)
                 return true;
         }
@@ -57,12 +57,12 @@ public class Location implements Serializable {
         return false;
     }
 
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
     public boolean isActive() {
         return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public ArrayList<Location> getAdjacentLocations() {
