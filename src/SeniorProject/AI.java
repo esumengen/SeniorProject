@@ -73,13 +73,12 @@ public class AI implements IAI, Serializable {
         result = "";
 
         ArrayList<MoveType> moves = new ArrayList<>();
-        Global.addLog("CM3");
 
         if (isInitial) {
             moves.add(MoveType.CreateSettlement);
             moves.add(MoveType.CreateRoad);
         } else {
-            Global.addLog("CM4");
+
         }
 
         for (int i = 0; i < moves.size(); i++) {
@@ -111,13 +110,10 @@ public class AI implements IAI, Serializable {
                 case KnightCard:
                     break;
             }
-            Global.addLog("CM5");
 
             moves.remove(i);
             i--;
         }
-
-        Global.addLog("CMEND");
 
         return result;
     }
