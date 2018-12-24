@@ -11,6 +11,8 @@ public class Road extends Structure implements Serializable {
         this.locations = new Location[2];
         this.locations[0] = startLocation;
         this.locations[1] = endLocation;
+
+        setType(StructureType.ROAD);
     }
 
     public Location getStartLocation() {

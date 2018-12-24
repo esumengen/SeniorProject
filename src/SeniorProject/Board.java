@@ -1,5 +1,6 @@
 package SeniorProject;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.ini4j.Wini;
 
 import java.io.File;
@@ -151,12 +152,22 @@ public class Board implements Serializable {
     }
 
     public void createSettlement(Player player, Location location) {
+        int settlementCount = countStructures(StructureType.SETTLEMENT, player);
+
         Settlement settlement = new Settlement(location, player);
         structures.add(settlement);
 
         location.setOwner(player);
 
         addLog("ACTION: A settlement has been added on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
+
+        // Immediate Harvesting
+        if (settlementCount == 1) {
+            Global.addLog("H");
+
+            for (Land land : location.getAdjacentLands())
+                player.addResource(land.getResourceType(), 1);
+        }
 
         syncPlayer(player);
     }
@@ -208,13 +219,13 @@ public class Board implements Serializable {
                 return false;
 
             // Herhangi bir ucunda rakip bina olmamalı. (?)
-            if (countStructures("Settlement", start) - countStructures("Settlement", start, road.getPlayer())
-                    + countStructures("Settlement", end) - countStructures("Settlement", end, road.getPlayer()) > 0)
+            if (countStructures(StructureType.SETTLEMENT, start) - countStructures(StructureType.SETTLEMENT, start, road.getPlayer())
+                    + countStructures(StructureType.SETTLEMENT, end) - countStructures(StructureType.SETTLEMENT, end, road.getPlayer()) > 0)
                 return false;
 
             // İki ucunda en az bir tane kendi yapısı olmalı.
-            if (countStructures("Road", start, structure.getPlayer()) + countStructures("Road", end, structure.getPlayer())
-                    + countStructures("Settlement", start, structure.getPlayer()) + countStructures("Settlement", end, structure.getPlayer()) == 0)
+            if (countStructures(StructureType.ROAD, start, structure.getPlayer()) + countStructures(StructureType.ROAD, end, structure.getPlayer())
+                    + countStructures(StructureType.SETTLEMENT, start, structure.getPlayer()) + countStructures(StructureType.SETTLEMENT, end, structure.getPlayer()) == 0)
                 return false;
         } else if (structure instanceof Building) {
             Building settlement = (Building) structure;
@@ -229,7 +240,7 @@ public class Board implements Serializable {
 
             // Başlangıç durumu değilse, tam o location'a bağlı en az bir yol bulunmalı.
             if (!isInitial) {
-                if (countStructures("Road", settlement.getLocation(), settlement.getPlayer()) == 0)
+                if (countStructures(StructureType.ROAD, settlement.getLocation(), settlement.getPlayer()) == 0)
                     return false;
             }
 
@@ -260,27 +271,38 @@ public class Board implements Serializable {
         return true;
     }
 
-    int countStructures(String type, Location location) {
+    int countStructures(StructureType type, Player player) {
+        return countStructures(type, null, player);
+    }
+
+    int countStructures(StructureType type, Location location) {
         return countStructures(type, location, null);
     }
 
-    int countStructures(String type, Location location, Player player) {
+    int countStructures(StructureType type, Location location, Player player) {
         int count = 0;
 
-        if (type.equals("Road")) {
-            for (Structure structure : location.getStructures()) {
-                if (structure instanceof Road && (player == null || structure.getPlayer() == player))
-                    count++;
+        if (location == null) {
+            for (Structure structure:player.getStructures()) {
+                count += structure.getType() == type ? 1 : 0;
             }
-        } else if (type.equals("Settlement")) {
-            for (Structure structure : location.getStructures()) {
-                if (structure instanceof Settlement && (player == null || structure.getPlayer() == player))
-                    count++;
-            }
-        } else if (type.equals("City")) {
-            for (Structure structure : location.getStructures()) {
-                if (structure instanceof City && (player == null || structure.getPlayer() == player))
-                    count++;
+        }
+        else {
+            if (type == StructureType.ROAD) {
+                for (Structure structure : location.getStructures()) {
+                    if (structure instanceof Road && (player == null || structure.getPlayer() == player))
+                        count++;
+                }
+            } else if (type == StructureType.SETTLEMENT) {
+                for (Structure structure : location.getStructures()) {
+                    if (structure instanceof Settlement && (player == null || structure.getPlayer() == player))
+                        count++;
+                }
+            } else if (type == StructureType.CITY) {
+                for (Structure structure : location.getStructures()) {
+                    if (structure instanceof City && (player == null || structure.getPlayer() == player))
+                        count++;
+                }
             }
         }
 
@@ -343,6 +365,30 @@ public class Board implements Serializable {
     void addLog(String log) {
         if (isActive)
             Global.addLog(log);
+    }
+
+    public static Board deepCopy(Serializable object) {
+        Board copy = (Board) SerializationUtils.clone(object);
+        return copy;
+
+        /*try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ObjectOutputStream outputStrm = new ObjectOutputStream(outputStream);
+
+            outputStrm.writeObject(object);
+
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+            ObjectInputStream objInputStream = new ObjectInputStream(inputStream);
+
+            Global.addLog("DC2");
+
+            return (Board) objInputStream.readObject();
+        }
+        catch (Exception e) {
+            Global.addLog("DC ER");
+            e.printStackTrace();
+            return null;
+        }*/
     }
 
     public boolean isActive() {

@@ -1,5 +1,5 @@
 import SeniorProject.Building;
-import SeniorProject.BuildingType;
+import SeniorProject.StructureType;
 import SeniorProject.Location;
 import SeniorProject.Player;
 import org.junit.Assert;
@@ -10,7 +10,7 @@ public class TestBuilding {
     public void testGetLocation(){
         Player player = new Player(1);
         Location location = new Location(2);
-        Building building = new Building(location, player, BuildingType.SETTLEMENT) {
+        Building building = new Building(location, player, StructureType.SETTLEMENT) {
             @Override
             public Location getLocation() {
                 return super.getLocation();
@@ -23,11 +23,11 @@ public class TestBuilding {
     public void testGetType(){
         Player player = new Player(1);
         Location location = new Location(2);
-        Building building = new Building(location, player, BuildingType.SETTLEMENT) {
-            public BuildingType getType() {
+        Building building = new Building(location, player, StructureType.SETTLEMENT) {
+            public StructureType getType() {
                 return super.getType();
             }
         };
-        Assert.assertEquals(BuildingType.SETTLEMENT, building.getType());
+        Assert.assertEquals(StructureType.SETTLEMENT, building.getType());
     }
 }

@@ -43,30 +43,6 @@ class Global {
         return String.copyValueOf(string.toCharArray(), 1, string.length() - 2);
     }
 
-    public static Board deepCopy(Serializable object) {
-        Board copy = (Board) SerializationUtils.clone(object);
-        return copy;
-
-        /*try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            ObjectOutputStream outputStrm = new ObjectOutputStream(outputStream);
-
-            outputStrm.writeObject(object);
-
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
-            ObjectInputStream objInputStream = new ObjectInputStream(inputStream);
-
-            Global.addLog("DC2");
-
-            return (Board) objInputStream.readObject();
-        }
-        catch (Exception e) {
-            Global.addLog("DC ER");
-            e.printStackTrace();
-            return null;
-        }*/
-    }
-
     static void addLog(String text) {
         createTextFile(LOG_FILE, text);
     }

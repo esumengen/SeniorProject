@@ -1,7 +1,7 @@
 package SeniorProject;
 
-public enum BuildingType {
-    SETTLEMENT, CITY;
+public enum StructureType {
+    SETTLEMENT, CITY, ROAD;
 
     @Override
     public String toString() {

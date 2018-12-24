@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 public abstract class Building extends Structure implements Serializable {
     private Location location;
-    private BuildingType type;
+    private StructureType type;
 
-    public Building(Location location, Player player, BuildingType type) {
+    public Building(Location location, Player player, StructureType type) {
         super(player);
         this.location = location;
         this.type = type;
@@ -16,7 +16,7 @@ public abstract class Building extends Structure implements Serializable {
         return location;
     }
 
-    public BuildingType getType() {
+    public StructureType getType() {
         return type;
     }
 }

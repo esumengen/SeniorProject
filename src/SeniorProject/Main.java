@@ -22,8 +22,6 @@ public class Main {
 
         Synchronizer synchronizer = new Synchronizer(board);
 
-        AIFrame aiFrame = new AIFrame(board);
-
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
             @Override
@@ -75,6 +73,10 @@ public class Main {
         };
 
         timer.schedule(task, 0, 333);
+
+        // Debug Frame
+        DebugFrame debugFrame = new DebugFrame(board);
+        debugFrame.setVisible(true);
     }
 
     public static ArrayList<Player> createPlayers() {

@@ -14,31 +14,35 @@ enum PlayerType {
 }
 
 enum PlayerState {
-    THINKING, READY
+    THINKING, IDLE
 }
 
-public class Player implements Serializable {
+public class Player implements Serializable, Observer {
     private String name;
     private int index;
     private PlayerType type;
     private ArrayList<Structure> structures = new ArrayList<>();
-    private int grain, lumber, ore, wool, brick = 0;
     private Map<ResourceType, Integer> resources;
     private int knight = 0;
-    private AI ai;
+    private BasicAI ai;
     private Board board;
-    private PlayerState state = PlayerState.READY;
+    private PlayerState state = PlayerState.IDLE;
+    private ArrayList<Subscriber> subscribers;
 
     public Player(int index) {
         this.index = index;
         this.type = PlayerType.AI;
 
+        this.name = "Player "+(index+1);
+
+        subscribers = new ArrayList<>();
+
         resources = new HashMap<>();
-        resources.put(ResourceType.BRICK, this.brick);
-        resources.put(ResourceType.ORE, this.ore);
-        resources.put(ResourceType.GRAIN, this.grain);
-        resources.put(ResourceType.LUMBER, this.lumber);
-        resources.put(ResourceType.WOOL, this.wool);
+        resources.put(ResourceType.BRICK, 0);
+        resources.put(ResourceType.ORE, 0);
+        resources.put(ResourceType.GRAIN, 0);
+        resources.put(ResourceType.LUMBER, 0);
+        resources.put(ResourceType.WOOL, 0);
     }
 
     public int getIndex() {
@@ -53,7 +57,7 @@ public class Player implements Serializable {
         Global.createTextFile(fileName, actionList_str);
         Global.createTextFile(System.nanoTime() + fileName, actionList_str);
 
-        setState(PlayerState.READY);
+        setState(PlayerState.IDLE);
     }
 
     PlayerState getState() {
@@ -62,6 +66,7 @@ public class Player implements Serializable {
 
     void setState(PlayerState state) {
         this.state = state;
+        updateSubscribers();
     }
 
     public String getName() {
@@ -70,6 +75,7 @@ public class Player implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+        updateSubscribers();
     }
 
     PlayerType getType() {
@@ -85,43 +91,53 @@ public class Player implements Serializable {
     }
 
     public int getGrain() {
-        return grain;
+        return resources.get(ResourceType.GRAIN);
     }
 
-    public void setGrain(int grain) {
-        this.grain = grain;
+    public void setGrain(int value) {
+        resources.replace(ResourceType.GRAIN, value);
+
+        updateSubscribers();
     }
 
     public int getLumber() {
-        return lumber;
+        return resources.get(ResourceType.LUMBER);
     }
 
-    public void setLumber(int lumber) {
-        this.lumber = lumber;
+    public void setLumber(int value) {
+        resources.replace(ResourceType.LUMBER, value);
+
+        updateSubscribers();
     }
 
     public int getOre() {
-        return ore;
+        return resources.get(ResourceType.ORE);
     }
 
-    public void setOre(int ore) {
-        this.ore = ore;
+    public void setOre(int value) {
+        resources.replace(ResourceType.ORE, value);
+
+        updateSubscribers();
     }
 
     public int getWool() {
-        return wool;
+        return resources.get(ResourceType.WOOL);
     }
 
-    public void setWool(int wool) {
-        this.wool = wool;
+    public void setWool(int value) {
+        resources.replace(ResourceType.WOOL, value);
+
+        updateSubscribers();
     }
 
     public int getBrick() {
-        return brick;
+        return resources.get(ResourceType.BRICK);
     }
 
-    public void setBrick(int brick) {
-        this.brick = brick;
+    public void setBrick(int value) {
+        resources.replace(ResourceType.BRICK, value);
+
+        updateSubscribers();
     }
 
     Map<ResourceType, Integer> getResources() {
@@ -129,20 +145,39 @@ public class Player implements Serializable {
     }
 
     void addResource(ResourceType resourceType, Integer value) {
-        resources.replace(resourceType, resources.get(resourceType) + value);
+        if (resourceType != null)
+            resources.replace(resourceType, resources.get(resourceType) + value);
+
+        updateSubscribers();
     }
 
     void createAI(Board board) {
         this.board = board;
-        this.ai = new AI(this, board);
+        this.ai = new BasicAI(this, board);
     }
 
-    public AI getAi() {
+    public BasicAI getAI() {
         return ai;
     }
 
 
     public int getKnight() {
         return knight;
+    }
+
+    @Override
+    public void addSubscriber(Subscriber subscriber) {
+        subscribers.add(subscriber);
+    }
+
+    public void updateSubscribers() {
+        for (Subscriber subscriber:subscribers) {
+            subscriber.update();
+        }
+    }
+
+    @Override
+    public ArrayList<Subscriber> getSubscribers() {
+        return subscribers;
     }
 }

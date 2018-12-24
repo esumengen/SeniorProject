@@ -12,7 +12,10 @@ enum LandType implements Serializable {
     }
 
     public ResourceType toResourceType() {
-        return ResourceType.values()[ordinal()];
+        if (ordinal() < 5)
+            return ResourceType.values()[ordinal()];
+        else
+            return null;
     }
 }
 
