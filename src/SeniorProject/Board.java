@@ -166,8 +166,6 @@ public class Board implements Serializable {
 
         // Immediate Harvesting
         if (settlementCount == 1) {
-            Global.addLog("H");
-
             for (Land land : location.getAdjacentLands())
                 player.addResource(land.getResourceType(), 1);
         }
