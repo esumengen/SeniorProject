@@ -2,6 +2,8 @@ package DevelopmentCards;
 
 import SeniorProject.Player;
 
+import java.io.Serializable;
+
 public class Knight extends DevelopmentCard {
 
     public Knight(Player player) {

@@ -1,9 +1,10 @@
 package DevelopmentCards;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Random;
 
-public class Deck {
+public class Deck implements Serializable {
 
     HashMap<CardType, Integer> deck;
 

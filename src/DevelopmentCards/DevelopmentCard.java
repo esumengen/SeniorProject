@@ -2,11 +2,13 @@ package DevelopmentCards;
 
 import SeniorProject.Player;
 
+import java.io.Serializable;
+
 enum CardType {
     KNIGHT, ROADBUILDING, YEAROFPLENT, MONOPOLY, VICTORYPOINT
 }
 
-public abstract class DevelopmentCard {
+public abstract class DevelopmentCard implements Serializable {
     private CardType cardType;
     protected Player player;
 
