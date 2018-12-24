@@ -3,7 +3,7 @@ package DevelopmentCards;
 import SeniorProject.Player;
 
 enum CardType {
-    KNIGHT, ROADBUILDING, YEAROFPLENT, MONOPOLY,VICTORYPOINT
+    KNIGHT, ROADBUILDING, YEAROFPLENT, MONOPOLY, VICTORYPOINT
 }
 
 public abstract class DevelopmentCard {

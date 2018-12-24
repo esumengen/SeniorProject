@@ -1,5 +1,6 @@
 package SeniorProject;
 
+import DevelopmentCards.Deck;
 import org.apache.commons.lang3.SerializationUtils;
 import org.ini4j.Wini;
 
@@ -16,6 +17,7 @@ public class Board implements Serializable {
     private ArrayList<Location> locations = new ArrayList<>();
     private ArrayList<Structure> structures = new ArrayList<>();
     private ArrayList<Player> players;
+    private Deck deck;
     private int locationCount = calculateLocationCount();
     private Land robbedLand;
     private boolean isActive;
@@ -24,6 +26,7 @@ public class Board implements Serializable {
         this.isActive = false;
 
         this.players = players;
+        this.deck = new Deck();
 
         //region Initialization of Lands&Locations
         int landIndex;
