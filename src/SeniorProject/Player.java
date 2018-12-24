@@ -1,5 +1,7 @@
 package SeniorProject;
 
+import DevelopmentCards.DevelopmentCard;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,9 +22,11 @@ enum PlayerState {
 public class Player implements Serializable, Observer {
     private String name;
     private int index;
+    private int victoryPoint;
     private PlayerType type;
     private ArrayList<Structure> structures = new ArrayList<>();
     private Map<ResourceType, Integer> resources;
+    private ArrayList<DevelopmentCard> developmentCards = new ArrayList<>();
     private int knight = 0;
     private BasicAI ai;
     private Board board;
@@ -32,6 +36,7 @@ public class Player implements Serializable, Observer {
     public Player(int index) {
         this.index = index;
         this.type = PlayerType.AI;
+        this.victoryPoint = 0;
 
         this.name = "Player "+(index+1);
 
@@ -160,9 +165,24 @@ public class Player implements Serializable, Observer {
         return ai;
     }
 
+    public ArrayList<DevelopmentCard> getDevelopmentCards() {
+        return developmentCards;
+    }
 
     public int getKnight() {
         return knight;
+    }
+
+    public void setKnight(int knight) {
+        this.knight = knight;
+    }
+
+    public int getVictoryPoint() {
+        return victoryPoint;
+    }
+
+    public void setVictoryPoint(int victoryPoint) {
+        this.victoryPoint = victoryPoint;
     }
 
     @Override

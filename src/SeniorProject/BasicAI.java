@@ -242,6 +242,18 @@ public class BasicAI implements AI, Serializable {
         return owner.getStructures().size() == 2;
     }
 
+    public void useMonopoly() {
+        // TODO: 24-Dec-18  
+    }
+
+    public void useRoadBuild() {
+        // TODO: 24-Dec-18  
+    }
+
+    public void useYearOfPlenty() {
+    }
+
+
     public enum MoveType {
         CreateSettlement, CreateRoad, UpgradeSettlement, DevelopmentCard, Trade, KnightCard, etc;
     }
