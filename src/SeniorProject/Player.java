@@ -60,7 +60,9 @@ public class Player implements Serializable, Observer {
 
         String fileName = "actions_temp" + index + ".txt";
         Global.createTextFile(fileName, actionList_str);
-        Global.createTextFile(System.nanoTime() + fileName, actionList_str);
+
+        if (!actionList_str.equals(""))
+            Global.createTextFile(System.nanoTime()/10000 + fileName, actionList_str);
 
         setState(PlayerState.IDLE);
     }
@@ -149,7 +151,7 @@ public class Player implements Serializable, Observer {
         return resources;
     }
 
-    void addResource(ResourceType resourceType, Integer value) {
+    void changeResource(ResourceType resourceType, Integer value) {
         if (resourceType != null)
             resources.replace(resourceType, resources.get(resourceType) + value);
 

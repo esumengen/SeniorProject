@@ -2,8 +2,6 @@ package DevelopmentCards;
 
 import SeniorProject.Player;
 
-import java.io.Serializable;
-
 public class Knight extends DevelopmentCard {
 
     public Knight(Player player) {
@@ -14,6 +12,6 @@ public class Knight extends DevelopmentCard {
     void use() {
         player.setKnight(player.getKnight() + 1);
         player.getAI().useKnight();
-        delete();
+        destroy();
     }
 }

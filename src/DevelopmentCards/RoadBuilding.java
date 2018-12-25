@@ -11,7 +11,7 @@ public class RoadBuilding extends DevelopmentCard {
 
     @Override
     void use() {
-        player.getAI().useRoadBuilding();
-        delete();
+        player.getAI().useRoadBuild();
+        destroy();
     }
 }

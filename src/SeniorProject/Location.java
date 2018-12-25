@@ -11,6 +11,7 @@ public class Location implements Serializable {
     private ArrayList<Structure> structures;
     private Player owner;
     private boolean isActive = false;
+    private boolean isCorner = false;
 
     public Location(int index) {
         this.adjacentLands = new ArrayList<>();
@@ -63,6 +64,14 @@ public class Location implements Serializable {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public void makeCorner() {
+        isCorner = true;
+    }
+
+    public boolean isCorner() {
+        return isCorner;
     }
 
     public ArrayList<Location> getAdjacentLocations() {

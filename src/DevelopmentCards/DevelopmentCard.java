@@ -12,7 +12,6 @@ public abstract class DevelopmentCard implements Serializable {
     private CardType cardType;
     protected Player player;
 
-
     public DevelopmentCard (Player player) {
         this.player = player;
     }
@@ -26,7 +25,7 @@ public abstract class DevelopmentCard implements Serializable {
         return cardType;
     }
 
-    public void delete() {
+    public void destroy() {
         player.getDevelopmentCards().remove(this);
     }
 }

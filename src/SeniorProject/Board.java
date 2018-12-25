@@ -1,6 +1,6 @@
 package SeniorProject;
 
-import DevelopmentCards.Deck;
+import DevelopmentCards.*;
 import org.apache.commons.lang3.SerializationUtils;
 import org.ini4j.Wini;
 
@@ -98,6 +98,16 @@ public class Board implements Serializable {
         //endregion
 
         load(lands);
+
+        //region Mark the corner locations
+        for (Land land : lands) {
+            if (land.getType() == LandType.SEA) {
+                for (Location location:land.getAdjacentLocations()) {
+                    location.makeCorner();
+                }
+            }
+        }
+        //endregion
     }
 
     private static int calculateLocationCount() {
@@ -167,10 +177,68 @@ public class Board implements Serializable {
         // Immediate Harvesting
         if (settlementCount == 1) {
             for (Land land : location.getAdjacentLands())
-                player.addResource(land.getResourceType(), 1);
+                player.changeResource(land.getResourceType(), 1);
         }
 
         syncPlayer(player);
+    }
+
+    public static boolean isAffordable(BasicAI.MoveType type, Player player) {
+        int brick = player.getResources().get(ResourceType.BRICK);
+        int grain = player.getResources().get(ResourceType.GRAIN);
+        int wool = player.getResources().get(ResourceType.WOOL);
+        int ore = player.getResources().get(ResourceType.ORE);
+        int lumber = player.getResources().get(ResourceType.LUMBER);
+
+        switch (type) {
+            case CreateSettlement:
+                if (brick >= 1 && grain >= 1 && wool >= 1 && lumber >= 1)
+                    return true;
+                break;
+            case CreateRoad:
+                if (brick >= 1 && lumber >= 1)
+                    return true;
+                break;
+            case UpgradeSettlement:
+                if (ore >= 3 && grain >= 2)
+                    return true;
+                break;
+            case DevelopmentCard:
+                if (grain >= 1 && wool >= 1 && ore >= 1)
+                    return true;
+                break;
+            case KnightCard:
+                if (player.getKnight() > 0)
+                    return true;
+                break;
+            case Trade:
+                return true;
+            case MonopolyCard:
+                for (DevelopmentCard card : player.getDevelopmentCards()) {
+                    if (card instanceof Monopoly) {
+                        return true;
+                    }
+                }
+                break;
+            case RoadBuildingCard: {
+                for (DevelopmentCard card : player.getDevelopmentCards()) {
+                    if (card instanceof RoadBuilding) {
+                        return true;
+                    }
+                }
+                break;
+            }
+            case YearOfPlentyCard: {
+                for (DevelopmentCard card : player.getDevelopmentCards()) {
+                    if (card instanceof YearOfPlenty) {
+                        return true;
+                    }
+                }
+                break;
+            }
+        }
+
+        return false;
     }
 
     void createRoad(Player player, Location location_first, Location location_second) {
@@ -241,7 +309,7 @@ public class Board implements Serializable {
 
             // Başlangıç durumu değilse, tam o location'a bağlı en az bir yol bulunmalı.
             if (!isInitial) {
-                if (countStructures(StructureType.ROAD, settlement.getLocation(), settlement.getPlayer()) == 0)
+                if (countStructures(StructureType.ROAD, settlement.getLocation(), settlement.getPlayer()) == 0 || ((Building) structure).getLocation().isCorner())
                     return false;
             }
 
@@ -318,8 +386,8 @@ public class Board implements Serializable {
     }
 
     private void stealRandomResource(Player robber, Player robbed, ResourceType randomType) {
-        robbed.addResource(randomType, robbed.getResources().get(randomType) - 1);
-        robber.addResource(randomType, 1);
+        robbed.changeResource(randomType, robbed.getResources().get(randomType) - 1);
+        robber.changeResource(randomType, 1);
 
         addLog("ACTION: [Player " + (robbed.getIndex() + 1) + "] is robbed by [Player " + (robber.getIndex() + 1) + "]");
     }
@@ -354,7 +422,7 @@ public class Board implements Serializable {
                     if (location.hasOwner()) {
                         Player rewardedPlayer = location.getOwner();
 
-                        rewardedPlayer.addResource(land.getResourceType(), location.hasCity() ? 2 : 1);
+                        rewardedPlayer.changeResource(land.getResourceType(), location.hasCity() ? 2 : 1);
                     }
                 }
             }

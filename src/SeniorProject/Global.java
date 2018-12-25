@@ -5,7 +5,7 @@ import org.apache.commons.lang3.SerializationUtils;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Serializable;
+import java.util.Random;
 
 enum OSType {
     WINDOWS, MAC;
@@ -16,7 +16,7 @@ enum OSType {
     }
 }
 
-class Global {
+public class Global {
     static final int PLAYER_COUNT = 4;
 
     static final OSType OS_TYPE = System.getProperty("os.name").toLowerCase().contains("windows") ? OSType.WINDOWS : OSType.MAC;
@@ -25,6 +25,9 @@ class Global {
     static final String ACTIONS_FILE = "actions.txt";
     static final String LOG_FILE = "log.txt";
     static final String COMMUNICATION_FILE = "communication.ini";
+
+    static public Random randomGenerator = new Random();
+
 
     static String get_working_path(String filename) {
         String file_path = Global.WORKING_PATH;
