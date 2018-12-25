@@ -12,6 +12,5 @@ public class YearOfPlenty extends DevelopmentCard {
     @Override
     void use() {
         player.getAI().useYearOfPlenty();
-        player.getDevelopmentCards().remove(this);
-    }
+        delete();    }
 }

@@ -1,5 +1,10 @@
 package SeniorProject;
 
+import DevelopmentCards.DevelopmentCard;
+import DevelopmentCards.Monopoly;
+import DevelopmentCards.RoadBuilding;
+import DevelopmentCards.YearOfPlenty;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
@@ -9,7 +14,7 @@ public class BasicAI implements AI, Serializable {
     private Board board;
     private String result = "";
     private Board virtualBoard;
-    private ArrayList<Boolean> canAfford;
+    private ArrayList<Boolean> possibleMoves;
 
     private Random randomGenerator = new Random();
 
@@ -17,48 +22,95 @@ public class BasicAI implements AI, Serializable {
         this.owner = player;
         this.board = board;
 
-        this.canAfford = new ArrayList<>();
+        this.possibleMoves = new ArrayList<>();
         for (int i = 0; i < MoveType.values().length; i++) {
-            canAfford.add(false);
+            possibleMoves.add(false);
         }
     }
 
-    void isAffordable(MoveType type) {
+    void updatePossibleMoves() {
         Player virtualOwner = virtualBoard.getPlayers().get(owner.getIndex());
-        switch (type) {
-            case CreateSettlement: {
-                if (virtualOwner.getResources().get(ResourceType.BRICK) >= 1 && virtualOwner.getResources().get(ResourceType.GRAIN) >= 1
-                        && virtualOwner.getResources().get(ResourceType.WOOL) >= 1 && virtualOwner.getResources().get(ResourceType.LUMBER) >= 1) {
-                    canAfford.set(type.ordinal(), true);
-                }
-                canAfford.set(type.ordinal(), false);
-            }
-            case CreateRoad: {
-                if (virtualOwner.getResources().get(ResourceType.BRICK) >= 1 && virtualOwner.getResources().get(ResourceType.LUMBER) >= 1) {
-                    canAfford.set(type.ordinal(), true);
-                }
-                canAfford.set(type.ordinal(), false);
-            }
-            case UpgradeSettlement: {
-                if (virtualOwner.getResources().get(ResourceType.ORE) >= 3 && virtualOwner.getResources().get(ResourceType.GRAIN) >= 2) {
-                    canAfford.set(type.ordinal(), true);
-                }
-                canAfford.set(type.ordinal(), false);
-            }
-            case DevelopmentCard: {
-                if (virtualOwner.getResources().get(ResourceType.GRAIN) >= 1 && virtualOwner.getResources().get(ResourceType.WOOL) >= 1
-                        && owner.getResources().get(ResourceType.ORE) >= 1) {
-                    canAfford.set(type.ordinal(), true);
-                }
-                canAfford.set(type.ordinal(), false);
-            }
-            case KnightCard: {
-                if (virtualOwner.getKnight() > 0)
-                    canAfford.set(type.ordinal(), true);
+        for (int i = 0; i < possibleMoves.size(); i++) {
+            MoveType type = MoveType.values()[i];
 
-                canAfford.set(type.ordinal(), false);
+            switch (type) {
+                case CreateSettlement: {
+                    if (virtualOwner.getResources().get(ResourceType.BRICK) >= 1 && virtualOwner.getResources().get(ResourceType.GRAIN) >= 1
+                            && virtualOwner.getResources().get(ResourceType.WOOL) >= 1 && virtualOwner.getResources().get(ResourceType.LUMBER) >= 1) {
+                        possibleMoves.set(type.ordinal(), true);
+                        break;
+                    }
+                    possibleMoves.set(type.ordinal(), false);
+                    break;
+                }
+                case CreateRoad: {
+                    if (virtualOwner.getResources().get(ResourceType.BRICK) >= 1 && virtualOwner.getResources().get(ResourceType.LUMBER) >= 1) {
+                        possibleMoves.set(type.ordinal(), true);
+                        break;
+                    }
+                    possibleMoves.set(type.ordinal(), false);
+                    break;
+                }
+                case UpgradeSettlement: {
+                    if (virtualOwner.getResources().get(ResourceType.ORE) >= 3 && virtualOwner.getResources().get(ResourceType.GRAIN) >= 2) {
+                        possibleMoves.set(type.ordinal(), true);
+                        break;
+                    }
+                    possibleMoves.set(type.ordinal(), false);
+                    break;
+                }
+                case DevelopmentCard: {
+                    if (virtualOwner.getResources().get(ResourceType.GRAIN) >= 1 && virtualOwner.getResources().get(ResourceType.WOOL) >= 1
+                            && owner.getResources().get(ResourceType.ORE) >= 1) {
+                        possibleMoves.set(type.ordinal(), true);
+                        break;
+                    }
+                    possibleMoves.set(type.ordinal(), false);
+                    break;
+                }
+                case Trade: {
+                    possibleMoves.set(type.ordinal(), true);
+                    break;
+                }
+                case KnightCard: {
+                    if (virtualOwner.getKnight() > 0)
+                        possibleMoves.set(type.ordinal(), true);
+
+                    possibleMoves.set(type.ordinal(), false);
+                }
+                case UseMonopoly: {
+                    for (DevelopmentCard card : owner.getDevelopmentCards()) {
+                        if (card instanceof Monopoly) {
+                            possibleMoves.set(type.ordinal(), true);
+                            break;
+                        }
+                    }
+                    possibleMoves.set(type.ordinal(), false);
+                    break;
+                }
+                case UseRoadBuilding: {
+                    for (DevelopmentCard card : owner.getDevelopmentCards()) {
+                        if (card instanceof RoadBuilding) {
+                            possibleMoves.set(type.ordinal(), true);
+                            break;
+                        }
+                    }
+                    possibleMoves.set(type.ordinal(), false);
+                    break;
+                }
+                case UseYearOfPlenty: {
+                    for (DevelopmentCard card : owner.getDevelopmentCards()) {
+                        if (card instanceof YearOfPlenty) {
+                            possibleMoves.set(type.ordinal(), true);
+                            break;
+                        }
+                    }
+                    possibleMoves.set(type.ordinal(), false);
+                    break;
+                }
             }
         }
+
     }
 
     public void clearVirtualBoards() {
@@ -70,6 +122,7 @@ public class BasicAI implements AI, Serializable {
         clearVirtualBoards();
         this.virtualBoard = Board.deepCopy(board);
         virtualBoard.setActive(false);
+        updatePossibleMoves();
         result = "";
 
         ArrayList<MoveType> moves = new ArrayList<>();
@@ -108,6 +161,15 @@ public class BasicAI implements AI, Serializable {
                     break;
 
                 case KnightCard:
+                    break;
+
+                case UseRoadBuilding:
+                    break;
+
+                case UseYearOfPlenty:
+                    break;
+
+                case UseMonopoly:
                     break;
             }
 
@@ -211,7 +273,7 @@ public class BasicAI implements AI, Serializable {
     }
 
     private boolean createRoad_move(Location location) {
-        Road road_temp = null;
+        Road road_temp;
 
         while (true) {
             ArrayList<Location> adjacentList = location.getAdjacentLocations();
@@ -234,28 +296,31 @@ public class BasicAI implements AI, Serializable {
         return false;
     }
 
-    public ArrayList<Boolean> getCanAfford() {
-        return canAfford;
+    public ArrayList<Boolean> getPossibleMoves() {
+        updatePossibleMoves();
+        return possibleMoves;
     }
 
     public boolean isPHMove() {
         return owner.getStructures().size() == 2;
     }
 
+    public void useKnight() {
+    }
+
     public void useMonopoly() {
         // TODO: 24-Dec-18  
     }
 
-    public void useRoadBuild() {
+    public void useRoadBuilding() {
         // TODO: 24-Dec-18  
     }
 
     public void useYearOfPlenty() {
     }
 
-
     public enum MoveType {
-        CreateSettlement, CreateRoad, UpgradeSettlement, DevelopmentCard, Trade, KnightCard, etc;
+        CreateSettlement, CreateRoad, UpgradeSettlement, DevelopmentCard, Trade, KnightCard, UseMonopoly, UseRoadBuilding, UseYearOfPlenty;
     }
 
 }

@@ -12,6 +12,6 @@ public class Monopoly extends DevelopmentCard {
     @Override
     void use() {
         player.getAI().useMonopoly();
-        player.getDevelopmentCards().remove(this);
+        delete();
     }
 }

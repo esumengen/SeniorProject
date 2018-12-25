@@ -13,6 +13,7 @@ public class Knight extends DevelopmentCard {
     @Override
     void use() {
         player.setKnight(player.getKnight() + 1);
-        player.getDevelopmentCards().remove(this);
+        player.getAI().useKnight();
+        delete();
     }
 }
