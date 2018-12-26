@@ -31,6 +31,7 @@ public class BasicAI implements AI, Serializable {
     public String createMoves(boolean isInitial) {
         clearVirtualBoards();
         this.virtualBoard = Board.deepCopy(board);
+
         virtualBoard.setActive(false);
         result = "";
 
@@ -46,8 +47,8 @@ public class BasicAI implements AI, Serializable {
                 moves.add(MoveType.CreateRoad);
             if (Board.isAffordable(MoveType.UpgradeSettlement, owner))
                 moves.add(MoveType.UpgradeSettlement);
-            if (Board.isAffordable(MoveType.DevelopmentCard, owner))
-                moves.add(MoveType.DevelopmentCard);
+            /*if (Board.isAffordable(MoveType.DevelopmentCard, owner))
+                moves.add(MoveType.DevelopmentCard);*/
         }
 
         for (int i = 0; i < moves.size(); i++) {
@@ -124,10 +125,12 @@ public class BasicAI implements AI, Serializable {
             Structure structure = virtualOwner.getStructures().get(Global.randomGenerator.nextInt(virtualOwner.getStructures().size()));
 
             if (structure instanceof Settlement) {
-                result += "P" + (owner.getIndex() + 1) + " [CR " + ((((Settlement) structure).getLocation().getIndex() < 10) ? ("0" + ((Settlement) structure).getLocation().getIndex()) : ((Settlement) structure).getLocation().getIndex()) + "] S\r\n";
+                result += "P" + (owner.getIndex() + 1) + " [UP " + ((((Settlement) structure).getLocation().getIndex() < 10) ? ("0" + ((Settlement) structure).getLocation().getIndex()) : ((Settlement) structure).getLocation().getIndex()) + "] S\r\n";
                 virtualBoard.upgradeSettlement(virtualOwner, ((Settlement) structure).getLocation());
+
                 return true;
             }
+
             count++;
         }
 
@@ -155,7 +158,7 @@ public class BasicAI implements AI, Serializable {
             if (virtualBoard.isValid(settlement_temp, isInitial)) {
                 for (Land land : location.getAdjacentLands()) {
                     value += land.getDiceChance();
-                }
+            }
 
                 if (value > maxValue) {
                     maxValue = value;
@@ -170,8 +173,6 @@ public class BasicAI implements AI, Serializable {
     private boolean createRoad_move() {
         Player virtualOwner = virtualBoard.getPlayers().get(owner.getIndex());
 
-        Road road_temp = null;
-
         ArrayList<Location> possibleLocations = new ArrayList<>();
         for (int i = 0; i < virtualOwner.getStructures().size(); i++) {
             if (virtualOwner.getStructures().get(i) instanceof Building) {
@@ -183,25 +184,31 @@ public class BasicAI implements AI, Serializable {
             }
         }
 
-        int count = 0;
-        while (count < 99999) {
-            Location startLocation = possibleLocations.get(Global.randomGenerator.nextInt(possibleLocations.size()));
-            Location endLocation = startLocation.getAdjacentLocations().get(randomGenerator.nextInt(startLocation.getAdjacentLocations().size()));
+        Location startLocation = null;
+        Location endLocation = null;
+        Road road_temp = null;
 
+        int count = 0;
+        while (count < 999999) {
+            startLocation = possibleLocations.get(Global.randomGenerator.nextInt(possibleLocations.size()));
+            endLocation = startLocation.getAdjacentLocations().get(randomGenerator.nextInt(startLocation.getAdjacentLocations().size()));
             road_temp = new Road(startLocation, endLocation, virtualOwner);
+
             if (virtualBoard.isValid(road_temp)) {
                 break;
+            }
+            else {
+                startLocation = null;
+                endLocation = null;
+                road_temp = null;
             }
 
             count++;
         }
 
-        int roadStart = road_temp.getStartLocation().getIndex();
-        int roadEnd = road_temp.getEndLocation().getIndex();
-
         if (road_temp != null) {
-            result += "P" + (owner.getIndex() + 1) + " [CR " + ((roadStart < 10) ? ("0" + roadStart) : roadStart) + " " + ((roadEnd < 10) ? ("0" + roadEnd) : roadEnd) + "] R\r\n";
-            virtualBoard.createRoad(virtualBoard.getPlayers().get(owner.getIndex()), virtualBoard.getLocations().get(roadStart), virtualBoard.getLocations().get(roadEnd));
+            result += "P" + (owner.getIndex() + 1) + " [CR " + ((startLocation.getIndex() < 10) ? ("0" + startLocation.getIndex()) : startLocation.getIndex()) + " " + ((endLocation.getIndex() < 10) ? ("0" + endLocation.getIndex()) : endLocation.getIndex()) + "] R\r\n";
+            virtualBoard.createRoad(virtualOwner, startLocation, endLocation);
 
             return true;
         }
@@ -240,7 +247,7 @@ public class BasicAI implements AI, Serializable {
     }
 
     public void useMonopoly() {
-        // TODO: 24-Dec-18  
+        // TODO: 24-Dec-18
     }
 
     public void useRoadBuild() {

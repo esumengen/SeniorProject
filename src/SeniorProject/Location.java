@@ -33,8 +33,16 @@ public class Location implements Serializable {
         return structures;
     }
 
+    public void addStructures(Structure structure) {
+        structures.add(structure);
+    }
+
     ArrayList<Road> getConnectedRoads() {
         return connectedRoads;
+    }
+
+    public void addConnectedRoad(Road road) {
+        connectedRoads.add(road);
     }
 
     Player getOwner() {

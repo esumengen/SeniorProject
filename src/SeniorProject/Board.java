@@ -4,8 +4,7 @@ import DevelopmentCards.*;
 import org.apache.commons.lang3.SerializationUtils;
 import org.ini4j.Wini;
 
-import java.io.File;
-import java.io.Serializable;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -171,6 +170,7 @@ public class Board implements Serializable {
         structures.add(settlement);
 
         location.setOwner(player);
+        location.addStructures(settlement);
 
         addLog("ACTION: A settlement has been added on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
 
@@ -243,7 +243,13 @@ public class Board implements Serializable {
 
     void createRoad(Player player, Location location_first, Location location_second) {
         Road road = new Road(location_first, location_second, player);
+        location_first.addConnectedRoad(road);
+        location_second.addConnectedRoad(road);
+
         structures.add(road);
+
+        location_first.addStructures(road);
+        location_second.addStructures(road);
 
         addLog("ACTION: A road has been added between [Location " + location_first.getIndex() + " and Location " + location_second.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
 
@@ -255,6 +261,7 @@ public class Board implements Serializable {
             if (structure instanceof Settlement) {
                 City city = new City(location, structure.getPlayer());
                 structures.set(structures.indexOf(structure), city);
+                location.getStructures().set(location.getStructures().indexOf(structure), city);
                 break;
             }
         }
@@ -288,13 +295,13 @@ public class Board implements Serializable {
                 return false;
 
             // Herhangi bir ucunda rakip bina olmamalı. (?)
-            if (countStructures(StructureType.SETTLEMENT, start) - countStructures(StructureType.SETTLEMENT, start, road.getPlayer())
-                    + countStructures(StructureType.SETTLEMENT, end) - countStructures(StructureType.SETTLEMENT, end, road.getPlayer()) > 0)
+            if ((start.hasOwner() && start.getOwner().getIndex() != road.getPlayer().getIndex())
+                    || (end.hasOwner() && end.getOwner().getIndex() != road.getPlayer().getIndex()))
                 return false;
 
             // İki ucunda en az bir tane kendi yapısı olmalı.
-            if (countStructures(StructureType.ROAD, start, structure.getPlayer()) + countStructures(StructureType.ROAD, end, structure.getPlayer())
-                    + countStructures(StructureType.SETTLEMENT, start, structure.getPlayer()) + countStructures(StructureType.SETTLEMENT, end, structure.getPlayer()) == 0)
+            if (countStructures(StructureType.ROAD, start, road.getPlayer()) + countStructures(StructureType.ROAD, end, road.getPlayer())
+                    + countStructures(StructureType.SETTLEMENT, start, road.getPlayer()) + countStructures(StructureType.SETTLEMENT, end, road.getPlayer()) == 0)
                 return false;
         } else if (structure instanceof Building) {
             Building settlement = (Building) structure;
@@ -304,33 +311,51 @@ public class Board implements Serializable {
                 return false;
 
             // Etrafında bina olmamalı.
-            if (!radiusCheck(settlement.getLocation()))
+            if (!isAdjacentFree(settlement.getLocation()))
                 return false;
 
-            // Başlangıç durumu değilse, tam o location'a bağlı en az bir yol bulunmalı.
+            // Başlangıç durumu değilse
             if (!isInitial) {
-                if (countStructures(StructureType.ROAD, settlement.getLocation(), settlement.getPlayer()) == 0 || ((Building) structure).getLocation().isCorner())
+                // Tam o location'a bağlı en az bir yolu bulunmalı.
+                if (countStructures(StructureType.ROAD, settlement.getLocation(), settlement.getPlayer()) == 0)
                     return false;
             }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    boolean roadExits(Road newRoad) {
-        for (Road road : newRoad.getStartLocation().getConnectedRoads()) {
-            if ((road.getStartLocation() == newRoad.getStartLocation() && (road.getEndLocation() == newRoad.getEndLocation())) || ((road.getStartLocation() == newRoad.getEndLocation()) && (road.getEndLocation() == road.getStartLocation())))
-                return false;
+            else {
+                // Köşede olmamalı.
+                if (((Building) structure).getLocation().isCorner())
+                    return false;
+            }
         }
 
         return true;
     }
 
-    boolean radiusCheck(Location location) {
-        if (location.hasOwner())
+    boolean roadExits(Road newRoad) {
+        for (Structure structure : structures) {
+            if (structure.getType() == StructureType.ROAD) {
+                Road road = (Road) structure;
+
+                if ((road.getStartLocation() == newRoad.getStartLocation() && (road.getEndLocation() == newRoad.getEndLocation()))
+                        || ((road.getStartLocation() == newRoad.getEndLocation()) && (road.getEndLocation() == newRoad.getStartLocation()))) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    boolean isAdjacentFree(Location location) {
+        /*for (Player player:players) {
+            for (Structure structure:player.getStructures()) {
+                if (structure instanceof Building)
+                    if (((Building) structure).getLocation().getIndex() == location.getIndex())
+                        return false;
+            }
+        }*/
+        if (location.hasOwner()) {
             return false;
+        }
 
         for (Location adjacentLocation : location.getAdjacentLocations()) {
             if (adjacentLocation.hasOwner())
@@ -449,12 +474,9 @@ public class Board implements Serializable {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
             ObjectInputStream objInputStream = new ObjectInputStream(inputStream);
 
-            Global.addLog("DC2");
-
             return (Board) objInputStream.readObject();
         }
         catch (Exception e) {
-            Global.addLog("DC ER");
             e.printStackTrace();
             return null;
         }*/
@@ -479,11 +501,11 @@ public class Board implements Serializable {
         }
     }
 
-    ArrayList<Land> getLands() {
+    public ArrayList<Land> getLands() {
         return lands;
     }
 
-    ArrayList<Location> getLocations() {
+    public ArrayList<Location> getLocations() {
         return locations;
     }
 
