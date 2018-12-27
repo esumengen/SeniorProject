@@ -1,11 +1,8 @@
 package SeniorProject;
 
-import DevelopmentCards.*;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 public class BasicAI implements AI, Serializable {
@@ -25,13 +22,13 @@ public class BasicAI implements AI, Serializable {
         this.board = board;
     }
 
-    public void clearVirtualBoards() {
+    public void clearMoves() {
         virtualBoard = null;
         System.gc();
     }
 
     public String createMoves(boolean isInitial) {
-        clearVirtualBoards();
+        clearMoves();
         this.virtualBoard = Board.deepCopy(board);
         Player virtualOwner = virtualBoard.getPlayers().get(owner.getIndex());
 
@@ -48,20 +45,20 @@ public class BasicAI implements AI, Serializable {
             while (count < 3) {
                 boolean willBreak = false;*/
 
-            if (Board.isAffordable(MoveType.CreateSettlement, virtualOwner))
-                moves.add(MoveType.CreateSettlement);
-            if (Board.isAffordable(MoveType.CreateRoad, virtualOwner))
-                moves.add(MoveType.CreateRoad);
-            if (Board.isAffordable(MoveType.UpgradeSettlement, virtualOwner))
-                moves.add(MoveType.UpgradeSettlement);
+                if (Board.isAffordable(MoveType.CreateSettlement, virtualOwner))
+                    moves.add(MoveType.CreateSettlement);
+                if (Board.isAffordable(MoveType.CreateRoad, virtualOwner))
+                    moves.add(MoveType.CreateRoad);
+                if (Board.isAffordable(MoveType.UpgradeSettlement, virtualOwner))
+                    moves.add(MoveType.UpgradeSettlement);
 
             /*    if (moves.size() > 0)
                     willBreak = true;*/
 
-            if (Board.isAffordable(MoveType.TradeBank, virtualOwner)) {
-                //if (!moves.contains(MoveType.TradeBank))
-                moves.add(MoveType.TradeBank);
-            }
+                if (Board.isAffordable(MoveType.TradeBank, virtualOwner)) {
+                    //if (!moves.contains(MoveType.TradeBank))
+                        moves.add(MoveType.TradeBank);
+                }
 
             /*    if (willBreak)
                     break;
@@ -278,7 +275,7 @@ public class BasicAI implements AI, Serializable {
             if (virtualBoard.isValid(settlement_temp, isInitial)) {
                 for (Land land : location.getAdjacentLands()) {
                     value += land.getDiceChance();
-                }
+            }
 
                 if (value > maxValue) {
                     maxValue = value;

@@ -11,7 +11,7 @@ public class Knight extends DevelopmentCard {
     @Override
     void use() {
         player.setKnight(player.getKnight() + 1);
-        player.getAI().useKnight();
+        player.getAI_instance().useKnight();
         destroy();
     }
 }

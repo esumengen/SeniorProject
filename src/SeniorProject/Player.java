@@ -20,6 +20,8 @@ enum PlayerState {
 }
 
 public class Player implements Serializable, Observer {
+    private BasicAI AI_instance;
+
     private String name;
     private int index;
     private int victoryPoint;
@@ -28,7 +30,6 @@ public class Player implements Serializable, Observer {
     private Map<ResourceType, Integer> resources;
     private ArrayList<DevelopmentCard> developmentCards = new ArrayList<>();
     private int knight = 0;
-    private BasicAI ai;
     private Board board;
     private PlayerState state = PlayerState.IDLE;
     private ArrayList<Subscriber> subscribers;
@@ -55,8 +56,8 @@ public class Player implements Serializable, Observer {
     }
 
     void writeMove(boolean isInitial) {
-        String actionList_str = ai.createMoves(isInitial);
-        ai.clearVirtualBoards();
+        String actionList_str = AI_instance.createMoves(isInitial);
+        AI_instance.createMoves(isInitial);
 
         String fileName = "actions_temp" + index + ".txt";
         Global.createTextFile(fileName, actionList_str);
@@ -160,11 +161,11 @@ public class Player implements Serializable, Observer {
 
     void createAI(Board board) {
         this.board = board;
-        this.ai = new BasicAI(this, board);
+        this.AI_instance = new BasicAI(this, board);
     }
 
-    public BasicAI getAI() {
-        return ai;
+    public BasicAI getAI_instance() {
+        return AI_instance;
     }
 
     public ArrayList<DevelopmentCard> getDevelopmentCards() {

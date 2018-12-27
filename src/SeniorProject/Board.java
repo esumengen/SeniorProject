@@ -43,36 +43,22 @@ public class Board implements Serializable {
 
             for (int j = 0; j < landCount_horizontal; j++) {
                 Land land = new Land(landIndex++);
+                land.setI(i);
+                land.setJ(j);
                 lands.add(land);
             }
         }
 
         // Bind lands&locations
-        ArrayList<Integer> topLocationIndexes = new ArrayList<>();
-        topLocationIndexes.add(1);
-
         landIndex = 0;
         for (int i = 0; i < landCount_vertical; i++) {
             int landCount_horizontal = landCount_horizontal_max - Math.abs(i - (int) Math.floor(landCount_vertical / 2));
 
             for (int j = 0; j < landCount_horizontal; j++) {
                 Land land = lands.get(landIndex);
-                int result = topLocationIndexes.get(0);
 
-                if (landIndex != 0) {
-                    result = topLocationIndexes.get(landIndex - 1) + 2;
-
-                    if (j == 0) {
-                        if (i == landCount_vertical / 2 + 1)
-                            result += 2;
-                        else if (i < landCount_vertical / 2 + 1)
-                            result += 1;
-                        else
-                            result += 3;
-                    }
-
-                    topLocationIndexes.add(result);
-                }
+                int result = getTopLocation_index(landIndex);
+                System.out.println(result);
 
                 makeAdjacent(locations.get(result - 1), locations.get(result));
                 makeAdjacent(locations.get(result + 1), locations.get(result));
@@ -154,6 +140,35 @@ public class Board implements Serializable {
             new Message(e.getMessage() + " - 7");
 
             Global.addLog("ERROR: The game is not loaded to the AI.");
+        }
+    }
+
+    private ArrayList<Integer> topLocationIndexes = new ArrayList<>();
+
+    private int getTopLocation_index (int landIndex) {
+        if (topLocationIndexes.size() > landIndex)
+            return topLocationIndexes.get(landIndex);
+        else if (landIndex == 0) {
+            topLocationIndexes.add(1);
+            return 1;
+        }
+        else {
+            int result = getTopLocation_index(landIndex-1) + 2;
+
+            int i = lands.get(landIndex).getI();
+            int j = lands.get(landIndex).getJ();
+
+            if (j == 0) {
+                if (i == landCount_vertical / 2 + 1)
+                    result += 2;
+                else if (i < landCount_vertical / 2 + 1)
+                    result += 1;
+                else
+                    result += 3;
+            }
+
+            topLocationIndexes.add(result);
+            return result;
         }
     }
 
