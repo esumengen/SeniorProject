@@ -21,7 +21,7 @@ public class Location implements Serializable {
         this.index = index;
     }
 
-    int getIndex() {
+    public int getIndex() {
         return index;
     }
 
