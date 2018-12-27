@@ -1,12 +1,16 @@
 package SeniorProject;
 
+import DevelopmentCards.*;
+
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class BasicAI implements AI, Serializable {
     public enum MoveType {
-        CreateSettlement, CreateRoad, UpgradeSettlement, DevelopmentCard, Trade, KnightCard, RoadBuildingCard, YearOfPlentyCard, MonopolyCard
+        CreateSettlement, CreateRoad, UpgradeSettlement, DevelopmentCard, TradeBank, TradePlayer, KnightCard, RoadBuildingCard, YearOfPlentyCard, MonopolyCard
     }
 
     private Player owner;
@@ -29,6 +33,7 @@ public class BasicAI implements AI, Serializable {
     public String createMoves(boolean isInitial) {
         clearVirtualBoards();
         this.virtualBoard = Board.deepCopy(board);
+        Player virtualOwner = virtualBoard.getPlayers().get(owner.getIndex());
 
         virtualBoard.setActive(false);
         result = "";
@@ -39,12 +44,30 @@ public class BasicAI implements AI, Serializable {
             moves.add(MoveType.CreateSettlement);
             moves.add(MoveType.CreateRoad);
         } else {
-            if (Board.isAffordable(MoveType.CreateSettlement, owner))
+            /*int count = 0;
+            while (count < 3) {
+                boolean willBreak = false;*/
+
+            if (Board.isAffordable(MoveType.CreateSettlement, virtualOwner))
                 moves.add(MoveType.CreateSettlement);
-            if (Board.isAffordable(MoveType.CreateRoad, owner))
+            if (Board.isAffordable(MoveType.CreateRoad, virtualOwner))
                 moves.add(MoveType.CreateRoad);
-            if (Board.isAffordable(MoveType.UpgradeSettlement, owner))
+            if (Board.isAffordable(MoveType.UpgradeSettlement, virtualOwner))
                 moves.add(MoveType.UpgradeSettlement);
+
+            /*    if (moves.size() > 0)
+                    willBreak = true;*/
+
+            if (Board.isAffordable(MoveType.TradeBank, virtualOwner)) {
+                //if (!moves.contains(MoveType.TradeBank))
+                moves.add(MoveType.TradeBank);
+            }
+
+            /*    if (willBreak)
+                    break;
+
+                count++;
+            }*/
             /*if (Board.isAffordable(MoveType.DevelopmentCard, owner))
                 moves.add(MoveType.DevelopmentCard);*/
         }
@@ -91,6 +114,10 @@ public class BasicAI implements AI, Serializable {
 
                 case DevelopmentCard:
                     break;
+
+                case TradeBank:
+                    moveSuccess = tradeBank_move();
+                    break;
             }
 
             moves.remove(i);
@@ -135,6 +162,101 @@ public class BasicAI implements AI, Serializable {
         return false;
     }
 
+    private boolean tradeBank_move() {
+        Player virtualOwner = virtualBoard.getPlayers().get(owner.getIndex());
+
+        HashMap<ResourceType, Integer> localResources = new HashMap<>(virtualOwner.getResources());
+
+        int grain = 0;
+        int lumber = 0;
+        int wool = 0;
+        int ore = 0;
+        int brick = 0;
+                    /*int grainB = 0;
+                    int woodB = 0;
+                    int woolB = 0;
+                    int oreB = 0;
+                    int brickB = 0;*/
+
+        for (ResourceType resourceType:ResourceType.values()) {
+            ResourceType targetResource = (Global.randomGenerator.nextInt(2) == 0) ? ResourceType.BRICK : ResourceType.LUMBER;
+
+            if (resourceType != ResourceType.BRICK && resourceType != ResourceType.LUMBER && localResources.get(resourceType) > 6 && resourceType != targetResource) {
+                int grainChange = (targetResource == ResourceType.GRAIN ? 1 : 0)-(resourceType == ResourceType.GRAIN ? 4 : 0);
+                grain += grainChange;
+                localResources.put(ResourceType.GRAIN, localResources.get(ResourceType.GRAIN)+grainChange);
+
+                int lumberChange = (targetResource == ResourceType.LUMBER ? 1 : 0)-(resourceType == ResourceType.LUMBER ? 4 : 0);
+                lumber += (targetResource == ResourceType.LUMBER ? 1 : 0)-(resourceType == ResourceType.LUMBER ? 4 : 0);
+                localResources.put(ResourceType.LUMBER, localResources.get(ResourceType.LUMBER)+lumberChange);
+
+                int woolChange = (targetResource == ResourceType.WOOL ? 1 : 0)-(resourceType == ResourceType.WOOL ? 4 : 0);
+                wool += (targetResource == ResourceType.WOOL ? 1 : 0)-(resourceType == ResourceType.WOOL ? 4 : 0);
+                localResources.put(ResourceType.WOOL, localResources.get(ResourceType.WOOL)+woolChange);
+
+                int oreChange = (targetResource == ResourceType.ORE ? 1 : 0)-(resourceType == ResourceType.ORE ? 4 : 0);
+                ore += (targetResource == ResourceType.ORE ? 1 : 0)-(resourceType == ResourceType.ORE ? 4 : 0);
+                localResources.put(ResourceType.ORE, localResources.get(ResourceType.ORE)+oreChange);
+
+                int brickChange = (targetResource == ResourceType.BRICK ? 1 : 0)-(resourceType == ResourceType.BRICK ? 4 : 0);
+                brick += (targetResource == ResourceType.BRICK ? 1 : 0)-(resourceType == ResourceType.BRICK ? 4 : 0);
+                localResources.put(ResourceType.BRICK, localResources.get(ResourceType.BRICK)+brickChange);
+                            /*grainB = (targetResource == ResourceType.GRAIN ? 1 : 0)-(resourceType == ResourceType.GRAIN ? 4 : 0);
+                            woodB = (targetResource == ResourceType.GRAIN ? 1 : 0)-(resourceType == ResourceType.GRAIN ? 4 : 0);
+                            woolB = (targetResource == ResourceType.GRAIN ? 1 : 0)-(resourceType == ResourceType.GRAIN ? 4 : 0);
+                            oreB = (targetResource == ResourceType.GRAIN ? 1 : 0)-(resourceType == ResourceType.GRAIN ? 4 : 0);
+                            brickB = (targetResource == ResourceType.GRAIN ? 1 : 0)-(resourceType == ResourceType.GRAIN ? 4 : 0);*/
+            }
+        }
+
+        if (grain+lumber+wool+ore+brick != 0) {
+            int takenGrain = localResources.get(ResourceType.GRAIN) - virtualOwner.getResources().get(ResourceType.GRAIN);
+            takenGrain = takenGrain < 0 ? 0 : takenGrain;
+
+            int takenLumber = localResources.get(ResourceType.LUMBER) - virtualOwner.getResources().get(ResourceType.LUMBER);
+            takenLumber = takenLumber < 0 ? 0 : takenLumber;
+
+            int takenWool = localResources.get(ResourceType.WOOL) - virtualOwner.getResources().get(ResourceType.WOOL);
+            takenWool = takenWool < 0 ? 0 : takenWool;
+
+            int takenOre = localResources.get(ResourceType.ORE) - virtualOwner.getResources().get(ResourceType.ORE);
+            takenOre = takenOre < 0 ? 0 : takenOre;
+
+            int takenBrick = localResources.get(ResourceType.BRICK) - virtualOwner.getResources().get(ResourceType.BRICK);
+            takenBrick = takenBrick < 0 ? 0 : takenBrick;
+
+            grain = grain > 0 ? 0 : -grain;
+            lumber = lumber > 0 ? 0 : -lumber;
+            wool = wool > 0 ? 0 : -wool;
+            ore = ore > 0 ? 0 : -ore;
+            brick = brick > 0 ? 0 : -brick;
+
+            result += "P" + (owner.getIndex() + 1)
+                    + " [TR " + ((grain < 10) ? ("0" + grain) : grain)
+                    + " " + ((lumber < 10) ? ("0" + lumber) : lumber)
+                    + " " + ((wool < 10) ? ("0" + wool) : wool)
+                    + " " + ((ore < 10) ? ("0" + ore) : ore)
+                    + " " + ((brick < 10) ? ("0" + brick) : brick)
+                    + " " + ((takenGrain < 10) ? ("0" + takenGrain) : takenGrain)
+                    + " " + ((takenLumber < 10) ? ("0" + takenLumber) : takenLumber)
+                    + " " + ((takenWool < 10) ? ("0" + takenWool) : takenWool)
+                    + " " + ((takenOre < 10) ? ("0" + takenOre) : takenOre)
+                    + " " + ((takenBrick < 10) ? ("0" + takenBrick) : takenBrick)
+                    + "] B\r\n";
+
+            virtualBoard.tradeBank(virtualOwner.getIndex(), grain, lumber, wool, ore, brick
+                    , takenGrain
+                    , takenLumber
+                    , takenWool
+                    , takenOre
+                    , takenBrick);
+
+            return true;
+        }
+
+        return false;
+    }
+
     private boolean developmentCard_move() {
         return false;
     }
@@ -156,7 +278,7 @@ public class BasicAI implements AI, Serializable {
             if (virtualBoard.isValid(settlement_temp, isInitial)) {
                 for (Land land : location.getAdjacentLands()) {
                     value += land.getDiceChance();
-            }
+                }
 
                 if (value > maxValue) {
                     maxValue = value;
@@ -214,7 +336,6 @@ public class BasicAI implements AI, Serializable {
         return false;
     }
 
-
     private boolean createRoad_move(Location location) {
         Player virtualOwner = virtualBoard.getPlayers().get(owner.getIndex());
 
@@ -243,36 +364,6 @@ public class BasicAI implements AI, Serializable {
 
     public boolean isPHMove() {
         return owner.getStructures().size() == 2;
-    }
-
-    public void moveRobber () {
-        for (Land land : board.getLands()) {
-            if (land.getType() == LandType.HILLS) {
-                if(!haveMyStructure(land))
-                    board.moveRobber(owner, land, choseVictim(land), ResourceType.BRICK);
-            }
-        }
-    }
-
-    private boolean haveMyStructure(Land land) {
-        boolean haveStructure = false;
-        for (Location location : land.getAdjacentLocations()) {
-            if(location.getOwner().getIndex() == owner.getIndex())
-                haveStructure = true;
-
-        }
-        return haveStructure;
-    }
-
-    private Player choseVictim(Land land) {
-        Player victim = null;
-        while (victim == null) {
-            Location location = land.getAdjacentLocations().get(randomGenerator.nextInt(land.getAdjacentLocations().size()));
-            if (location.hasOwner())
-                victim = location.getOwner();
-        }
-
-        return victim;
     }
 
     public void useMonopoly() {

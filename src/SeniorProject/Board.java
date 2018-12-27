@@ -70,6 +70,7 @@ public class Board implements Serializable {
                         else
                             result += 3;
                     }
+
                     topLocationIndexes.add(result);
                 }
 
@@ -211,7 +212,12 @@ public class Board implements Serializable {
                 if (player.getKnight() > 0)
                     return true;
                 break;
-            case Trade:
+            case TradeBank:
+                /*if (brick < 4 && grain < 4 && wool < 4 && ore < 4 && lumber < 4)
+                    return false;*/
+
+                if (brick % 4 + grain % 4 + wool % 4 + ore % 4 + lumber % 4 == 0)
+                    return false;
                 return true;
             case MonopolyCard:
                 for (DevelopmentCard card : player.getDevelopmentCards()) {
@@ -280,10 +286,10 @@ public class Board implements Serializable {
             Road road = (Road) structure;
             Location end = road.getEndLocation();
             Location start = road.getStartLocation();
-            boolean isBothLocationsActive = start.isActive() && end.isActive();
+            boolean areBothLocationsActive = start.isActive() && end.isActive();
 
             // İki ucu aktif olmak zorunda.
-            if (!isBothLocationsActive)
+            if (!areBothLocationsActive)
                 return false;
 
             // İki ucu komşu olmak zorunda.
@@ -419,14 +425,14 @@ public class Board implements Serializable {
 
     void tradeBank(int playerIndex, int wheat, int wood, int wool, int stone, int brick, int wheatB, int woodB, int woolB, int stoneB, int brickB) {
         if (((wheatB + woodB + woolB + stoneB + brickB) * 4) == wheat + wood + wool + stone + brick) {
-            players.get(playerIndex).setGrain(players.get(playerIndex).getGrain() - wheat);
-            players.get(playerIndex).setLumber(players.get(playerIndex).getLumber() - wood);
-            players.get(playerIndex).setWool(players.get(playerIndex).getWool() - wool);
-            players.get(playerIndex).setOre(players.get(playerIndex).getOre() - stone);
-            players.get(playerIndex).setBrick(players.get(playerIndex).getBrick() - brick);
-            addLog("ACTION: A trade with bank has been done by [Player " + playerIndex + "]");
+            players.get(playerIndex).setGrain(players.get(playerIndex).getGrain() - wheat + wheatB);
+            players.get(playerIndex).setLumber(players.get(playerIndex).getLumber() - wood + woodB);
+            players.get(playerIndex).setWool(players.get(playerIndex).getWool() - wool + woolB);
+            players.get(playerIndex).setOre(players.get(playerIndex).getOre() - stone + stoneB);
+            players.get(playerIndex).setBrick(players.get(playerIndex).getBrick() - brick + brickB);
+            addLog("ACTION: A trade with bank has been done by [Player " + (playerIndex + 1) + "]");
         } else {
-            addLog("ACTION: A trade with bank has been failed by [Player " + playerIndex + "]");
+            addLog("ACTION: A trade with bank has been failed by [Player " + (playerIndex + 1) + "]");
         }
     }
 
@@ -437,10 +443,6 @@ public class Board implements Serializable {
 
     void rollDice(Player player, int dice1, int dice2) {
         generateResource(dice1 + dice2);
-        if(dice1 + dice2 == 7) {
-            // TODO: 27-Dec-18  
-        }
-            
         addLog("ACTION: Dice are rolled " + dice1 + " " + dice2 + " by [Player " + (player.getIndex() + 1) + "]");
     }
 
@@ -519,10 +521,6 @@ public class Board implements Serializable {
 
     public ArrayList<Structure> getStructures() {
         return structures;
-    }
-
-    public Deck getDeck() {
-        return deck;
     }
 
     @Override
