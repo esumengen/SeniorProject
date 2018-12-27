@@ -187,6 +187,10 @@ public class Player implements Serializable, Observer {
         this.victoryPoint = victoryPoint;
     }
 
+    public void pickDevelopmentCard(Integer CardIndex) {
+        board.getDeck().pickCard(CardIndex);
+    }
+
     @Override
     public void addSubscriber(Subscriber subscriber) {
         subscribers.add(subscriber);
@@ -202,4 +206,5 @@ public class Player implements Serializable, Observer {
     public ArrayList<Subscriber> getSubscribers() {
         return subscribers;
     }
+
 }

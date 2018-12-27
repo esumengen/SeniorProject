@@ -80,6 +80,9 @@ class Synchronizer {
                         break;
                     case "RD":  //P0 [RD 06 03] X q
                         board.rollDice(board.getPlayers().get(playerIndex), actionParam.get(0), actionParam.get(1));
+                    case "DC":  // P0 [DC 01] X
+                        board.getPlayers().get(playerIndex).pickDevelopmentCard(actionParam.get(0));
+
                 }
                 actionParam.clear();
             }

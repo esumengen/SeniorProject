@@ -437,6 +437,10 @@ public class Board implements Serializable {
 
     void rollDice(Player player, int dice1, int dice2) {
         generateResource(dice1 + dice2);
+        if(dice1 + dice2 == 7) {
+            // TODO: 27-Dec-18  
+        }
+            
         addLog("ACTION: Dice are rolled " + dice1 + " " + dice2 + " by [Player " + (player.getIndex() + 1) + "]");
     }
 
@@ -515,6 +519,10 @@ public class Board implements Serializable {
 
     public ArrayList<Structure> getStructures() {
         return structures;
+    }
+
+    public Deck getDeck() {
+        return deck;
     }
 
     @Override

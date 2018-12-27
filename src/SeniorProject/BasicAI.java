@@ -1,7 +1,5 @@
 package SeniorProject;
 
-import DevelopmentCards.*;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
@@ -216,6 +214,7 @@ public class BasicAI implements AI, Serializable {
         return false;
     }
 
+
     private boolean createRoad_move(Location location) {
         Player virtualOwner = virtualBoard.getPlayers().get(owner.getIndex());
 
@@ -244,6 +243,36 @@ public class BasicAI implements AI, Serializable {
 
     public boolean isPHMove() {
         return owner.getStructures().size() == 2;
+    }
+
+    public void moveRobber () {
+        for (Land land : board.getLands()) {
+            if (land.getType() == LandType.HILLS) {
+                if(!haveMyStructure(land))
+                    board.moveRobber(owner, land, choseVictim(land), ResourceType.BRICK);
+            }
+        }
+    }
+
+    private boolean haveMyStructure(Land land) {
+        boolean haveStructure = false;
+        for (Location location : land.getAdjacentLocations()) {
+            if(location.getOwner().getIndex() == owner.getIndex())
+                haveStructure = true;
+
+        }
+        return haveStructure;
+    }
+
+    private Player choseVictim(Land land) {
+        Player victim = null;
+        while (victim == null) {
+            Location location = land.getAdjacentLocations().get(randomGenerator.nextInt(land.getAdjacentLocations().size()));
+            if (location.hasOwner())
+                victim = location.getOwner();
+        }
+
+        return victim;
     }
 
     public void useMonopoly() {

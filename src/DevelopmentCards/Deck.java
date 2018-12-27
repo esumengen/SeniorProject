@@ -1,5 +1,7 @@
 package DevelopmentCards;
 
+import SeniorProject.Player;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Random;
@@ -25,6 +27,17 @@ public class Deck implements Serializable {
             return randomCard;
         }else {
             return pickCard();
+        }
+    }
+
+    public CardType pickCard(Integer cardTypeIndex) {
+        CardType cardType = CardType.values()[cardTypeIndex];
+        if (deck.get(cardType) > 0) {
+            deck.replace(cardType, (deck.get(cardType) - 1));
+            return cardType;
+        }
+        else {
+            return null;
         }
     }
 
