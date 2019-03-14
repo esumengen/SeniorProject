@@ -57,13 +57,13 @@ public class Player implements Serializable, Observer {
 
     void writeMove(boolean isInitial) {
         String actionList_str = AI_instance.createMoves(isInitial);
-        AI_instance.createMoves(isInitial);
+        AI_instance.clearVirtualBoards();
 
         String fileName = "actions_temp" + index + ".txt";
         Global.createTextFile(fileName, actionList_str);
 
-        if (!actionList_str.equals(""))
-            Global.createTextFile(System.nanoTime()/10000 + fileName, actionList_str);
+        /*if (!actionList_str.equals(""))
+            Global.createTextFile(System.nanoTime()/10000 + fileName, actionList_str);*/
 
         setState(PlayerState.IDLE);
     }

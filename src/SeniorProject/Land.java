@@ -71,9 +71,9 @@ public class Land implements Serializable {
 
     private double calculateDiceChance() {
         double numerator = 0.0;
-        for (int i = 1; i <= 6; i++) {
-            for (int j = 1; j <= 6; j++) {
-                if (i + j == diceNo) numerator++;
+        for (int k = 1; k <= 6; k++) {
+            for (int l = 1; l <= 6; l++) {
+                if (k + l == diceNo) numerator++;
             }
         }
         return numerator / 36;

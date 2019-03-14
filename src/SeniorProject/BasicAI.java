@@ -1,5 +1,7 @@
 package SeniorProject;
 
+import DevelopmentCards.*;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,13 +24,13 @@ public class BasicAI implements AI, Serializable {
         this.board = board;
     }
 
-    public void clearMoves() {
+    public void clearVirtualBoards() {
         virtualBoard = null;
         System.gc();
     }
 
     public String createMoves(boolean isInitial) {
-        clearMoves();
+        clearVirtualBoards();
         this.virtualBoard = Board.deepCopy(board);
         Player virtualOwner = virtualBoard.getPlayers().get(owner.getIndex());
 
@@ -41,32 +43,14 @@ public class BasicAI implements AI, Serializable {
             moves.add(MoveType.CreateSettlement);
             moves.add(MoveType.CreateRoad);
         } else {
-            /*int count = 0;
-            while (count < 3) {
-                boolean willBreak = false;*/
-
-                if (Board.isAffordable(MoveType.CreateSettlement, virtualOwner))
-                    moves.add(MoveType.CreateSettlement);
-                if (Board.isAffordable(MoveType.CreateRoad, virtualOwner))
-                    moves.add(MoveType.CreateRoad);
-                if (Board.isAffordable(MoveType.UpgradeSettlement, virtualOwner))
-                    moves.add(MoveType.UpgradeSettlement);
-
-            /*    if (moves.size() > 0)
-                    willBreak = true;*/
-
-                if (Board.isAffordable(MoveType.TradeBank, virtualOwner)) {
-                    //if (!moves.contains(MoveType.TradeBank))
-                        moves.add(MoveType.TradeBank);
-                }
-
-            /*    if (willBreak)
-                    break;
-
-                count++;
-            }*/
-            /*if (Board.isAffordable(MoveType.DevelopmentCard, owner))
-                moves.add(MoveType.DevelopmentCard);*/
+            if (Board.isAffordable(MoveType.CreateSettlement, virtualOwner))
+                moves.add(MoveType.CreateSettlement);
+            if (Board.isAffordable(MoveType.CreateRoad, virtualOwner))
+                moves.add(MoveType.CreateRoad);
+            if (Board.isAffordable(MoveType.UpgradeSettlement, virtualOwner))
+                moves.add(MoveType.UpgradeSettlement);
+            if (Board.isAffordable(MoveType.TradeBank, virtualOwner))
+                moves.add(MoveType.TradeBank);
         }
 
         for (int i = 0; i < moves.size(); i++) {
@@ -143,7 +127,7 @@ public class BasicAI implements AI, Serializable {
         Player virtualOwner = virtualBoard.getPlayers().get(owner.getIndex());
 
         int count = 0;
-        while (count < 9999) {
+        while (count < 5000) {
             Structure structure = virtualOwner.getStructures().get(Global.randomGenerator.nextInt(virtualOwner.getStructures().size()));
 
             if (structure instanceof Settlement) {
@@ -169,11 +153,6 @@ public class BasicAI implements AI, Serializable {
         int wool = 0;
         int ore = 0;
         int brick = 0;
-                    /*int grainB = 0;
-                    int woodB = 0;
-                    int woolB = 0;
-                    int oreB = 0;
-                    int brickB = 0;*/
 
         for (ResourceType resourceType:ResourceType.values()) {
             ResourceType targetResource = (Global.randomGenerator.nextInt(2) == 0) ? ResourceType.BRICK : ResourceType.LUMBER;
@@ -198,11 +177,6 @@ public class BasicAI implements AI, Serializable {
                 int brickChange = (targetResource == ResourceType.BRICK ? 1 : 0)-(resourceType == ResourceType.BRICK ? 4 : 0);
                 brick += (targetResource == ResourceType.BRICK ? 1 : 0)-(resourceType == ResourceType.BRICK ? 4 : 0);
                 localResources.put(ResourceType.BRICK, localResources.get(ResourceType.BRICK)+brickChange);
-                            /*grainB = (targetResource == ResourceType.GRAIN ? 1 : 0)-(resourceType == ResourceType.GRAIN ? 4 : 0);
-                            woodB = (targetResource == ResourceType.GRAIN ? 1 : 0)-(resourceType == ResourceType.GRAIN ? 4 : 0);
-                            woolB = (targetResource == ResourceType.GRAIN ? 1 : 0)-(resourceType == ResourceType.GRAIN ? 4 : 0);
-                            oreB = (targetResource == ResourceType.GRAIN ? 1 : 0)-(resourceType == ResourceType.GRAIN ? 4 : 0);
-                            brickB = (targetResource == ResourceType.GRAIN ? 1 : 0)-(resourceType == ResourceType.GRAIN ? 4 : 0);*/
             }
         }
 
@@ -275,7 +249,7 @@ public class BasicAI implements AI, Serializable {
             if (virtualBoard.isValid(settlement_temp, isInitial)) {
                 for (Land land : location.getAdjacentLands()) {
                     value += land.getDiceChance();
-            }
+                }
 
                 if (value > maxValue) {
                     maxValue = value;
@@ -306,7 +280,7 @@ public class BasicAI implements AI, Serializable {
         Road road_temp = null;
 
         int count = 0;
-        while (count < 999999) {
+        while (count < 5000) {
             startLocation = possibleLocations.get(Global.randomGenerator.nextInt(possibleLocations.size()));
             endLocation = startLocation.getAdjacentLocations().get(randomGenerator.nextInt(startLocation.getAdjacentLocations().size()));
             road_temp = new Road(startLocation, endLocation, virtualOwner);

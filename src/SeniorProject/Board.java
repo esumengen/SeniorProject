@@ -231,7 +231,7 @@ public class Board implements Serializable {
                 /*if (brick < 4 && grain < 4 && wool < 4 && ore < 4 && lumber < 4)
                     return false;*/
 
-                if (brick % 4 + grain % 4 + wool % 4 + ore % 4 + lumber % 4 == 0)
+                if (brick / 4 + grain / 4 + wool / 4 + ore / 4 + lumber / 4 == 0)
                     return false;
                 return true;
             case MonopolyCard:
@@ -469,6 +469,8 @@ public class Board implements Serializable {
                         Player rewardedPlayer = location.getOwner();
 
                         rewardedPlayer.changeResource(land.getResourceType(), location.hasCity() ? 2 : 1);
+
+                        addLog("?");
                     }
                 }
             }
@@ -483,10 +485,10 @@ public class Board implements Serializable {
     }
 
     public static Board deepCopy(Serializable object) {
-        Board copy = (Board) SerializationUtils.clone(object);
-        return copy;
+        /*Board copy = (Board) SerializationUtils.clone(object);
+        return copy;*/
 
-        /*try {
+        try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ObjectOutputStream outputStrm = new ObjectOutputStream(outputStream);
 
@@ -496,11 +498,10 @@ public class Board implements Serializable {
             ObjectInputStream objInputStream = new ObjectInputStream(inputStream);
 
             return (Board) objInputStream.readObject();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
-        }*/
+        }
     }
 
     public boolean isActive() {
