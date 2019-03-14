@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="commons-net-3.6">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/commons-lang3-3.8.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ini4j-0.5.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
