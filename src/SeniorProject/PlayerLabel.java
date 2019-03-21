@@ -2,7 +2,7 @@ package SeniorProject;
 
 import javax.swing.*;
 
-public class PlayerLabel extends JLabel implements Subscriber {
+public class PlayerLabel extends JLabel implements IObserver {
     ResourceType resourceType;
     Player player;
     boolean stateControl;
@@ -13,7 +13,7 @@ public class PlayerLabel extends JLabel implements Subscriber {
         this.stateControl = false;
         this.player = player;
 
-        player.addSubscriber(this);
+        player.addObserver(this);
     }
 
     public PlayerLabel (Player player, ResourceType resourceType) {
@@ -31,7 +31,7 @@ public class PlayerLabel extends JLabel implements Subscriber {
         if (stateControl)
             setText(player.getState().toString());
         else if (resourceType != null) {
-            setText(player.getResources().get(resourceType).toString());
+            setText(player.getResource().get(resourceType).toString());
         }
     }
 }

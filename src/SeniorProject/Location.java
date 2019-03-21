@@ -12,6 +12,7 @@ public class Location implements Serializable {
     private Player owner;
     private boolean isActive = false;
     private boolean isCorner = false;
+    private PureBoard pureBoard;
 
     public Location(int index) {
         this.adjacentLands = new ArrayList<>();
@@ -88,5 +89,13 @@ public class Location implements Serializable {
 
     public void addAdjacentLocations(Location location) {
         adjacentLocations.add(location);
+    }
+
+    public PureBoard getPureBoard() {
+        return pureBoard;
+    }
+
+    public void setPureBoard(PureBoard board) {
+        this.pureBoard = board;
     }
 }

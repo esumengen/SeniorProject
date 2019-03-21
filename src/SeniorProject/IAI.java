@@ -1,5 +1,5 @@
 package SeniorProject;
 
-public interface AI {
+public interface IAI {
     String createMoves(boolean isInitial);
 }

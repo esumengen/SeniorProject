@@ -17,7 +17,8 @@ public class Main {
         board.setActive(true);
 
         for (Player player : players) {
-            player.createAI(board);
+            player.setPureBoard(board);
+            player.createAI();
         }
 
         Synchronizer synchronizer = new Synchronizer(board);
@@ -26,49 +27,63 @@ public class Main {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                try {
-                    if (!synchronizer.isSynchronized() && synchronizer.getState() == SynchronizerState.WAITING) {
-                        File actionsFile = new File(Global.get_working_path(Global.ACTIONS_FILE));
+                if (!synchronizer.isSynchronized() && synchronizer.getState() == SynchronizerState.WAITING) {
+                    File actionsFile = new File(Global.get_working_path(Global.ACTIONS_FILE));
 
-                        if (actionsFile.exists())
-                            synchronizer.sync(actionsFile);
+                    if (actionsFile.exists())
+                        synchronizer.sync(actionsFile);
+                }
+
+                File communication_file = new File(Global.get_working_path(Global.COMMUNICATION_FILE));
+                if (communication_file.exists()) {
+
+                    Wini communication_ini = null;
+                    try {
+                        communication_ini = new Wini(communication_file);
+                    }
+                    catch (Exception e) {
+                        new Message(e.getMessage() + " - 12");
                     }
 
-                    File communication_file = new File(Global.get_working_path(Global.COMMUNICATION_FILE));
-                    if (communication_file.exists()) {
-                        Wini communication_ini = new Wini(communication_file);
+                    for (Player player : players) {
+                        if (player.getType() != PlayerType.HUMAN) {
+                            String turnMode = communication_ini.get("General", "turnMode[" + player.getIndex() + "]", String.class);
+                            boolean isInitial = communication_ini.get("Game State", "isInitial", String.class).equals("\"true\"");
+                            turnMode = Global.getRidOf_quotationMarks(turnMode);
 
-                        for (Player player : players) {
-                            if (player.getType() != PlayerType.HUMAN) {
-                                String turnMode = communication_ini.get("General", "turnMode[" + player.getIndex() + "]", String.class);
-                                boolean isInitial = communication_ini.get("Game State", "isInitial", String.class).equals("\"true\"");
-                                turnMode = Global.getRidOf_quotationMarks(turnMode);
+                            if (turnMode.equals("waiting") && player.getState() != PlayerState.THINKING) {
+                                player.setState(PlayerState.THINKING);
 
-                                if (turnMode.equals("waiting") && player.getState() != PlayerState.THINKING) {
-                                    player.setState(PlayerState.THINKING);
+                                player.writeMove(isInitial);
 
-                                    player.writeMove(isInitial);
+                                communication_ini.put("General", "turnMode[" + player.getIndex() + "]", "\"done\"");
 
-                                    communication_ini.put("General", "turnMode[" + player.getIndex() + "]", "\"done\"");
+                                try {
                                     communication_ini.store();
-                                    break;
+                                } catch (Exception e) {
+                                    new Message(e.getMessage() + " - 11");
                                 }
+
+                                break;
                             }
                         }
                     }
-
-                    ///region Automatic Termination
-                    ProcessBuilder processBuilder = new ProcessBuilder("tasklist.exe");
-                    Process process = processBuilder.start();
-                    String tasksList = stream_toString(process.getInputStream());
-
-                    if (!tasksList.contains("Catan.exe") && !tasksList.contains("Runner.exe")) {
-                        System.exit(0);
-                    }
-                    ///endregion
-                } catch (Exception e) {
-                    new Message(e.getMessage() + " - 1");
                 }
+
+                ///region Automatic Termination
+                ProcessBuilder processBuilder = new ProcessBuilder("tasklist.exe");
+                Process process = null;
+                try {
+                    process = processBuilder.start();
+                } catch (Exception e) {
+                    new Message(e.getMessage() + " - 13");
+                }
+                String tasksList = stream_toString(process.getInputStream());
+
+                if (!tasksList.contains("Catan.exe") && !tasksList.contains("Runner.exe")) {
+                    System.exit(0);
+                }
+                ///endregion
             }
         };
 

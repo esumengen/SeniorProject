@@ -27,6 +27,7 @@ public class Land implements Serializable {
     private double diceChance = 0;
     private int i;
     private int j;
+    private PureBoard pureBoard;
 
     public Land(int index) {
         this.adjacentLocations = new ArrayList<>();
@@ -97,5 +98,13 @@ public class Land implements Serializable {
 
     public void setJ(int j) {
         this.j = j;
+    }
+
+    public PureBoard getPureBoard() {
+        return pureBoard;
+    }
+
+    public void setPureBoard(PureBoard board) {
+        this.pureBoard = board;
     }
 }

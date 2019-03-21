@@ -27,6 +27,18 @@ class Synchronizer {
     }
 
     void sync(File file) {
+        State.StateBuilder stateBuilder = new State.StateBuilder();
+        State currentState = stateBuilder.setPureBoard(Board.deepCopy(board)).initial(false)
+                .setResources(board.getPlayers().get(0).getResource(),0)
+                .setResources(board.getPlayers().get(1).getResource(),1)
+                .setResources(board.getPlayers().get(2).getResource(),2)
+                .setResources(board.getPlayers().get(3).getResource(),3)
+                .build();
+
+        System.out.println(currentState);
+        System.out.println("[Player 2's Affordable Moves]: "+currentState.getAffordableMoves(1));
+        System.out.println("[Player 2's Possible Actions]: "+currentState.getPossibleActions(1));
+
         setState(SynchronizerState.RUNNING);
 
         String line;
@@ -37,7 +49,6 @@ class Synchronizer {
         String objectType;
 
         try {
-
             Scanner scanner = new Scanner(file);
             while (scanner.hasNext()) {
                 line = scanner.nextLine();
@@ -72,11 +83,13 @@ class Synchronizer {
                         }
                         break;
                     case "TR":
-                        if (objectType.equals("B")) {  //P0 [TR 35 35 35 35 35 35 35 35 35 35] B
-                            board.tradeBank(playerIndex, actionParam.get(0), actionParam.get(1), actionParam.get(2), actionParam.get(3), actionParam.get(4), actionParam.get(5), actionParam.get(6), actionParam.get(7), actionParam.get(8), actionParam.get(9));
-                        } else {  //P0 [TR 35 35 35 35 35 35 35 35 35 35] 1
-                            board.tradePlayer(playerIndex, Integer.parseInt(objectType), actionParam.get(0), actionParam.get(1), actionParam.get(2), actionParam.get(3), actionParam.get(4), actionParam.get(5), actionParam.get(6), actionParam.get(7), actionParam.get(8), actionParam.get(9));
-                        }
+                        Resource givenResources = new Resource(actionParam.get(0), actionParam.get(1), actionParam.get(2), actionParam.get(3), actionParam.get(4));
+                        Resource takenResources = new Resource(actionParam.get(5), actionParam.get(6), actionParam.get(7), actionParam.get(8), actionParam.get(9));
+
+                        if (objectType.equals("B"))  //P0 [TR 35 35 35 35 35 35 35 35 35 35] B
+                            board.tradeBank(playerIndex, givenResources, takenResources);
+                        else  //P0 [TR 35 35 35 35 35 35 35 35 35 35] 1
+                            board.tradePlayer(playerIndex, Integer.parseInt(objectType), givenResources, takenResources);
                         break;
                     case "RD":  //P0 [RD 06 03] X q
                         board.rollDice(board.getPlayers().get(playerIndex), actionParam.get(0), actionParam.get(1));

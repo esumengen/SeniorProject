@@ -1,38 +1,24 @@
 package SeniorProject;
 
-import DevelopmentCards.DevelopmentCard;
+import SeniorProject.DevelopmentCards.DevelopmentCardType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
-enum ResourceType {
-    BRICK, ORE, GRAIN, LUMBER, WOOL
-}
-
-enum PlayerType {
-    AI, HUMAN
-}
-
-enum PlayerState {
-    THINKING, IDLE
-}
-
-public class Player implements Serializable, Observer {
+public class Player implements Serializable, IObservable {
     private BasicAI AI_instance;
-
     private String name;
     private int index;
     private int victoryPoint;
     private PlayerType type;
     private ArrayList<Structure> structures = new ArrayList<>();
-    private Map<ResourceType, Integer> resources;
-    private ArrayList<DevelopmentCard> developmentCards = new ArrayList<>();
+    private Resource resource;
+    private ArrayList<DevelopmentCardType> developmentCards = new ArrayList<>();
     private int knight = 0;
-    private Board board;
+    private PureBoard pureBoard;
     private PlayerState state = PlayerState.IDLE;
-    private ArrayList<Subscriber> subscribers;
+    private ArrayList<IObserver> observers;
 
     public Player(int index) {
         this.index = index;
@@ -41,14 +27,9 @@ public class Player implements Serializable, Observer {
 
         this.name = "Player "+(index+1);
 
-        subscribers = new ArrayList<>();
+        observers = new ArrayList<>();
 
-        resources = new HashMap<>();
-        resources.put(ResourceType.BRICK, 0);
-        resources.put(ResourceType.ORE, 0);
-        resources.put(ResourceType.GRAIN, 0);
-        resources.put(ResourceType.LUMBER, 0);
-        resources.put(ResourceType.WOOL, 0);
+        resource = new Resource(0, 0, 0, 0, 0);
     }
 
     public int getIndex() {
@@ -77,6 +58,10 @@ public class Player implements Serializable, Observer {
         updateSubscribers();
     }
 
+    void setResource(Resource resource) {
+        this.resource = this.resource;
+    }
+
     public String getName() {
         return name;
     }
@@ -99,76 +84,75 @@ public class Player implements Serializable, Observer {
     }
 
     public int getGrain() {
-        return resources.get(ResourceType.GRAIN);
+        return resource.get(ResourceType.GRAIN);
     }
 
     public void setGrain(int value) {
-        resources.replace(ResourceType.GRAIN, value);
+        resource.replace(ResourceType.GRAIN, value);
 
         updateSubscribers();
     }
 
     public int getLumber() {
-        return resources.get(ResourceType.LUMBER);
+        return resource.get(ResourceType.LUMBER);
     }
 
     public void setLumber(int value) {
-        resources.replace(ResourceType.LUMBER, value);
+        resource.replace(ResourceType.LUMBER, value);
 
         updateSubscribers();
     }
 
     public int getOre() {
-        return resources.get(ResourceType.ORE);
+        return resource.get(ResourceType.ORE);
     }
 
     public void setOre(int value) {
-        resources.replace(ResourceType.ORE, value);
+        resource.replace(ResourceType.ORE, value);
 
         updateSubscribers();
     }
 
     public int getWool() {
-        return resources.get(ResourceType.WOOL);
+        return resource.get(ResourceType.WOOL);
     }
 
     public void setWool(int value) {
-        resources.replace(ResourceType.WOOL, value);
+        resource.replace(ResourceType.WOOL, value);
 
         updateSubscribers();
     }
 
     public int getBrick() {
-        return resources.get(ResourceType.BRICK);
+        return resource.get(ResourceType.BRICK);
     }
 
     public void setBrick(int value) {
-        resources.replace(ResourceType.BRICK, value);
+        resource.replace(ResourceType.BRICK, value);
 
         updateSubscribers();
     }
 
-    Map<ResourceType, Integer> getResources() {
-        return resources;
+    Resource getResource() {
+        return resource;
     }
 
     void changeResource(ResourceType resourceType, Integer value) {
         if (resourceType != null)
-            resources.replace(resourceType, resources.get(resourceType) + value);
+            resource.replace(resourceType, resource.get(resourceType) + value);
 
         updateSubscribers();
     }
 
-    void createAI(Board board) {
-        this.board = board;
-        this.AI_instance = new BasicAI(this, board);
+    void createAI() {
+        this.AI_instance = new BasicAI(this, (Board) pureBoard);
     }
 
     public BasicAI getAI_instance() {
         return AI_instance;
     }
 
-    public ArrayList<DevelopmentCard> getDevelopmentCards() {
+    public ArrayList<DevelopmentCardType> getDevelopmentCards() {
         return developmentCards;
     }
 
@@ -189,18 +173,30 @@ public class Player implements Serializable, Observer {
     }
 
     @Override
-    public void addSubscriber(Subscriber subscriber) {
-        subscribers.add(subscriber);
+    public void addObserver(IObserver observer) {
+        observers.add(observer);
     }
 
     public void updateSubscribers() {
-        for (Subscriber subscriber:subscribers) {
-            subscriber.update();
+        for (IObserver observer : observers) {
+            observer.update();
         }
     }
 
     @Override
-    public ArrayList<Subscriber> getSubscribers() {
-        return subscribers;
+    public ArrayList<IObserver> getObservers() {
+        return observers;
+    }
+
+    public PureBoard getPureBoard() {
+        return pureBoard;
+    }
+
+    public void setPureBoard(PureBoard pureBoard) {
+        this.pureBoard = pureBoard;
+    }
+
+    public void addDevelopmentCard(DevelopmentCardType developmentCardType) {
+        developmentCards.add(developmentCardType);
     }
 }

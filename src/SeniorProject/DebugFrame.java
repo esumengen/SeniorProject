@@ -2,7 +2,6 @@ package SeniorProject;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 
 public class DebugFrame extends JFrame {
@@ -41,7 +40,7 @@ public class DebugFrame extends JFrame {
 
         //region Resources Panel
         resourcesPanel = new JPanel();
-        resourcesPanel.setLayout(new GridLayout(board.getPlayers().size() + 1, board.getPlayers().get(0).getResources().size()));
+        resourcesPanel.setLayout(new GridLayout(board.getPlayers().size() + 1, board.getPlayers().get(0).getResource().size()));
 
         for (ResourceType resource : ResourceType.values()) {
             JLabel resourceNameLabel = new JLabel(resource.toString());
