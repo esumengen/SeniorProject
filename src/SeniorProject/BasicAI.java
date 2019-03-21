@@ -1,11 +1,17 @@
 package SeniorProject;
 
+import DevelopmentCards.*;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-public class BasicAI implements IAI, Serializable {
+public class BasicAI implements AI, Serializable {
+    public enum MoveType {
+        CreateSettlement, CreateRoad, UpgradeSettlement, DevelopmentCard, TradeBank, TradePlayer, KnightCard, RoadBuildingCard, YearOfPlentyCard, MonopolyCard
+    }
+
     private Player owner;
     private Board board;
     private String result = "";
@@ -140,7 +146,7 @@ public class BasicAI implements IAI, Serializable {
     private boolean tradeBank_move() {
         Player virtualOwner = virtualBoard.getPlayers().get(owner.getIndex());
 
-        HashMap<ResourceType, Integer> localResources = new HashMap<>(virtualOwner.getResource());
+        HashMap<ResourceType, Integer> localResources = new HashMap<>(virtualOwner.getResources());
 
         int grain = 0;
         int lumber = 0;
@@ -175,19 +181,19 @@ public class BasicAI implements IAI, Serializable {
         }
 
         if (grain+lumber+wool+ore+brick != 0) {
-            int takenGrain = localResources.get(ResourceType.GRAIN) - virtualOwner.getResource().get(ResourceType.GRAIN);
+            int takenGrain = localResources.get(ResourceType.GRAIN) - virtualOwner.getResources().get(ResourceType.GRAIN);
             takenGrain = takenGrain < 0 ? 0 : takenGrain;
 
-            int takenLumber = localResources.get(ResourceType.LUMBER) - virtualOwner.getResource().get(ResourceType.LUMBER);
+            int takenLumber = localResources.get(ResourceType.LUMBER) - virtualOwner.getResources().get(ResourceType.LUMBER);
             takenLumber = takenLumber < 0 ? 0 : takenLumber;
 
-            int takenWool = localResources.get(ResourceType.WOOL) - virtualOwner.getResource().get(ResourceType.WOOL);
+            int takenWool = localResources.get(ResourceType.WOOL) - virtualOwner.getResources().get(ResourceType.WOOL);
             takenWool = takenWool < 0 ? 0 : takenWool;
 
-            int takenOre = localResources.get(ResourceType.ORE) - virtualOwner.getResource().get(ResourceType.ORE);
+            int takenOre = localResources.get(ResourceType.ORE) - virtualOwner.getResources().get(ResourceType.ORE);
             takenOre = takenOre < 0 ? 0 : takenOre;
 
-            int takenBrick = localResources.get(ResourceType.BRICK) - virtualOwner.getResource().get(ResourceType.BRICK);
+            int takenBrick = localResources.get(ResourceType.BRICK) - virtualOwner.getResources().get(ResourceType.BRICK);
             takenBrick = takenBrick < 0 ? 0 : takenBrick;
 
             grain = grain > 0 ? 0 : -grain;
@@ -209,7 +215,12 @@ public class BasicAI implements IAI, Serializable {
                     + " " + ((takenBrick < 10) ? ("0" + takenBrick) : takenBrick)
                     + "] B\r\n";
 
-            virtualBoard.tradeBank(virtualOwner.getIndex(), new Resource(grain, lumber, wool, ore, brick), new Resource(takenGrain, takenLumber, takenWool, takenOre, takenBrick));
+            virtualBoard.tradeBank(virtualOwner.getIndex(), grain, lumber, wool, ore, brick
+                    , takenGrain
+                    , takenLumber
+                    , takenWool
+                    , takenOre
+                    , takenBrick);
 
             return true;
         }
@@ -324,5 +335,37 @@ public class BasicAI implements IAI, Serializable {
 
     public boolean isPHMove() {
         return owner.getStructures().size() == 2;
+    }
+
+    public void useMonopoly_move() {
+        ResourceType chosenType = chooseResourceType();
+        result += "P" + (owner.getIndex() + 1) + " [DC "+ "MP" + "] " + chosenType.ordinal() + "\r\n";
+
+        for (Player player : virtualBoard.getPlayers()) {
+            if(player.getIndex() != owner.getIndex()) {
+                if (player.getResources().get(chosenType) > 0) {
+                    player.getResources().put(chosenType, player.getResources().get(chosenType) - 1);
+                    virtualBoard.getPlayers().get(owner.getIndex()).getResources().put(chosenType, virtualBoard.getPlayers().get(owner.getIndex()).getResources().get(chosenType) + 1);
+                }
+            }
+        }
+    }
+
+    private ResourceType chooseResourceType() {
+        // TODO: 16-Mar-19
+
+        return ResourceType.BRICK;
+    }
+
+    public void useRoadBuild() {
+        // TODO: 24-Dec-18  
+    }
+
+    public void useYearOfPlenty() {
+        // TODO: 24-Dec-18
+    }
+
+    public void useKnight() {
+        // TODO: 25-Dec-18
     }
 }
