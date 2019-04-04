@@ -6,6 +6,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Map;
 
+import static SeniorProject.DevelopmentCards.DevelopmentCardType.ROADBUILDING;
+import static SeniorProject.DevelopmentCards.DevelopmentCardType.VICTORYPOINT;
+
 public class Board extends PureBoard implements Serializable {
     private ArrayList<Player> players;
 
@@ -115,9 +118,9 @@ public class Board extends PureBoard implements Serializable {
         syncPlayer(player);
     }
 
-    public void moveRobber(Player robber, Land land, Player victim, ResourceType resourceType) {
+    public void moveRobber(Player robber, Land land, Player victim) {
         setRobbedLand(land);
-        stealRandomResource(robber, victim, resourceType);
+        robber.getResource().add(land.getResourceType(), 1);
 
         addLog("ACTION: The robber has been moved to [Land " + land.getIndex() + "] by [Player " + (robber.getIndex() + 1) + "]");
     }
@@ -129,46 +132,53 @@ public class Board extends PureBoard implements Serializable {
         addLog("ACTION: A development card("+developmentCardType+") is drawn by [Player " + (player.getIndex() + 1) + "]");
     }
 
-    public void useDevelopmentCard (DevelopmentCardType developmentCardType, Player player) {
-        switch (developmentCardType) {
-            case KNIGHT:
-                // TODO
-                break;
-
-            case MONOPOLY:
-                // TODO
-                break;
-
-            case ROADBUILDING:
-                // TODO
-                break;
-
-            case VICTORYPOINT:
-                // TODO
-                break;
-
-            case YEAROFPLENTY:
-                // TODO
-                break;
-        }
-
-        addLog("ACTION: A development card ("+developmentCardType.toString()+") is used by [Player " + (player.getIndex() + 1) + "]");
+    public void useDevelopmentCard_KNIGHT(Player player, Land land, Player victim) {
+        moveRobber(player, land, victim);
+        addLog("ACTION: Knight card is used by [Player " + (player.getIndex() + 1) + "]");
     }
 
-    private void stealRandomResource(Player robber, Player robbed, ResourceType randomType) {
-        robbed.changeResource(randomType, robbed.getResource().get(randomType) - 1);
-        robber.changeResource(randomType, 1);
+    public void useDevelopmentCard_MONOPOLY(Player player, ResourceType resourceType) {
+        for(Player _player : players) {
+            if (_player.getIndex() != player.getIndex()) {
+                if (_player.getResource().get(resourceType) > 0) {
+                    _player.getResource().add(resourceType, -1);
+                    player.getResource().add(resourceType, 1);
+                }
+            }
+        }
+        addLog("ACTION: Monopoly card is used by [Player " + (player.getIndex() + 1) + "]");
+    }
 
-        addLog("ACTION: [Player " + (robbed.getIndex() + 1) + "] is robbed by [Player " + (robber.getIndex() + 1) + "]");
+    public void useDevelopmentCard_ROADBUILDING(Player player, Location loc1, Location loc2, Location loc3, Location loc4) {
+        createRoad(player, loc1, loc2);
+        createRoad(player, loc3, loc4);
+        addLog("ACTION: Raod Building card is used by [Player " + (player.getIndex() + 1) + "]");
+    }
+
+    public void useDevelopmentCard_YEAROFPLENTY(Player player, ResourceType resourceType1, ResourceType resourceType2) {
+        player.getResource().add(resourceType1, 1);
+        player.getResource().add(resourceType2, 1);
+        addLog("ACTION: Year Of Plenty card is used by [Player " + (player.getIndex() + 1) + "]");
     }
 
     public void tradeBank(int playerIndex, Resource givenResources, Resource takenResources) {
-        if (((takenResources.get(ResourceType.GRAIN) + takenResources.get(ResourceType.LUMBER) + takenResources.get(ResourceType.WOOL) + takenResources.get(ResourceType.ORE) + takenResources.get(ResourceType.BRICK)) * 4) == givenResources.get(ResourceType.GRAIN) + givenResources.get(ResourceType.LUMBER) + givenResources.get(ResourceType.WOOL) + givenResources.get(ResourceType.ORE) + givenResources.get(ResourceType.BRICK)) {
-            players.get(playerIndex).setGrain(players.get(playerIndex).getGrain() - givenResources.get(ResourceType.GRAIN) + takenResources.get(ResourceType.GRAIN));
-            players.get(playerIndex).setLumber(players.get(playerIndex).getLumber() - givenResources.get(ResourceType.LUMBER) + takenResources.get(ResourceType.LUMBER));
-            players.get(playerIndex).setWool(players.get(playerIndex).getWool() - givenResources.get(ResourceType.WOOL) + takenResources.get(ResourceType.WOOL));
-            players.get(playerIndex).setOre(players.get(playerIndex).getOre() - givenResources.get(ResourceType.ORE) + takenResources.get(ResourceType.ORE));
-            players.get(playerIndex).setBrick(players.get(playerIndex).getBrick() - givenResources.get(ResourceType.BRICK) + takenResources.get(ResourceType.BRICK));
+        if (((takenResources.get(ResourceType.GRAIN) + takenResources.get(ResourceType.LUMBER)
+                + takenResources.get(ResourceType.WOOL) + takenResources.get(ResourceType.ORE)
+                + takenResources.get(ResourceType.BRICK)) * 4) == givenResources.get(ResourceType.GRAIN)
+                + givenResources.get(ResourceType.LUMBER) + givenResources.get(ResourceType.WOOL)
+                + givenResources.get(ResourceType.ORE) + givenResources.get(ResourceType.BRICK)) {
+
+            players.get(playerIndex).setGrain(players.get(playerIndex).getGrain() - givenResources.get(ResourceType.GRAIN)
+                    + takenResources.get(ResourceType.GRAIN));
+            players.get(playerIndex).setLumber(players.get(playerIndex).getLumber() - givenResources.get(ResourceType.LUMBER)
+                    + takenResources.get(ResourceType.LUMBER));
+            players.get(playerIndex).setWool(players.get(playerIndex).getWool() - givenResources.get(ResourceType.WOOL)
+                    + takenResources.get(ResourceType.WOOL));
+            players.get(playerIndex).setOre(players.get(playerIndex).getOre() - givenResources.get(ResourceType.ORE)
+                    + takenResources.get(ResourceType.ORE));
+            players.get(playerIndex).setBrick(players.get(playerIndex).getBrick() - givenResources.get(ResourceType.BRICK)
+                    + takenResources.get(ResourceType.BRICK));
+
             addLog("ACTION: A trade with bank has been done by [Player " + (playerIndex + 1) + "]");
         } else {
             addLog("ACTION: A trade with bank has been failed by [Player " + (playerIndex + 1) + "]");

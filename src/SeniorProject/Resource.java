@@ -21,4 +21,8 @@ public class Resource extends HashMap<ResourceType, Integer> {
         this.put(ResourceType.ORE, ore);
         this.put(ResourceType.BRICK, brick);
     }
+
+    public void add (ResourceType resourceType, int value ) {
+        this.put(resourceType, this.get(resourceType) + value);
+    }
 }
