@@ -1,6 +1,6 @@
 package SeniorProject;
 
-import SeniorProject.DevelopmentCards.*;
+import SeniorProject.DevelopmentCards.Deck;
 import org.ini4j.Wini;
 
 import java.io.*;

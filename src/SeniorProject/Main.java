@@ -15,6 +15,7 @@ public class Main {
 
         Board board = new Board(players);
         board.setActive(true);
+        board.setMain(true);
 
         for (Player player : players) {
             player.setPureBoard(board);
@@ -30,8 +31,9 @@ public class Main {
                 if (!synchronizer.isSynchronized() && synchronizer.getState() == SynchronizerState.WAITING) {
                     File actionsFile = new File(Global.get_working_path(Global.ACTIONS_FILE));
 
-                    if (actionsFile.exists())
+                    if (actionsFile.exists()) {
                         synchronizer.sync(actionsFile);
+                    }
                 }
 
                 File communication_file = new File(Global.get_working_path(Global.COMMUNICATION_FILE));
@@ -45,16 +47,23 @@ public class Main {
                         new Message(e.getMessage() + " - 12");
                     }
 
+                    boolean isPlayed = false;
+                    Player playerMoved = null;
+
                     for (Player player : players) {
+                        boolean isInitial = true;
+
                         if (player.getType() != PlayerType.HUMAN) {
                             String turnMode = communication_ini.get("General", "turnMode[" + player.getIndex() + "]", String.class);
-                            boolean isInitial = communication_ini.get("Game State", "isInitial", String.class).equals("\"true\"");
+                            isInitial = communication_ini.get("Game State", "isInitial", String.class).equals("\"true\"");
                             turnMode = Global.getRidOf_quotationMarks(turnMode);
 
                             if (turnMode.equals("waiting") && player.getState() != PlayerState.THINKING) {
                                 player.setState(PlayerState.THINKING);
 
                                 player.writeMove(isInitial);
+                                isPlayed = true;
+                                playerMoved = player;
 
                                 communication_ini.put("General", "turnMode[" + player.getIndex() + "]", "\"done\"");
 
@@ -64,8 +73,15 @@ public class Main {
                                     new Message(e.getMessage() + " - 11");
                                 }
 
-                                break;
+                                //break;
                             }
+                        }
+
+                        if (isPlayed) {
+                            if (playerMoved.getIndex() == Global.PLAYER_COUNT - 1 && !isInitial)
+                                board.setTurn(board.getTurn() + 1);
+
+                            break;
                         }
                     }
                 }
@@ -90,8 +106,8 @@ public class Main {
         timer.schedule(task, 0, 333);
 
         // Debug Frame
-        DebugFrame debugFrame = new DebugFrame(board);
-        debugFrame.setVisible(true);
+        //DebugFrame debugFrame = new DebugFrame(board);
+        //debugFrame.setVisible(true);
     }
 
     public static ArrayList<Player> createPlayers() {

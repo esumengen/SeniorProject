@@ -1,11 +1,13 @@
 package SeniorProject.Actions;
 
-import SeniorProject.*;
+import SeniorProject.Board;
+import SeniorProject.IAction;
+import SeniorProject.Location;
+import SeniorProject.Player;
 
 public class CreateSettlement implements IAction {
     Location location;
     Player player;
-    Board board;
 
     public CreateSettlement (Location location, Player player) {
         this.location = location;
@@ -14,6 +16,11 @@ public class CreateSettlement implements IAction {
 
     @Override
     public void execute () {
-        board.createSettlement(player, location);
+        ((Board) location.getPureBoard()).createSettlement(player, location);
+    }
+
+    @Override
+    public String toString() {
+        return player + " SE " + location;
     }
 }

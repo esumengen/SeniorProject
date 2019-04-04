@@ -4,7 +4,6 @@ import SeniorProject.DevelopmentCards.DevelopmentCardType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Player implements Serializable, IObservable {
     private BasicAI AI_instance;
@@ -43,8 +42,8 @@ public class Player implements Serializable, IObservable {
         String fileName = "actions_temp" + index + ".txt";
         Global.createTextFile(fileName, actionList_str);
 
-        /*if (!actionList_str.equals(""))
-            Global.createTextFile(System.nanoTime()/10000 + fileName, actionList_str);*/
+        if (!actionList_str.equals(""))
+            Global.createTextFile(System.nanoTime()/10000 + fileName, actionList_str);
 
         setState(PlayerState.IDLE);
     }
@@ -59,7 +58,7 @@ public class Player implements Serializable, IObservable {
     }
 
     void setResource(Resource resource) {
-        this.resource = this.resource;
+        this.resource = resource;
     }
 
     public String getName() {
@@ -91,6 +90,13 @@ public class Player implements Serializable, IObservable {
         resource.replace(ResourceType.GRAIN, value);
 
         updateSubscribers();
+    }
+
+    public int getNextIndex() {
+        if (index == Global.PLAYER_COUNT - 1)
+            return 0;
+        else
+            return index + 1;
     }
 
     public int getLumber() {
@@ -198,5 +204,10 @@ public class Player implements Serializable, IObservable {
 
     public void addDevelopmentCard(DevelopmentCardType developmentCardType) {
         developmentCards.add(developmentCardType);
+    }
+
+    @Override
+    public String toString() {
+        return "P" + (index + 1);
     }
 }

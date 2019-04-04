@@ -19,4 +19,9 @@ public class MoveRobber implements IAction {
     public void execute () {
         ((Board) land.getPureBoard()).moveRobber(player, land, victim, resourceType);
     }
+
+    @Override
+    public String toString() {
+        return player + " ROB " + land;
+    }
 }

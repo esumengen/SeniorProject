@@ -2,7 +2,6 @@ package SeniorProject.Actions;
 
 import SeniorProject.Board;
 import SeniorProject.IAction;
-import SeniorProject.Location;
 import SeniorProject.Player;
 
 public class DrawDevelopmentCard implements IAction {
@@ -15,5 +14,10 @@ public class DrawDevelopmentCard implements IAction {
     @Override
     public void execute () {
         ((Board) player.getPureBoard()).drawDevelopmentCard(player);
+    }
+
+    @Override
+    public String toString() {
+        return player + " DRAW";
     }
 }

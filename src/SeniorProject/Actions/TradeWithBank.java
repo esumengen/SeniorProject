@@ -1,10 +1,9 @@
 package SeniorProject.Actions;
 
-import SeniorProject.*;
-import SeniorProject.DevelopmentCards.DevelopmentCardType;
-
-import java.util.ArrayList;
-import java.util.Map;
+import SeniorProject.Board;
+import SeniorProject.IAction;
+import SeniorProject.Player;
+import SeniorProject.Resource;
 
 public class TradeWithBank implements IAction {
     Player player;
@@ -21,4 +20,10 @@ public class TradeWithBank implements IAction {
     public void execute() {
         ((Board) player.getPureBoard()).tradeBank(player.getIndex(), givenResources, takenResources);
     }
+
+    @Override
+    public String toString() {
+        return player + " TRA";
+    }
+
 }
