@@ -98,4 +98,9 @@ public class Location implements Serializable {
     public void setPureBoard(PureBoard board) {
         this.pureBoard = board;
     }
+
+    @Override
+    public String toString() {
+        return "Loc" + index;
+    }
 }

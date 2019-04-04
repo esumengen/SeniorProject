@@ -18,4 +18,9 @@ public class UseDevelopmentCard implements IAction {
     public void execute() {
         ((Board) player.getPureBoard()).useDevelopmentCard(developmentCardType, player);
     }
+
+    @Override
+    public String toString() {
+        return player + " USE " + developmentCardType;
+    }
 }

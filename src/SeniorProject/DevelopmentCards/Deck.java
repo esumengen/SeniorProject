@@ -35,8 +35,7 @@ public class Deck implements Serializable {
         if (deck.get(cardType) > 0) {
             deck.replace(cardType, (deck.get(cardType) - 1));
             return cardType;
-        }
-        else {
+        } else {
             return null;
         }
     }

@@ -107,4 +107,8 @@ public class Land implements Serializable {
     public void setPureBoard(PureBoard board) {
         this.pureBoard = board;
     }
+
+    public String toString() {
+        return "Land" + index;
+    }
 }

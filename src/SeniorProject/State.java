@@ -3,7 +3,9 @@ package SeniorProject;
 import SeniorProject.Actions.*;
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class State {
     private int[] victoryPoints;
@@ -65,13 +67,13 @@ public class State {
 
     @Override
     public String toString() {
-        String string = "______\n";
+        String string = "";
 
         for (int i = 0; i < Global.PLAYER_COUNT; i++) {
-            string += "[PLAYER " + (i + 1) + "]: "+allResources.get(i)+"\n";
+            string += "P" + (i + 1) + ": " + allResources.get(i) + ((i != Global.PLAYER_COUNT - 1) ? "\n" : "");
         }
 
-        return string+"______";
+        return string;
     }
 
     public static class StateBuilder {
@@ -91,6 +93,19 @@ public class State {
             allAffordableMoves = new HashMap<>();
             isInitial = false;
 
+            initPureBoard();
+        }
+
+        public StateBuilder(State state) {
+            victoryPoints = state.victoryPoints.clone();
+            allResources = new HashMap<>(state.allResources);
+            allDevelopmentCards = new HashMap<>(allDevelopmentCards);
+            isInitial = state.isInitial;
+
+            initPureBoard();
+        }
+
+        public void initPureBoard() {
             ArrayList<Player> players = new ArrayList<>();
             for (int playerIndex = 0; playerIndex < Global.PLAYER_COUNT; playerIndex++) {
                 players.add(new Player(playerIndex));
@@ -111,8 +126,8 @@ public class State {
             return this;
         }
 
-        public StateBuilder setResources(Resource resources, int playerIndex) {
-            allResources.replace(playerIndex, new Resource(resources));
+        public StateBuilder setResource(Resource resource, int playerIndex) {
+            allResources.replace(playerIndex, new Resource(resource));
 
             return this;
         }
@@ -182,7 +197,6 @@ public class State {
                     }
                     if (Board.isAffordable(MoveType.TradeBank, player.getResource())) {
                         affordableMoves.add(MoveType.TradeBank);
-                        // TODO
                     }
                     if (Board.isAffordable(MoveType.TradePlayer, player.getResource())) {
                         affordableMoves.add(MoveType.TradePlayer);
@@ -190,6 +204,24 @@ public class State {
                     }
                 }
                 /// endregion
+
+                if (affordableMoves.contains(MoveType.TradeBank)) {
+                    for (ResourceType resourceType : ResourceType.values()) {
+                        int amount = 4;
+
+                        while (player.getResource().get(resourceType) >= amount) {
+                            Resource givenResource = new Resource();
+                            givenResource.put(resourceType, amount);
+
+                            Resource takenResource = new Resource();
+                            takenResource.put(resourceType, amount / 4);
+
+                            possibleActions.add(new TradeWithBank(givenResource, takenResource, player));
+
+                            amount += 4;
+                        }
+                    }
+                }
 
                 for (Location location : pureBoard.getLocations()) {
                     for (Location endLocation : location.getAdjacentLocations()) {

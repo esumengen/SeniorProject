@@ -18,4 +18,9 @@ public class UpgradeSettlement implements IAction {
     public void execute() {
         ((Board) location.getPureBoard()).upgradeSettlement(player, location);
     }
+
+    @Override
+    public String toString() {
+        return player + " UPG " + location;
+    }
 }

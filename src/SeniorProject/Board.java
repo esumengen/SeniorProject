@@ -1,17 +1,21 @@
 package SeniorProject;
 
-import SeniorProject.DevelopmentCards.*;
+import SeniorProject.DevelopmentCards.DevelopmentCardType;
 
-import java.io.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 
 public class Board extends PureBoard implements Serializable {
     private ArrayList<Player> players;
+    private int turn;
+    private boolean isMain;
 
     public Board(ArrayList<Player> players) {
         super();
         this.players = players;
+        turn = 1;
+        isMain = false;
     }
 
     public void createSettlement(Player player, Location location) {
@@ -229,7 +233,7 @@ public class Board extends PureBoard implements Serializable {
 
     @Override
     public String toString() {
-        String string = "";
+        String string = "Turn: " + getTurn();
         /*for (int i = 0; i < getLands().size(); i++) {
             string += "[LAND " + getLands().get(i).getIndex() + "]\nScore: " + getLands().get(i).getDiceChance() + "\nType: " + getLands().get(i).getType().toString() + "\nLocations: {";
             int j_max = getLands().get(i).getAdjacentLocations().size() - 1;
@@ -240,8 +244,24 @@ public class Board extends PureBoard implements Serializable {
         }*/
 
         for (Player player : players) {
-            string += "[PLAYER " + player.getIndex() + "]: "+player.getResource();
+            string += player + ": " + player.getResource();
         }
         return string;
+    }
+
+    public int getTurn() {
+        return turn;
+    }
+
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
+
+    public boolean isMain() {
+        return isMain;
+    }
+
+    public void setMain(boolean main) {
+        isMain = main;
     }
 }
