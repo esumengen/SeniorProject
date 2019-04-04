@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class Location implements Serializable {
     private int index;
+    private HarborType harborType;
     private ArrayList<Land> adjacentLands;
     private ArrayList<Location> adjacentLocations;
     private ArrayList<Road> connectedRoads;
@@ -20,6 +21,7 @@ public class Location implements Serializable {
         this.connectedRoads = new ArrayList<>();
         this.structures = new ArrayList<>();
         this.index = index;
+        this.harborType = null;
     }
 
     int getIndex() {
@@ -56,6 +58,10 @@ public class Location implements Serializable {
 
     boolean hasOwner() {
         return owner != null;
+    }
+
+    public void setHarborType(HarborType harborType) {
+        this.harborType = harborType;
     }
 
     boolean hasCity() {
