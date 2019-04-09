@@ -181,19 +181,19 @@ public class State {
                     }
                     if (Board.isAffordable(MoveType.KnightCard, player.getResource())) {
                         affordableMoves.add(MoveType.KnightCard);
-                        possibleActions.add(new UseDevelopmentCard(DevelopmentCardType.KNIGHT, player));
+                        //possibleActions.add(new UseDevelopmentCard(DevelopmentCardType.KNIGHT, player));
                     }
                     if (Board.isAffordable(MoveType.YearOfPlentyCard, player.getResource())) {
                         affordableMoves.add(MoveType.YearOfPlentyCard);
-                        possibleActions.add(new UseDevelopmentCard(DevelopmentCardType.YEAROFPLENTY, player));
+                        //possibleActions.add(new UseDevelopmentCard(DevelopmentCardType.YEAROFPLENTY, player));
                     }
                     if (Board.isAffordable(MoveType.RoadBuildingCard, player.getResource())) {
                         affordableMoves.add(MoveType.RoadBuildingCard);
-                        possibleActions.add(new UseDevelopmentCard(DevelopmentCardType.ROADBUILDING, player));
+                        //possibleActions.add(new UseDevelopmentCard(DevelopmentCardType.ROADBUILDING, player));
                     }
                     if (Board.isAffordable(MoveType.MonopolyCard, player.getResource())) {
                         affordableMoves.add(MoveType.MonopolyCard);
-                        possibleActions.add(new UseDevelopmentCard(DevelopmentCardType.MONOPOLY, player));
+                        //possibleActions.add(new UseDevelopmentCard(DevelopmentCardType.MONOPOLY, player));
                     }
                     if (Board.isAffordable(MoveType.TradeBank, player.getResource())) {
                         affordableMoves.add(MoveType.TradeBank);

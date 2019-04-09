@@ -129,6 +129,7 @@ public class PureBoard implements Serializable {
             String type_str;
             String dice_str;
             int diceNo;
+            String harbor_str;
 
             for (Land land : lands) {
                 type_str = ini.get("LandTypes", Integer.toString(land.getIndex()), String.class);
@@ -142,6 +143,14 @@ public class PureBoard implements Serializable {
                 land.setDiceNo(diceNo);
 
                 if (land.getType() == LandType.DESERT) robbedLand = land;
+            }
+
+            for (Location location : locations) {
+                harbor_str = ini.get("HarborTypes", Integer.toString(location.getIndex()), String.class);
+                harbor_str = Global.getRidOf_quotationMarks(harbor_str);
+                if(!harbor_str.equals("null")){
+                    location.setHarborType(HarborType.valueOf(harbor_str));
+                }
             }
 
             Global.addLog("SUCCESS: The game is loaded to the AI.");
