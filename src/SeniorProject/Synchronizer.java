@@ -37,13 +37,22 @@ class Synchronizer {
         String actionType;
         String objectType;
 
+        /*System.out.println("--------------");
+        try {
+            Scanner scannerr = new Scanner(file);
+            while (scannerr.hasNext()) {
+                System.out.println(scannerr.nextLine());
+            }
+        } catch (Exception e) {
+
+        }*/
+
         try {
             Scanner scanner = new Scanner(file);
             while (scanner.hasNext()) {
                 line = scanner.nextLine();
 
                 playerIndex = Integer.parseInt(Character.toString(line.charAt(1))) - 1;
-                System.out.println("___"+playerIndex);
 
                 actionType = String.copyValueOf(line.toCharArray(), 4, 2);
 
@@ -60,17 +69,24 @@ class Synchronizer {
                         if (objectType.equals("S")) { //P1 [CR 16] S
                             //board.createSettlement(board.getPlayers().get(playerIndex), board.getLocations().get(actionParam.get(0)));
                             CreateSettlement action = new CreateSettlement(board.getLocations().get(actionParam.get(0)), board.getPlayers().get(playerIndex));
-                            System.out.println(action);
+                            //System.out.println(action);
                             action.execute();
                         } else if (objectType.equals("R")) { //P1 [CR 10 10] R
-                            board.createRoad(board.getPlayers().get(playerIndex), board.getLocations().get(actionParam.get(0)), board.getLocations().get(actionParam.get(1)));
+                            //board.createRoad(board.getPlayers().get(playerIndex), board.getLocations().get(actionParam.get(0)), board.getLocations().get(actionParam.get(1)));
+                            Location[] locations = new Location[2];
+                            locations[0] = board.getLocations().get(actionParam.get(0));
+                            locations[1] = board.getLocations().get(actionParam.get(1));
+
+                            CreateRoad action = new CreateRoad(locations, board.getPlayers().get(playerIndex));
+                            //System.out.println(action);
+                            action.execute();
                         }
                         break;
                     case "UP":
                         if (objectType.equals("S")) { // P1 [UP 10] S
                             //board.upgradeSettlement(board.getPlayers().get(playerIndex), board.getLocations().get(actionParam.get(0)));
                             UpgradeSettlement action = new UpgradeSettlement(board.getLocations().get(actionParam.get(0)), board.getPlayers().get(playerIndex));
-                            System.out.println(action);
+                            //System.out.println(action);
                             action.execute();
                         }
                         break;
@@ -78,7 +94,7 @@ class Synchronizer {
                         if (objectType.equals("T")) { //P1 [MO 11 01 01] T
                             //board.moveRobber(board.getPlayers().get(playerIndex), board.getLands().get(actionParam.get(0)), board.getPlayers().get(actionParam.get(1)), ResourceType.values()[actionParam.get(2)]);
                             MoveRobber action = new MoveRobber(board.getLands().get(actionParam.get(0)), board.getPlayers().get(playerIndex), board.getPlayers().get(actionParam.get(1)), ResourceType.values()[actionParam.get(2)]);
-                            System.out.println(action);
+                            //System.out.println(action);
                             action.execute();
                         }
                         break;
@@ -88,7 +104,7 @@ class Synchronizer {
 
                         if (objectType.equals("B")) {  //P0 [TR 35 35 35 35 35 35 35 35 35 35] B
                             TradeWithBank action = new TradeWithBank(givenResources, takenResources, board.getPlayers().get(playerIndex));
-                            System.out.println(action);
+                            //System.out.println(action);
                             action.execute();
                             //board.tradeBank(playerIndex, givenResources, takenResources);
                         }
@@ -97,7 +113,6 @@ class Synchronizer {
                         break;
                     case "RD":  //P0 [RD 06 03] X q
                         board.rollDice(board.getPlayers().get(playerIndex), actionParam.get(0), actionParam.get(1));
-                        System.out.println(board.getPlayers().get(playerIndex)+" has rolled the dice.");
                         break;
                 }
                 actionParam.clear();
@@ -113,7 +128,7 @@ class Synchronizer {
         setState(SynchronizerState.WAITING);
 
         ///region State Printing
-        if (playerIndex != -1) {
+        /*if (playerIndex != -1) {
             State.StateBuilder stateBuilder = new State.StateBuilder();
             State currentState = stateBuilder.setPureBoard(Board.deepCopy(board)).initial(false)
                     .setResource(board.getPlayers().get(0).getResource(), 0)
@@ -122,6 +137,7 @@ class Synchronizer {
                     .setResource(board.getPlayers().get(3).getResource(), 3)
                     .build();
 
+            //int previousPlayer_index = board.getPlayers().get(playerIndex).getPreviousIndex();
             System.out.println("After P" + (playerIndex + 1) + "'s Move, Turn: " + board.getTurn());
 
             System.out.println(currentState);
@@ -130,7 +146,7 @@ class Synchronizer {
             System.out.println("[P" + (nextPlayer_index + 1) + "'s Affordable Moves]: " + currentState.getAffordableMoves(nextPlayer_index));
             System.out.println("[P" + (nextPlayer_index + 1) + "'s Possible Actions]: " + currentState.getPossibleActions(nextPlayer_index));
             System.out.println();
-        }
+        }*/
         ///endregion
     }
 

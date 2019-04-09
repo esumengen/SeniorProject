@@ -36,6 +36,32 @@ public class Player implements Serializable, IObservable {
     }
 
     void writeMove(boolean isInitial) {
+        if (!isInitial) {
+            System.out.println("---------\n"+this+"'s Turn");
+            Board board = (Board) getPureBoard();
+            ///region State Printing
+            State.StateBuilder stateBuilder = new State.StateBuilder();
+            State currentState = stateBuilder.setPureBoard(Board.deepCopy(board)).initial(false)
+                    .setResource(board.getPlayers().get(0).getResource(), 0)
+                    .setResource(board.getPlayers().get(1).getResource(), 1)
+                    .setResource(board.getPlayers().get(2).getResource(), 2)
+                    .setResource(board.getPlayers().get(3).getResource(), 3)
+                    .build();
+
+            System.out.println(currentState);
+
+            System.out.println("[My Affordable Moves]: " + currentState.getAffordableMoves(getIndex()));
+            System.out.print("[My Possible Actions]:");
+
+            int size = currentState.getPossibleActions(getIndex()).size();
+            for (int i = 0; i < size; i++)
+                System.out.print("\n"+(i+1)+". "+currentState.getPossibleActions(getIndex()).get(i));
+
+            System.out.println("\n");
+
+            ///endregion
+        }
+
         String actionList_str = AI_instance.createMoves(isInitial);
         AI_instance.clearVirtualBoards();
 
@@ -97,6 +123,13 @@ public class Player implements Serializable, IObservable {
             return 0;
         else
             return index + 1;
+    }
+
+    public int getPreviousIndex() {
+        if (index == 0)
+            return Global.PLAYER_COUNT-1;
+        else
+            return index - 1;
     }
 
     public int getLumber() {

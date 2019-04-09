@@ -294,24 +294,24 @@ public class PureBoard implements Serializable {
         int count = 0;
 
         if (location == null) {
-            for (Structure structure:player.getStructures()) {
+            for (Structure structure : player.getStructures()) {
                 count += structure.getType() == type ? 1 : 0;
             }
         }
         else {
             if (type == StructureType.ROAD) {
                 for (Structure structure : location.getStructures()) {
-                    if (structure instanceof Road && (player == null || structure.getPlayer() == player))
+                    if (structure instanceof Road && (player == null || structure.getPlayer().getIndex() == player.getIndex()))
                         count++;
                 }
             } else if (type == StructureType.SETTLEMENT) {
                 for (Structure structure : location.getStructures()) {
-                    if (structure instanceof Settlement && (player == null || structure.getPlayer() == player))
+                    if (structure instanceof Settlement && (player == null || structure.getPlayer().getIndex() == player.getIndex()))
                         count++;
                 }
             } else if (type == StructureType.CITY) {
                 for (Structure structure : location.getStructures()) {
-                    if (structure instanceof City && (player == null || structure.getPlayer() == player))
+                    if (structure instanceof City && (player == null || structure.getPlayer().getIndex() == player.getIndex()))
                         count++;
                 }
             }

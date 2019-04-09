@@ -224,15 +224,17 @@ public class State {
                 }
 
                 for (Location location : pureBoard.getLocations()) {
-                    for (Location endLocation : location.getAdjacentLocations()) {
-                        Road road = new Road(location, endLocation, player);
+                    if (affordableMoves.contains(MoveType.CreateRoad)) {
+                        for (Location endLocation : location.getAdjacentLocations()) {
+                            Road road = new Road(location, endLocation, player);
 
-                        if (pureBoard.isValid(road, isInitial)) {
-                            Location[] locations = new Location[2];
-                            locations[0] = location;
-                            locations[1] = endLocation;
+                            if (pureBoard.isValid(road, isInitial)) {
+                                Location[] locations = new Location[2];
+                                locations[0] = location;
+                                locations[1] = endLocation;
 
-                            possibleActions.add(new CreateRoad(locations, player));
+                                possibleActions.add(new CreateRoad(locations, player));
+                            }
                         }
                     }
 
