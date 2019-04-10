@@ -25,4 +25,9 @@ public class Resource extends HashMap<ResourceType, Integer> {
     public void add (ResourceType resourceType, int value ) {
         this.put(resourceType, this.get(resourceType) + value);
     }
+
+    @Override
+    public String toString() {
+        return "{GR("+get(ResourceType.GRAIN)+") LU("+get(ResourceType.LUMBER)+") WO("+get(ResourceType.WOOL)+") OR("+get(ResourceType.ORE)+") BR("+get(ResourceType.BRICK)+")}";
+    }
 }

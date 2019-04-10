@@ -58,6 +58,8 @@ public class Main {
                             isInitial = communication_ini.get("Game State", "isInitial", String.class).equals("\"true\"");
                             turnMode = Global.getRidOf_quotationMarks(turnMode);
 
+                            board.setInitial(isInitial);
+
                             if (turnMode.equals("waiting") && player.getState() != PlayerState.THINKING) {
                                 player.setState(PlayerState.THINKING);
 

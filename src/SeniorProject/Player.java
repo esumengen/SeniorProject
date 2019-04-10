@@ -2,8 +2,10 @@ package SeniorProject;
 
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
 
+import javax.sound.midi.Soundbank;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Player implements Serializable, IObservable {
     private BasicAI AI_instance;
@@ -36,40 +38,62 @@ public class Player implements Serializable, IObservable {
     }
 
     void writeMove(boolean isInitial) {
-        if (!isInitial) {
-            System.out.println("---------\n"+this+"'s Turn");
+        //if (!isInitial) {
+            System.out.println("\n---------\n"+this+"'s "+(isInitial ? "Initial" : "")+" Turn");
             Board board = (Board) getPureBoard();
             ///region State Printing
-            State.StateBuilder stateBuilder = new State.StateBuilder();
-            State currentState = stateBuilder.setPureBoard(Board.deepCopy(board)).initial(false)
-                    .setResource(board.getPlayers().get(0).getResource(), 0)
-                    .setResource(board.getPlayers().get(1).getResource(), 1)
-                    .setResource(board.getPlayers().get(2).getResource(), 2)
-                    .setResource(board.getPlayers().get(3).getResource(), 3)
-                    .build();
+            State.StateBuilder stateBuilder = new State.StateBuilder(board);
+            State currentState = stateBuilder.build();
 
             System.out.println(currentState);
 
-            System.out.println("[My Affordable Moves]: " + currentState.getAffordableMoves(getIndex()));
-            System.out.print("[My Possible Actions]:");
+            System.out.println("[My Affordable Moves]: " + currentState.getAffordableMoves(index));
+            System.out.print("[My Possible Actions]: ");
 
-            int size = currentState.getPossibleActions(getIndex()).size();
+            int size = currentState.getPossibleActions(index).size();
             for (int i = 0; i < size; i++)
-                System.out.print("\n"+(i+1)+". "+currentState.getPossibleActions(getIndex()).get(i));
+                System.out.print("\n"+(i+1)+". "+currentState.getPossibleActions(index).get(i));
 
-            System.out.println("\n");
+            if (size == 0)
+                System.out.print("[]");
+
+            System.out.println();
 
             ///endregion
-        }
+        //}
 
-        String actionList_str = AI_instance.createMoves(isInitial);
-        AI_instance.clearVirtualBoards();
+        ArrayList<IAction> actionList = AI_instance.createActions(isInitial);
 
         String fileName = "actions_temp" + index + ".txt";
+
+        String actionList_str = "";
+
+        for (IAction action : actionList) {
+            String action_str = action.getCommand();
+            if (action_str != null)
+                actionList_str += action_str + "\r\n";
+        }
+
+        AI_instance.clearVirtualBoards();
+
         Global.createTextFile(fileName, actionList_str);
 
-        if (!actionList_str.equals(""))
-            Global.createTextFile(System.nanoTime()/10000 + fileName, actionList_str);
+        if (!actionList_str.equals("")) {
+            System.out.println("["+this+"'s Choice}:");
+
+            Scanner scanner = new Scanner(actionList_str);
+            String action;
+            while (scanner.hasNext()) {
+                action = scanner.nextLine();
+                System.out.println(ActionFactory.getAction(action, (Board) getPureBoard()));
+            }
+
+            System.out.println();
+
+            Global.createTextFile(System.nanoTime() / 10000 + fileName, actionList_str);
+        }
+        else
+            System.out.println("["+this+"'s Choice]: []");
 
         setState(PlayerState.IDLE);
     }

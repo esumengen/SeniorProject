@@ -3,11 +3,12 @@ package SeniorProject;
 import SeniorProject.Actions.*;
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class State {
+public class State implements Serializable {
     private int[] victoryPoints;
     private Map<Integer, Resource> allResources;
     private Map<Integer, ArrayList<DevelopmentCardType>> allDevelopmentCards;
@@ -69,9 +70,8 @@ public class State {
     public String toString() {
         String string = "";
 
-        for (int i = 0; i < Global.PLAYER_COUNT; i++) {
-            string += "P" + (i + 1) + ": " + allResources.get(i) + ((i != Global.PLAYER_COUNT - 1) ? "\n" : "");
-        }
+        for (int i = 0; i < Global.PLAYER_COUNT; i++)
+            string += "P" + (i + 1) + "'s Resource: " + allResources.get(i) + ((i != Global.PLAYER_COUNT - 1) ? "\n" : "");
 
         return string;
     }
@@ -84,15 +84,10 @@ public class State {
         private Map<Integer, ArrayList<MoveType>> allAffordableMoves;
         private PureBoard pureBoard;
         private boolean isInitial;
+        private Board realOwner;
 
         public StateBuilder () {
-            victoryPoints = new int[Global.PLAYER_COUNT];
-            allResources = new HashMap<>();
-            allDevelopmentCards = new HashMap<>();
-            allPossibleActions = new HashMap<>();
-            allAffordableMoves = new HashMap<>();
-            isInitial = false;
-
+            initVariables();
             initPureBoard();
         }
 
@@ -105,7 +100,23 @@ public class State {
             initPureBoard();
         }
 
-        public void initPureBoard() {
+        public StateBuilder(Board board) {
+            initVariables();
+
+            realOwner = board;
+
+            for (int i = 0; i < Global.PLAYER_COUNT; i++) {
+                victoryPoints[i] = board.getPlayers().get(i).getVictoryPoint();
+                allResources.replace(i, board.getPlayers().get(i).getResource());
+                allDevelopmentCards.replace(i, board.getPlayers().get(i).getDevelopmentCards());
+            }
+
+            isInitial = board.isInitial();
+
+            initPureBoard();
+        }
+
+        private void initPureBoard() {
             ArrayList<Player> players = new ArrayList<>();
             for (int playerIndex = 0; playerIndex < Global.PLAYER_COUNT; playerIndex++) {
                 players.add(new Player(playerIndex));
@@ -117,7 +128,17 @@ public class State {
                 allAffordableMoves.put(playerIndex, new ArrayList<>());
             }
 
-            pureBoard = new Board(players);
+            pureBoard = new PureBoard();
+        }
+
+        private void initVariables() {
+            realOwner = null;
+            victoryPoints = new int[Global.PLAYER_COUNT];
+            allResources = new HashMap<>();
+            allDevelopmentCards = new HashMap<>();
+            allPossibleActions = new HashMap<>();
+            allAffordableMoves = new HashMap<>();
+            isInitial = false;
         }
 
         public StateBuilder setVictoryPoints(int victoryPoint, int playerIndex) {
@@ -160,13 +181,18 @@ public class State {
             for (Player player : players) {
                 player.setResource(allResources.get(player.getIndex()));
 
+                if (realOwner != null)
+                    player.setPureBoard(realOwner);
+
                 ArrayList<IAction> possibleActions = allPossibleActions.get(player.getIndex());
                 ArrayList<MoveType> affordableMoves = allAffordableMoves.get(player.getIndex());
 
                 /// region Affordability Test
                 if (isInitial) {
-                    affordableMoves.add(MoveType.CreateSettlement);
-                    affordableMoves.add(MoveType.CreateRoad);
+                    if (pureBoard.countStructures(StructureType.SETTLEMENT, player) == 0 || pureBoard.countStructures(StructureType.ROAD, player) == 1)
+                        affordableMoves.add(MoveType.CreateSettlement);
+                    else
+                        affordableMoves.add(MoveType.CreateRoad);
                 }
                 else {
                     if (Board.isAffordable(MoveType.CreateSettlement, player.getResource()))
@@ -177,7 +203,7 @@ public class State {
                         affordableMoves.add(MoveType.UpgradeSettlement);
                     if (Board.isAffordable(MoveType.DevelopmentCard, player.getResource())) {
                         affordableMoves.add(MoveType.DevelopmentCard);
-                        possibleActions.add(new DrawDevelopmentCard(player));
+                        possibleActions.add(new DrawDevelopmentCard(player, realOwner));
                     }
                     if (Board.isAffordable(MoveType.KnightCard, player.getResource())) {
                         affordableMoves.add(MoveType.KnightCard);
@@ -207,18 +233,24 @@ public class State {
 
                 if (affordableMoves.contains(MoveType.TradeBank)) {
                     for (ResourceType resourceType : ResourceType.values()) {
-                        int amount = 4;
+                        int amount;
 
-                        while (player.getResource().get(resourceType) >= amount) {
-                            Resource givenResource = new Resource();
-                            givenResource.put(resourceType, amount);
+                        for (ResourceType resourceType2 : ResourceType.values()) {
+                            if (!resourceType2.equals(resourceType)) {
+                                amount = 4;
 
-                            Resource takenResource = new Resource();
-                            takenResource.put(resourceType, amount / 4);
+                                while (player.getResource().get(resourceType) >= amount) {
+                                    Resource givenResource = new Resource();
+                                    givenResource.put(resourceType, amount);
 
-                            possibleActions.add(new TradeWithBank(givenResource, takenResource, player));
+                                    Resource takenResource = new Resource();
+                                    takenResource.put(resourceType2, amount / 4);
 
-                            amount += 4;
+                                    possibleActions.add(new TradeWithBank(givenResource, takenResource, player, realOwner));
+
+                                    amount += 4;
+                                }
+                            }
                         }
                     }
                 }
@@ -228,21 +260,21 @@ public class State {
                         for (Location endLocation : location.getAdjacentLocations()) {
                             Road road = new Road(location, endLocation, player);
 
-                            if (pureBoard.isValid(road, isInitial)) {
+                            if (endLocation.getIndex() > location.getIndex() && pureBoard.isValid(road, isInitial)) {
                                 Location[] locations = new Location[2];
                                 locations[0] = location;
                                 locations[1] = endLocation;
 
-                                possibleActions.add(new CreateRoad(locations, player));
+                                possibleActions.add(new CreateRoad(locations, player, realOwner));
                             }
                         }
                     }
 
                     if (affordableMoves.contains(MoveType.CreateSettlement) && pureBoard.isValid(new Settlement(location, player), isInitial))
-                        possibleActions.add(new CreateSettlement(location, player));
+                        possibleActions.add(new CreateSettlement(location, player, realOwner));
 
                     if (affordableMoves.contains(MoveType.UpgradeSettlement) && location.hasOwner() && location.getOwner().getIndex() == player.getIndex())
-                        possibleActions.add(new UpgradeSettlement(location, player));
+                        possibleActions.add(new UpgradeSettlement(location, player, realOwner));
                 }
             }
 

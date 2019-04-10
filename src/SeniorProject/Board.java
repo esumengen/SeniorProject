@@ -6,39 +6,32 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 
-import static SeniorProject.DevelopmentCards.DevelopmentCardType.ROADBUILDING;
-import static SeniorProject.DevelopmentCards.DevelopmentCardType.VICTORYPOINT;
-
 public class Board extends PureBoard implements Serializable {
     private ArrayList<Player> players;
     private int turn;
     private boolean isMain;
+    private State state;
+    private boolean isInitial;
 
     public Board(ArrayList<Player> players) {
         super();
+
+        for (Location location : getLocations())
+            location.setPureBoard(this);
+
+        for (Land land : getLands())
+            land.setPureBoard(this);
+
         this.players = players;
+
+        for (Player player : this.players)
+            player.setPureBoard(this);
+
+        changeUpdate();
+
         turn = 1;
         isMain = false;
-    }
-
-    public void createSettlement(Player player, Location location) {
-        int settlementCount = countStructures(StructureType.SETTLEMENT, player);
-
-        Settlement settlement = new Settlement(location, player);
-        getStructures().add(settlement);
-
-        location.setOwner(player);
-        location.addStructures(settlement);
-
-        addLog("ACTION: A settlement has been added on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
-
-        // Immediate Harvesting
-        if (settlementCount == 1) {
-            for (Land land : location.getAdjacentLands())
-                player.changeResource(land.getResourceType(), 1);
-        }
-
-        syncPlayer(player);
+        isInitial = true;
     }
 
     public static boolean isAffordable(MoveType type, Resource resource) {
@@ -92,6 +85,27 @@ public class Board extends PureBoard implements Serializable {
         return false;
     }
 
+    public void createSettlement(Player player, Location location) {
+        int settlementCount = countStructures(StructureType.SETTLEMENT, player);
+
+        Settlement settlement = new Settlement(location, player);
+        getStructures().add(settlement);
+
+        location.setOwner(player);
+        location.addStructures(settlement);
+
+        // Immediate Harvesting
+        if (settlementCount == 1) {
+            for (Land land : location.getAdjacentLands())
+                player.changeResource(land.getResourceType(), 1);
+        }
+
+        syncPlayer(player);
+        changeUpdate();
+
+        addLog("ACTION: A settlement has been added on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
+    }
+
     public void createRoad(Player player, Location location_first, Location location_second) {
         Road road = new Road(location_first, location_second, player);
         location_first.addConnectedRoad(road);
@@ -102,9 +116,10 @@ public class Board extends PureBoard implements Serializable {
         location_first.addStructures(road);
         location_second.addStructures(road);
 
-        addLog("ACTION: A road has been added between [Location " + location_first.getIndex() + " and Location " + location_second.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
-
         syncPlayer(player);
+        changeUpdate();
+
+        addLog("ACTION: A road has been added between [Location " + location_first.getIndex() + " and Location " + location_second.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
     }
 
     public void upgradeSettlement(Player player, Location location) {
@@ -117,14 +132,18 @@ public class Board extends PureBoard implements Serializable {
             }
         }
 
-        addLog("ACTION: A settlement has been upgraded on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
-
         syncPlayer(player);
+        changeUpdate();
+
+        addLog("ACTION: A settlement has been upgraded on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
     }
 
-    public void moveRobber(Player robber, Land land, Player victim) {
+    public void moveRobber(Player robber, Land land) {
         setRobbedLand(land);
         robber.getResource().add(land.getResourceType(), 1);
+
+        syncPlayer(robber);
+        changeUpdate();
 
         addLog("ACTION: The robber has been moved to [Land " + land.getIndex() + "] by [Player " + (robber.getIndex() + 1) + "]");
     }
@@ -133,35 +152,52 @@ public class Board extends PureBoard implements Serializable {
         DevelopmentCardType developmentCardType = getDeck().pickDevelopmentCard();
         player.addDevelopmentCard(developmentCardType);
 
+        syncPlayer(player);
+        changeUpdate();
+
         addLog("ACTION: A development card("+developmentCardType+") is drawn by [Player " + (player.getIndex() + 1) + "]");
     }
 
-    public void useDevelopmentCard_KNIGHT(Player player, Land land, Player victim) {
-        moveRobber(player, land, victim);
+    public void useDevelopmentCard_KNIGHT(Player player, Land land) {
+        moveRobber(player, land);
+
+        syncPlayer(player);
+        changeUpdate();
+
         addLog("ACTION: Knight card is used by [Player " + (player.getIndex() + 1) + "]");
     }
 
     public void useDevelopmentCard_MONOPOLY(Player player, ResourceType resourceType) {
         for(Player _player : players) {
-            if (_player.getIndex() != player.getIndex()) {
-                if (_player.getResource().get(resourceType) > 0) {
-                    _player.getResource().add(resourceType, -1);
-                    player.getResource().add(resourceType, 1);
-                }
+            if (_player.getIndex() != player.getIndex() && _player.getResource().get(resourceType) > 0) {
+                _player.getResource().add(resourceType, -1);
+                player.getResource().add(resourceType, 1);
             }
         }
+
+        syncPlayer(player);
+        changeUpdate();
+
         addLog("ACTION: Monopoly card is used by [Player " + (player.getIndex() + 1) + "]");
     }
 
     public void useDevelopmentCard_ROADBUILDING(Player player, Location loc1, Location loc2, Location loc3, Location loc4) {
         createRoad(player, loc1, loc2);
         createRoad(player, loc3, loc4);
-        addLog("ACTION: Raod Building card is used by [Player " + (player.getIndex() + 1) + "]");
+
+        syncPlayer(player);
+        changeUpdate();
+
+        addLog("ACTION: Road Building card is used by [Player " + (player.getIndex() + 1) + "]");
     }
 
     public void useDevelopmentCard_YEAROFPLENTY(Player player, ResourceType resourceType1, ResourceType resourceType2) {
         player.getResource().add(resourceType1, 1);
         player.getResource().add(resourceType2, 1);
+
+        syncPlayer(player);
+        changeUpdate();
+
         addLog("ACTION: Year Of Plenty card is used by [Player " + (player.getIndex() + 1) + "]");
     }
 
@@ -183,6 +219,9 @@ public class Board extends PureBoard implements Serializable {
             players.get(playerIndex).setBrick(players.get(playerIndex).getBrick() - givenResources.get(ResourceType.BRICK)
                     + takenResources.get(ResourceType.BRICK));
 
+            syncPlayer(players.get(playerIndex));
+            changeUpdate();
+
             addLog("ACTION: A trade with bank has been done by [Player " + (playerIndex + 1) + "]");
         } else {
             addLog("ACTION: A trade with bank has been failed by [Player " + (playerIndex + 1) + "]");
@@ -190,12 +229,18 @@ public class Board extends PureBoard implements Serializable {
     }
 
     void tradePlayer(int playerIndex1, int playerIndex2, Map<ResourceType, Integer> givenResources, Map<ResourceType, Integer> takenResources) {
-        addLog("TO DO ACTION: A trade with [Player " + playerIndex2 + 1 + " has been done by [Player " + (playerIndex1 + 1) + "]");
         // TODO
+
+        syncPlayer(players.get(playerIndex1));
+        syncPlayer(players.get(playerIndex2));
+        changeUpdate();
+
+        addLog("TO DO ACTION: A trade with [Player " + playerIndex2 + 1 + " has been done by [Player " + (playerIndex1 + 1) + "]");
     }
 
-    void rollDice(Player player, int dice1, int dice2) {
+    public void rollDice(Player player, int dice1, int dice2) {
         generateResource(dice1 + dice2);
+
         addLog("ACTION: Dice are rolled " + dice1 + " " + dice2 + " by [Player " + (player.getIndex() + 1) + "]");
     }
 
@@ -213,6 +258,8 @@ public class Board extends PureBoard implements Serializable {
                 }
             }
         }
+
+        changeUpdate();
 
         addLog("New resources are generated.");
     }
@@ -243,20 +290,12 @@ public class Board extends PureBoard implements Serializable {
 
     @Override
     public String toString() {
-        String string = "Turn: " + getTurn();
-        /*for (int i = 0; i < getLands().size(); i++) {
-            string += "[LAND " + getLands().get(i).getIndex() + "]\nScore: " + getLands().get(i).getDiceChance() + "\nType: " + getLands().get(i).getType().toString() + "\nLocations: {";
-            int j_max = getLands().get(i).getAdjacentLocations().size() - 1;
-            for (int j = 0; j < j_max + 1; j++) {
-                string += getLands().get(i).getAdjacentLocations().get(j).getIndex() + (j == j_max ? "" : ", ");
-            }
-            string += "}\n\n";
-        }*/
+        String text = "Turn: " + getTurn();
 
-        for (Player player : players) {
-            string += player + ": " + player.getResource();
-        }
-        return string;
+        for (Player player : players)
+            text += player + "'s Resource: " + player.getResource();
+
+        return text;
     }
 
     public int getTurn() {
@@ -273,5 +312,36 @@ public class Board extends PureBoard implements Serializable {
 
     public void setMain(boolean main) {
         isMain = main;
+    }
+
+    public boolean isInitial() {
+        return isInitial;
+    }
+
+    public void setInitial(boolean initial) {
+        isInitial = initial;
+
+        changeUpdate();
+    }
+
+    public void changeUpdate() {
+        if (isInitial) {
+            for (Player player : players) {
+                if (countStructures(StructureType.SETTLEMENT, player) > 2
+                || countStructures(StructureType.SETTLEMENT, players.get(players.size()-1)) > 1
+                || countStructures(StructureType.ROAD, player) > 2
+                || countStructures(StructureType.ROAD, players.get(players.size()-1)) > 1) {
+                    isInitial = false;
+                    break;
+                }
+            }
+        }
+
+        State.StateBuilder stateBuilder = new State.StateBuilder(this);
+        state = stateBuilder.build();
+    }
+
+    public State getState() {
+        return state;
     }
 }

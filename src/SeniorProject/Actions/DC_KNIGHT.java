@@ -5,19 +5,26 @@ import SeniorProject.IAction;
 import SeniorProject.Land;
 import SeniorProject.Player;
 
-public class DC_KNIGHT implements IAction {
+import java.io.Serializable;
+
+public class DC_KNIGHT implements IAction, Serializable {
     Player player;
     Land land;
-    Player victim;
+    Board board;
 
-    public DC_KNIGHT(Player player, Land land, Player victim) {
+    public DC_KNIGHT(Player player, Land land, Board board) {
         this.player = player;
         this.land = land;
-        this.victim = victim;
+        this.board = board;
     }
 
     @Override
     public void execute() {
-        ((Board) player.getPureBoard()).useDevelopmentCard_KNIGHT(player, land, victim);
+        board.useDevelopmentCard_KNIGHT(player, land);
+    }
+
+    @Override
+    public String getCommand() {
+        return null;
     }
 }

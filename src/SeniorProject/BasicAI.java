@@ -9,12 +9,13 @@ import java.util.Random;
 public class BasicAI implements IAI, Serializable {
     private Player owner;
     private Board board;
-    private String result = "";
+    private ArrayList<IAction> actionsDone;
     private Board virtualBoard;
 
     private Random randomGenerator = new Random();
 
     public BasicAI(Player player, Board board) {
+        actionsDone = new ArrayList<>();
         this.owner = player;
         this.board = board;
     }
@@ -24,7 +25,47 @@ public class BasicAI implements IAI, Serializable {
         System.gc();
     }
 
-    public String createMoves(boolean isInitial) {
+    public ArrayList<IAction> createActions(boolean isInitial) {
+        clearVirtualBoards();
+
+        this.virtualBoard = Board.deepCopy(board);
+        virtualBoard.setActive(false);
+
+        actionsDone = new ArrayList<>();
+
+        //Player virtualOwner = virtualBoard.getPlayers().get(owner.getIndex());
+
+        //ArrayList<MoveType> moves = new ArrayList<>();
+
+        /*if (isInitial) {
+            moves.add(MoveType.CreateSettlement);
+            moves.add(MoveType.CreateRoad);
+        } else {
+            if (Board.isAffordable(MoveType.CreateSettlement, virtualOwner))
+                moves.add(MoveType.CreateSettlement);
+            if (Board.isAffordable(MoveType.CreateRoad, virtualOwner))
+                moves.add(MoveType.CreateRoad);
+            if (Board.isAffordable(MoveType.UpgradeSettlement, virtualOwner))
+                moves.add(MoveType.UpgradeSettlement);
+            if (Board.isAffordable(MoveType.TradeBank, virtualOwner))
+                moves.add(MoveType.TradeBank);
+        }*/
+
+        ArrayList<IAction> possibleActions = virtualBoard.getState().getPossibleActions(owner.getIndex());
+
+        while (possibleActions.size() !=  0) {
+            if (possibleActions.size() > 0) {
+                IAction action = possibleActions.get(randomGenerator.nextInt(possibleActions.size() - 1));
+                actionsDone.add(action);
+                action.execute();
+            }
+        }
+
+        return actionsDone;
+    }
+
+    /// region DELETED
+    /*public String createMoves(boolean isInitial) {
         clearVirtualBoards();
         this.virtualBoard = Board.deepCopy(board);
         Player virtualOwner = virtualBoard.getPlayers().get(owner.getIndex());
@@ -101,9 +142,11 @@ public class BasicAI implements IAI, Serializable {
         }
 
         return result;
-    }
+    }*/
+    ///endregion
 
-    private boolean createSettlement_move(boolean isInitial) {
+    ///region DELETED
+    /*private boolean createSettlement_move(boolean isInitial) {
         Location targetLocation;
 
         targetLocation = getMostValuableLocation(isInitial);
@@ -325,5 +368,6 @@ public class BasicAI implements IAI, Serializable {
 
     public boolean isPHMove() {
         return owner.getStructures().size() == 2;
-    }
+    }*/
+    ///endregion
 }

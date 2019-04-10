@@ -4,16 +4,25 @@ import SeniorProject.Board;
 import SeniorProject.IAction;
 import SeniorProject.Player;
 
-public class DrawDevelopmentCard implements IAction {
-    Player player;
+import java.io.Serializable;
 
-    public DrawDevelopmentCard(Player player) {
+public class DrawDevelopmentCard implements IAction, Serializable {
+    Player player;
+    Board board;
+
+    public DrawDevelopmentCard(Player player, Board board) {
         this.player = player;
+        this.board = board;
     }
 
     @Override
     public void execute () {
-        ((Board) player.getPureBoard()).drawDevelopmentCard(player);
+        board.drawDevelopmentCard(player);
+    }
+
+    @Override
+    public String getCommand() {
+        return null;
     }
 
     @Override

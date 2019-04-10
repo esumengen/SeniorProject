@@ -2,9 +2,16 @@ package SeniorProject.Actions;
 
 import SeniorProject.IAction;
 
-public class DC_VICTORYPOINT implements IAction {
+import java.io.Serializable;
+
+public class DC_VICTORYPOINT implements IAction, Serializable {
     @Override
     public void execute() {
 
+    }
+
+    @Override
+    public String getCommand() {
+        return null;
     }
 }

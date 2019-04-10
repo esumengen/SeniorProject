@@ -1,5 +1,7 @@
 package SeniorProject;
 
+import java.util.ArrayList;
+
 public interface IAI {
-    String createMoves(boolean isInitial);
+    ArrayList<IAction> createActions(boolean isInitial);
 }

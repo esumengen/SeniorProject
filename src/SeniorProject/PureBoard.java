@@ -220,6 +220,13 @@ public class PureBoard implements Serializable {
             if (roadExits(road))
                 return false;
 
+            // Eğer başlangıç hamlesiyse, iki ucundan birinde mutlaka bir ev olmalı ve hiç yol olmamalı.
+            if (isInitial) {
+                if (!(countStructures(StructureType.SETTLEMENT, start) == 1 && countStructures(StructureType.ROAD, start) == 0)
+                && !(countStructures(StructureType.SETTLEMENT, end) == 1 && countStructures(StructureType.ROAD, end) == 0))
+                    return false;
+            }
+
             // Herhangi bir ucunda rakip bina olmamalı. (?)
             if ((start.hasOwner() && start.getOwner().getIndex() != road.getPlayer().getIndex())
                     || (end.hasOwner() && end.getOwner().getIndex() != road.getPlayer().getIndex()))

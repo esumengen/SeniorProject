@@ -5,13 +5,21 @@ import SeniorProject.IAction;
 import SeniorProject.Player;
 import SeniorProject.ResourceType;
 
-public class DC_YEAROFPLENTY implements IAction {
+import java.io.Serializable;
+
+public class DC_YEAROFPLENTY implements IAction, Serializable {
     Player player;
     ResourceType resourceType1;
     ResourceType resourceType2;
+    Board board;
 
     @Override
     public void execute() {
         ((Board) player.getPureBoard()).useDevelopmentCard_YEAROFPLENTY(player,resourceType1, resourceType2);
+    }
+
+    @Override
+    public String getCommand() {
+        return null;
     }
 }

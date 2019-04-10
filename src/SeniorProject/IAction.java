@@ -1,5 +1,6 @@
 package SeniorProject;
 
 public interface IAction {
-    public void execute ();
+    void execute();
+    String getCommand();
 }

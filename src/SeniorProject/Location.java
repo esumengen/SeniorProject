@@ -24,7 +24,7 @@ public class Location implements Serializable {
         this.harborType = null;
     }
 
-    int getIndex() {
+    public int getIndex() {
         return index;
     }
 

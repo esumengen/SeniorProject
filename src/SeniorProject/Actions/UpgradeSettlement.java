@@ -5,18 +5,27 @@ import SeniorProject.IAction;
 import SeniorProject.Location;
 import SeniorProject.Player;
 
-public class UpgradeSettlement implements IAction {
+import java.io.Serializable;
+
+public class UpgradeSettlement implements IAction, Serializable {
     Location location;
     Player player;
+    Board board;
 
-    public UpgradeSettlement(Location location, Player player) {
+    public UpgradeSettlement(Location location, Player player, Board board) {
         this.location = location;
         this.player = player;
+        this.board = board;
     }
 
     @Override
     public void execute() {
-        ((Board) location.getPureBoard()).upgradeSettlement(player, location);
+        board.upgradeSettlement(player, location);
+    }
+
+    @Override
+    public String getCommand() {
+        return "P" + (player.getIndex() + 1) + " [UP " + ((location.getIndex() < 10) ? ("0" + location.getIndex()) : location.getIndex()) + "] S";
     }
 
     @Override
