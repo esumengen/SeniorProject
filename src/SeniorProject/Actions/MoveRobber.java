@@ -11,10 +11,10 @@ public class MoveRobber implements IAction, Serializable {
     ResourceType resourceType;
     Board board;
 
-    public MoveRobber(Land land, Player player, Player victim, ResourceType resourceType, Board board) {
-        this.land = land;
-        this.player = player;
-        this.victim = victim;
+    public MoveRobber(int landIndex, int playerIndex, int victimIndex, ResourceType resourceType, Board board) {
+        this.land = board.getLands().get(landIndex);
+        this.player = board.getPlayers().get(playerIndex);
+        this.victim = board.getPlayers().get(victimIndex);
         this.resourceType = resourceType;
         this.board = board;
     }

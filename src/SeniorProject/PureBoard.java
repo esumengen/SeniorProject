@@ -153,11 +153,11 @@ public class PureBoard implements Serializable {
                 }
             }
 
-            Global.addLog("SUCCESS: The game is loaded to the AI.");
+            //Global.addLog("SUCCESS: The game is loaded to the AI.");
         } catch (Exception e) {
             new Message(e.getMessage() + " - 7");
 
-            Global.addLog("ERROR: The game is not loaded to the AI.");
+            //Global.addLog("ERROR: The game is not loaded to the AI.");
         }
     }
 
@@ -310,9 +310,11 @@ public class PureBoard implements Serializable {
         int count = 0;
 
         if (location == null) {
-            for (Structure structure : player.getStructures()) {
-                count += structure.getType() == type ? 1 : 0;
-            }
+            for (Location _location : locations)
+                count += countStructures(type, _location, player);
+
+            if (type == StructureType.ROAD)
+                count /= 2;
         }
         else {
             if (type == StructureType.ROAD) {
@@ -337,9 +339,6 @@ public class PureBoard implements Serializable {
     }
 
     public static PureBoard deepCopy(Serializable object) {
-        /*Board copy = (Board) SerializationUtils.clone(object);
-        return copy;*/
-
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ObjectOutputStream outputStrm = new ObjectOutputStream(outputStream);
@@ -349,7 +348,10 @@ public class PureBoard implements Serializable {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
             ObjectInputStream objInputStream = new ObjectInputStream(inputStream);
 
-            return (PureBoard) objInputStream.readObject();
+            PureBoard pureBoard = (PureBoard) objInputStream.readObject();
+            pureBoard.setActive(false);
+
+            return pureBoard;
         } catch (Exception e) {
             e.printStackTrace();
             return null;

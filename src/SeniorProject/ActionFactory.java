@@ -26,36 +26,36 @@ public class ActionFactory {
         switch (actionType) {
             case "CR":
                 if (objectType.equals("S")) //P1 [CR 16] S
-                    return new CreateSettlement(board.getLocations().get(actionParam.get(0)), board.getPlayers().get(playerIndex), board);
+                    return new CreateSettlement(actionParam.get(0), playerIndex, board);
                 else if (objectType.equals("R")) { //P1 [CR 10 10] R
-                    Location[] locations = new Location[2];
-                    locations[0] = board.getLocations().get(actionParam.get(0));
-                    locations[1] = board.getLocations().get(actionParam.get(1));
+                    int[] locations = new int[2];
+                    locations[0] = actionParam.get(0);
+                    locations[1] = actionParam.get(1);
 
-                    return new CreateRoad(locations, board.getPlayers().get(playerIndex), board);
+                    return new CreateRoad(locations, playerIndex, board);
                 }
                 break;
             case "UP":
                 if (objectType.equals("S")) // P1 [UP 10] S
-                    return new UpgradeSettlement(board.getLocations().get(actionParam.get(0)), board.getPlayers().get(playerIndex), board);
+                    return new UpgradeSettlement(actionParam.get(0), playerIndex, board);
                 break;
             case "MO":
                 if (objectType.equals("T")) //P1 [MO 11 01 01] T
-                    return new MoveRobber(board.getLands().get(actionParam.get(0)), board.getPlayers().get(playerIndex), board.getPlayers().get(actionParam.get(1)), ResourceType.values()[actionParam.get(2)], board);
+                    return new MoveRobber(actionParam.get(0), playerIndex, actionParam.get(1), ResourceType.values()[actionParam.get(2)], board);
                 break;
             case "TR":
                 Resource givenResources = new Resource(actionParam.get(0), actionParam.get(1), actionParam.get(2), actionParam.get(3), actionParam.get(4));
                 Resource takenResources = new Resource(actionParam.get(5), actionParam.get(6), actionParam.get(7), actionParam.get(8), actionParam.get(9));
 
                 if (objectType.equals("B")) {  //P0 [TR 35 35 35 35 35 35 35 35 35 35] B
-                    return new TradeWithBank(givenResources, takenResources, board.getPlayers().get(playerIndex), board);
+                    return new TradeWithBank(givenResources, takenResources, playerIndex, board);
                 }
                 else { //P0 [TR 35 35 35 35 35 35 35 35 35 35] 1
                     // TODO
-                    return new TradeWithBank(givenResources, takenResources, board.getPlayers().get(playerIndex), board);
+                    return new TradeWithBank(givenResources, takenResources, playerIndex, board);
                 }
             case "RD":  //P0 [RD 06 03] X q
-                return new RollDice(board.getPlayers().get(playerIndex), actionParam.get(0), actionParam.get(1), board);
+                return new RollDice(playerIndex, actionParam.get(0), actionParam.get(1), board);
         }
 
         return null;

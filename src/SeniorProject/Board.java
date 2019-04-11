@@ -86,7 +86,9 @@ public class Board extends PureBoard implements Serializable {
     }
 
     public void createSettlement(Player player, Location location) {
-        int settlementCount = countStructures(StructureType.SETTLEMENT, player);
+        int settlementCount = -1;
+        if (isInitial)
+            settlementCount = countStructures(StructureType.SETTLEMENT, player);
 
         Settlement settlement = new Settlement(location, player);
         getStructures().add(settlement);
@@ -98,6 +100,14 @@ public class Board extends PureBoard implements Serializable {
         if (settlementCount == 1) {
             for (Land land : location.getAdjacentLands())
                 player.changeResource(land.getResourceType(), 1);
+        }
+        else {
+            if (!isInitial) {
+                player.changeResource(ResourceType.BRICK, -1);
+                player.changeResource(ResourceType.GRAIN, -1);
+                player.changeResource(ResourceType.WOOL, -1);
+                player.changeResource(ResourceType.LUMBER, -1);
+            }
         }
 
         syncPlayer(player);
@@ -116,6 +126,11 @@ public class Board extends PureBoard implements Serializable {
         location_first.addStructures(road);
         location_second.addStructures(road);
 
+        if (!isInitial) {
+            player.changeResource(ResourceType.BRICK, -1);
+            player.changeResource(ResourceType.LUMBER, -1);
+        }
+
         syncPlayer(player);
         changeUpdate();
 
@@ -132,6 +147,11 @@ public class Board extends PureBoard implements Serializable {
             }
         }
 
+        if (!isInitial) {
+            player.changeResource(ResourceType.GRAIN, -2);
+            player.changeResource(ResourceType.ORE, -3);
+        }
+
         syncPlayer(player);
         changeUpdate();
 
@@ -143,7 +163,7 @@ public class Board extends PureBoard implements Serializable {
         robber.getResource().add(land.getResourceType(), 1);
 
         syncPlayer(robber);
-        changeUpdate();
+        //changeUpdate();
 
         addLog("ACTION: The robber has been moved to [Land " + land.getIndex() + "] by [Player " + (robber.getIndex() + 1) + "]");
     }
@@ -151,6 +171,12 @@ public class Board extends PureBoard implements Serializable {
     public void drawDevelopmentCard (Player player) {
         DevelopmentCardType developmentCardType = getDeck().pickDevelopmentCard();
         player.addDevelopmentCard(developmentCardType);
+
+        if (!isInitial) {
+            player.changeResource(ResourceType.WOOL, -1);
+            player.changeResource(ResourceType.GRAIN, -1);
+            player.changeResource(ResourceType.ORE, -1);
+        }
 
         syncPlayer(player);
         changeUpdate();
@@ -270,7 +296,10 @@ public class Board extends PureBoard implements Serializable {
     }
 
     static Board deepCopy (Board board) {
-        return (Board) PureBoard.deepCopy(board);
+        Board _board = (Board) PureBoard.deepCopy(board);
+        _board.setMain(false);
+
+        return _board;
     }
 
     void syncPlayer(Player player) {
@@ -278,7 +307,7 @@ public class Board extends PureBoard implements Serializable {
 
         // Structure assignment
         for (Structure structure : getStructures()) {
-            if (player == structure.getPlayer()) {
+            if (player.getIndex() == structure.getPlayer().getIndex()) {
                 player.getStructures().add(structure);
             }
         }
@@ -319,18 +348,17 @@ public class Board extends PureBoard implements Serializable {
     }
 
     public void setInitial(boolean initial) {
-        isInitial = initial;
+        if (isInitial != initial)
+            changeUpdate();
 
-        changeUpdate();
+        isInitial = initial;
     }
 
     public void changeUpdate() {
         if (isInitial) {
             for (Player player : players) {
                 if (countStructures(StructureType.SETTLEMENT, player) > 2
-                || countStructures(StructureType.SETTLEMENT, players.get(players.size()-1)) > 1
-                || countStructures(StructureType.ROAD, player) > 2
-                || countStructures(StructureType.ROAD, players.get(players.size()-1)) > 1) {
+                || countStructures(StructureType.ROAD, player) > 2) {
                     isInitial = false;
                     break;
                 }

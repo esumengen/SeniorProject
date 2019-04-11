@@ -27,38 +27,26 @@ public class BasicAI implements IAI, Serializable {
 
     public ArrayList<IAction> createActions(boolean isInitial) {
         clearVirtualBoards();
-
         this.virtualBoard = Board.deepCopy(board);
-        virtualBoard.setActive(false);
 
-        actionsDone = new ArrayList<>();
+        actionsDone.clear();
 
-        //Player virtualOwner = virtualBoard.getPlayers().get(owner.getIndex());
+        State.StateBuilder stateBuilder = new State.StateBuilder(virtualBoard);
+        State state = stateBuilder.build();
+        ArrayList<IAction> possibleActions = state.getPossibleActions(owner.getIndex());
 
-        //ArrayList<MoveType> moves = new ArrayList<>();
+        while (possibleActions.size() != 0) {
+            IAction action = possibleActions.get(randomGenerator.nextInt(possibleActions.size()));
 
-        /*if (isInitial) {
-            moves.add(MoveType.CreateSettlement);
-            moves.add(MoveType.CreateRoad);
-        } else {
-            if (Board.isAffordable(MoveType.CreateSettlement, virtualOwner))
-                moves.add(MoveType.CreateSettlement);
-            if (Board.isAffordable(MoveType.CreateRoad, virtualOwner))
-                moves.add(MoveType.CreateRoad);
-            if (Board.isAffordable(MoveType.UpgradeSettlement, virtualOwner))
-                moves.add(MoveType.UpgradeSettlement);
-            if (Board.isAffordable(MoveType.TradeBank, virtualOwner))
-                moves.add(MoveType.TradeBank);
-        }*/
+            actionsDone.add(action);
+            action.execute();
+            System.out.println("Did: "+action);
 
-        ArrayList<IAction> possibleActions = virtualBoard.getState().getPossibleActions(owner.getIndex());
+            stateBuilder = new State.StateBuilder(virtualBoard);
+            state = stateBuilder.build();
+            possibleActions = state.getPossibleActions(owner.getIndex());
 
-        while (possibleActions.size() !=  0) {
-            if (possibleActions.size() > 0) {
-                IAction action = possibleActions.get(randomGenerator.nextInt(possibleActions.size() - 1));
-                actionsDone.add(action);
-                action.execute();
-            }
+            System.out.println("New Possibles: "+state.getAffordableMoves(owner.getIndex()));
         }
 
         return actionsDone;

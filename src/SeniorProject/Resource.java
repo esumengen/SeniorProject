@@ -23,7 +23,7 @@ public class Resource extends HashMap<ResourceType, Integer> {
     }
 
     public void add (ResourceType resourceType, int value ) {
-        this.put(resourceType, this.get(resourceType) + value);
+        put(resourceType, get(resourceType) + value);
     }
 
     @Override

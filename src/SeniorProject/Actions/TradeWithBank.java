@@ -10,10 +10,10 @@ public class TradeWithBank implements IAction, Serializable {
     Resource takenResources;
     Board board;
 
-    public TradeWithBank(Resource givenResources, Resource takenResources, Player player, Board board) {
+    public TradeWithBank(Resource givenResources, Resource takenResources, int playerIndex, Board board) {
         this.givenResources = givenResources;
         this.takenResources = takenResources;
-        this.player = player;
+        this.player = board.getPlayers().get(playerIndex);
         this.board = board;
     }
 

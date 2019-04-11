@@ -9,9 +9,8 @@ public class RollDice implements IAction, Serializable {
     Board board;
     int[] dices = new int[2];
 
-    public RollDice(Player player, int dice0, int dice1, Board board) {
-        this.player = player;
-
+    public RollDice(int playerIndex, int dice0, int dice1, Board board) {
+        this.player = board.getPlayers().get(playerIndex);
         this.board = board;
 
         this.dices[0] = dice0;

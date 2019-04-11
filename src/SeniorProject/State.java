@@ -16,6 +16,7 @@ public class State implements Serializable {
     private Map<Integer, ArrayList<MoveType>> allAffordableMoves;
     private PureBoard pureBoard;
     private boolean isInitial;
+    private int turn;
 
     public State (StateBuilder stateBuilder) {
         victoryPoints = stateBuilder.victoryPoints;
@@ -24,6 +25,7 @@ public class State implements Serializable {
         allPossibleActions = stateBuilder.allPossibleActions;
         allAffordableMoves = stateBuilder.allAffordableMoves;
         isInitial = stateBuilder.isInitial;
+        turn = stateBuilder.turn;
     }
 
     public int getVictoryPoints(int playerIndex) {
@@ -68,12 +70,16 @@ public class State implements Serializable {
 
     @Override
     public String toString() {
-        String string = "";
+        String string = "Turn "+getTurn()+"\n";
 
         for (int i = 0; i < Global.PLAYER_COUNT; i++)
             string += "P" + (i + 1) + "'s Resource: " + allResources.get(i) + ((i != Global.PLAYER_COUNT - 1) ? "\n" : "");
 
         return string;
+    }
+
+    public int getTurn() {
+        return turn;
     }
 
     public static class StateBuilder {
@@ -85,50 +91,36 @@ public class State implements Serializable {
         private PureBoard pureBoard;
         private boolean isInitial;
         private Board realOwner;
+        private int turn;
 
         public StateBuilder () {
             initVariables();
-            initPureBoard();
+            pureBoard = new PureBoard();
         }
 
-        public StateBuilder(State state) {
+        /*public StateBuilder(State state) {
+            initVariables();
+            pureBoard = new PureBoard();
+
             victoryPoints = state.victoryPoints.clone();
             allResources = new HashMap<>(state.allResources);
             allDevelopmentCards = new HashMap<>(allDevelopmentCards);
             isInitial = state.isInitial;
-
-            initPureBoard();
-        }
+        }*/
 
         public StateBuilder(Board board) {
             initVariables();
-
             realOwner = board;
+            pureBoard = board;
+            turn = board.getTurn();
 
             for (int i = 0; i < Global.PLAYER_COUNT; i++) {
                 victoryPoints[i] = board.getPlayers().get(i).getVictoryPoint();
-                allResources.replace(i, board.getPlayers().get(i).getResource());
-                allDevelopmentCards.replace(i, board.getPlayers().get(i).getDevelopmentCards());
+                allResources.replace(i, new Resource(board.getPlayers().get(i).getResource()));
+                allDevelopmentCards.replace(i, new ArrayList<>(board.getPlayers().get(i).getDevelopmentCards()));
             }
 
             isInitial = board.isInitial();
-
-            initPureBoard();
-        }
-
-        private void initPureBoard() {
-            ArrayList<Player> players = new ArrayList<>();
-            for (int playerIndex = 0; playerIndex < Global.PLAYER_COUNT; playerIndex++) {
-                players.add(new Player(playerIndex));
-
-                allResources.put(playerIndex, new Resource());
-
-                allDevelopmentCards.put(playerIndex, new ArrayList<>());
-                allPossibleActions.put(playerIndex, new ArrayList<>());
-                allAffordableMoves.put(playerIndex, new ArrayList<>());
-            }
-
-            pureBoard = new PureBoard();
         }
 
         private void initVariables() {
@@ -139,6 +131,18 @@ public class State implements Serializable {
             allPossibleActions = new HashMap<>();
             allAffordableMoves = new HashMap<>();
             isInitial = false;
+            turn = Integer.MAX_VALUE;
+
+            ArrayList<Player> players = new ArrayList<>();
+            for (int playerIndex = 0; playerIndex < Global.PLAYER_COUNT; playerIndex++) {
+                players.add(new Player(playerIndex));
+
+                allResources.put(playerIndex, new Resource());
+
+                allDevelopmentCards.put(playerIndex, new ArrayList<>());
+                allPossibleActions.put(playerIndex, new ArrayList<>());
+                allAffordableMoves.put(playerIndex, new ArrayList<>());
+            }
         }
 
         public StateBuilder setVictoryPoints(int victoryPoint, int playerIndex) {
@@ -187,12 +191,22 @@ public class State implements Serializable {
                 ArrayList<IAction> possibleActions = allPossibleActions.get(player.getIndex());
                 ArrayList<MoveType> affordableMoves = allAffordableMoves.get(player.getIndex());
 
+                possibleActions.clear();
+                affordableMoves.clear();
+
                 /// region Affordability Test
                 if (isInitial) {
-                    if (pureBoard.countStructures(StructureType.SETTLEMENT, player) == 0 || pureBoard.countStructures(StructureType.ROAD, player) == 1)
-                        affordableMoves.add(MoveType.CreateSettlement);
-                    else
-                        affordableMoves.add(MoveType.CreateRoad);
+                    int settlementCount_my = pureBoard.countStructures(StructureType.SETTLEMENT, player);
+                    int roadCount_my = pureBoard.countStructures(StructureType.ROAD, player);
+
+                    if (settlementCount_my+roadCount_my < turn*2) {
+                        if (settlementCount_my == roadCount_my)
+                            affordableMoves.add(MoveType.CreateSettlement);
+                        else {
+                            System.out.println(settlementCount_my+", "+roadCount_my+", "+turn);
+                            affordableMoves.add(MoveType.CreateRoad);
+                        }
+                    }
                 }
                 else {
                     if (Board.isAffordable(MoveType.CreateSettlement, player.getResource()))
@@ -203,7 +217,7 @@ public class State implements Serializable {
                         affordableMoves.add(MoveType.UpgradeSettlement);
                     if (Board.isAffordable(MoveType.DevelopmentCard, player.getResource())) {
                         affordableMoves.add(MoveType.DevelopmentCard);
-                        possibleActions.add(new DrawDevelopmentCard(player, realOwner));
+                        possibleActions.add(new DrawDevelopmentCard(player.getIndex(), realOwner));
                     }
                     if (Board.isAffordable(MoveType.KnightCard, player.getResource())) {
                         affordableMoves.add(MoveType.KnightCard);
@@ -246,7 +260,7 @@ public class State implements Serializable {
                                     Resource takenResource = new Resource();
                                     takenResource.put(resourceType2, amount / 4);
 
-                                    possibleActions.add(new TradeWithBank(givenResource, takenResource, player, realOwner));
+                                    possibleActions.add(new TradeWithBank(givenResource, takenResource, player.getIndex(), realOwner));
 
                                     amount += 4;
                                 }
@@ -261,20 +275,20 @@ public class State implements Serializable {
                             Road road = new Road(location, endLocation, player);
 
                             if (endLocation.getIndex() > location.getIndex() && pureBoard.isValid(road, isInitial)) {
-                                Location[] locations = new Location[2];
-                                locations[0] = location;
-                                locations[1] = endLocation;
+                                int[] locations = new int[2];
+                                locations[0] = location.getIndex();
+                                locations[1] = endLocation.getIndex();
 
-                                possibleActions.add(new CreateRoad(locations, player, realOwner));
+                                possibleActions.add(new CreateRoad(locations, player.getIndex(), realOwner));
                             }
                         }
                     }
 
                     if (affordableMoves.contains(MoveType.CreateSettlement) && pureBoard.isValid(new Settlement(location, player), isInitial))
-                        possibleActions.add(new CreateSettlement(location, player, realOwner));
+                        possibleActions.add(new CreateSettlement(location.getIndex(), player.getIndex(), realOwner));
 
                     if (affordableMoves.contains(MoveType.UpgradeSettlement) && location.hasOwner() && location.getOwner().getIndex() == player.getIndex())
-                        possibleActions.add(new UpgradeSettlement(location, player, realOwner));
+                        possibleActions.add(new UpgradeSettlement(location.getIndex(), player.getIndex(), realOwner));
                 }
             }
 

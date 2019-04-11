@@ -80,7 +80,9 @@ public class Main {
                         }
 
                         if (isPlayed) {
-                            if (playerMoved.getIndex() == Global.PLAYER_COUNT - 1 && !isInitial)
+                            if (playerMoved.getIndex() == Global.PLAYER_COUNT - 1 && !isInitial
+                                    || playerMoved.getIndex() == 0 && board.countStructures(StructureType.SETTLEMENT, players.get(Global.PLAYER_COUNT-1)) > 0 && isInitial
+                                    || playerMoved.getIndex() == Global.PLAYER_COUNT - 1 && board.countStructures(StructureType.SETTLEMENT, players.get(Global.PLAYER_COUNT-1)) == 0 && isInitial)
                                 board.setTurn(board.getTurn() + 1);
 
                             break;

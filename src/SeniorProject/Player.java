@@ -93,7 +93,7 @@ public class Player implements Serializable, IObservable {
             Global.createTextFile(System.nanoTime() / 10000 + fileName, actionList_str);
         }
         else
-            System.out.println("["+this+"'s Choice]: []");
+            System.out.println("["+this+"'s Choice]: [X]");
 
         setState(PlayerState.IDLE);
     }
@@ -200,7 +200,7 @@ public class Player implements Serializable, IObservable {
         return resource;
     }
 
-    void changeResource(ResourceType resourceType, Integer value) {
+    public void changeResource(ResourceType resourceType, Integer value) {
         if (resourceType != null)
             resource.replace(resourceType, resource.get(resourceType) + value);
 
