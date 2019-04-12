@@ -1,6 +1,9 @@
 package SeniorProject;
 
-import SeniorProject.Actions.*;
+import SeniorProject.Actions.CreateRoad;
+import SeniorProject.Actions.CreateSettlement;
+import SeniorProject.Actions.TradeWithBank;
+import SeniorProject.Actions.UpgradeSettlement;
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
 
 import java.io.Serializable;
@@ -70,7 +73,7 @@ public class State implements Serializable {
 
     @Override
     public String toString() {
-        String string = "Turn "+getTurn()+"\n";
+        String string = ""/*"Turn "+getTurn()+"\n"*/;
 
         for (int i = 0; i < Global.PLAYER_COUNT; i++)
             string += "P" + (i + 1) + "'s Resource: " + allResources.get(i) + ((i != Global.PLAYER_COUNT - 1) ? "\n" : "");
@@ -196,16 +199,14 @@ public class State implements Serializable {
 
                 /// region Affordability Test
                 if (isInitial) {
-                    int settlementCount_my = pureBoard.countStructures(StructureType.SETTLEMENT, player);
-                    int roadCount_my = pureBoard.countStructures(StructureType.ROAD, player);
+                    int settlementCount_my = pureBoard.countStructures(StructureType.SETTLEMENT, player.getIndex());
+                    int roadCount_my = pureBoard.countStructures(StructureType.ROAD, player.getIndex());
 
                     if (settlementCount_my+roadCount_my < turn*2) {
                         if (settlementCount_my == roadCount_my)
                             affordableMoves.add(MoveType.CreateSettlement);
-                        else {
-                            System.out.println(settlementCount_my+", "+roadCount_my+", "+turn);
+                        else
                             affordableMoves.add(MoveType.CreateRoad);
-                        }
                     }
                 }
                 else {
@@ -217,7 +218,7 @@ public class State implements Serializable {
                         affordableMoves.add(MoveType.UpgradeSettlement);
                     if (Board.isAffordable(MoveType.DevelopmentCard, player.getResource())) {
                         affordableMoves.add(MoveType.DevelopmentCard);
-                        possibleActions.add(new DrawDevelopmentCard(player.getIndex(), realOwner));
+                        //possibleActions.add(new DrawDevelopmentCard(player.getIndex(), realOwner));
                     }
                     if (Board.isAffordable(MoveType.KnightCard, player.getResource())) {
                         affordableMoves.add(MoveType.KnightCard);

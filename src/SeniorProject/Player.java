@@ -2,7 +2,6 @@ package SeniorProject;
 
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
 
-import javax.sound.midi.Soundbank;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -38,36 +37,32 @@ public class Player implements Serializable, IObservable {
     }
 
     void writeMove(boolean isInitial) {
-        //if (!isInitial) {
-            System.out.println("\n---------\n"+this+"'s "+(isInitial ? "Initial" : "")+" Turn");
-            Board board = (Board) getPureBoard();
-            ///region State Printing
-            State.StateBuilder stateBuilder = new State.StateBuilder(board);
-            State currentState = stateBuilder.build();
+        ///region Print States
+        Board board = (Board) getPureBoard();
 
-            System.out.println(currentState);
+        State.StateBuilder stateBuilder = new State.StateBuilder(board);
+        State currentState = stateBuilder.build();
 
-            System.out.println("[My Affordable Moves]: " + currentState.getAffordableMoves(index));
-            System.out.print("[My Possible Actions]: ");
+        System.out.println("\n---------\n" + this + "'s " + (isInitial ? "[Initial]" : "") + " Turn "+currentState.getTurn());
 
-            int size = currentState.getPossibleActions(index).size();
-            for (int i = 0; i < size; i++)
-                System.out.print("\n"+(i+1)+". "+currentState.getPossibleActions(index).get(i));
+        System.out.println(currentState);
+        System.out.println("[My Affordable Moves]: " + currentState.getAffordableMoves(index));
+        System.out.print("[My Possible Actions]: ");
 
-            if (size == 0)
-                System.out.print("[]");
+        int size = currentState.getPossibleActions(index).size();
+        for (int i = 0; i < size; i++)
+            System.out.print("\n" + (i + 1) + ". " + currentState.getPossibleActions(index).get(i));
 
-            System.out.println();
+        if (size == 0)
+            System.out.print("[]");
 
-            ///endregion
-        //}
+        System.out.println();
+        ///endregion
 
         ArrayList<IAction> actionList = AI_instance.createActions(isInitial);
 
         String fileName = "actions_temp" + index + ".txt";
-
         String actionList_str = "";
-
         for (IAction action : actionList) {
             String action_str = action.getCommand();
             if (action_str != null)
@@ -78,6 +73,7 @@ public class Player implements Serializable, IObservable {
 
         Global.createTextFile(fileName, actionList_str);
 
+        ///region Print Actions
         if (!actionList_str.equals("")) {
             System.out.println("["+this+"'s Choice}:");
 
@@ -93,7 +89,17 @@ public class Player implements Serializable, IObservable {
             Global.createTextFile(System.nanoTime() / 10000 + fileName, actionList_str);
         }
         else
-            System.out.println("["+this+"'s Choice]: [X]");
+            System.out.println("[" + this + "'s Choice]: []");
+        ///endregion
+
+        for (Player player : board.getPlayers()) {
+            for (ResourceType resourceType : player.getResource().keySet()) {
+                if (player.getResource().get(resourceType) < 0) {
+                    for (int i = 0; i < 50; i++)
+                        System.out.println("ERROR! Negative values.");
+                }
+            }
+        }
 
         setState(PlayerState.IDLE);
     }
@@ -196,19 +202,23 @@ public class Player implements Serializable, IObservable {
         updateSubscribers();
     }
 
-    Resource getResource() {
+    public Resource getResource() {
         return resource;
     }
 
-    public void changeResource(ResourceType resourceType, Integer value) {
+    /*public void changeResource(ResourceType resourceType, Integer value) {
         if (resourceType != null)
             resource.replace(resourceType, resource.get(resourceType) + value);
 
         updateSubscribers();
-    }
+    }*/
 
     void createAI() {
         this.AI_instance = new BasicAI(this, (Board) pureBoard);
+    }
+
+    public void setAI(BasicAI ai) {
+        this.AI_instance = ai;
     }
 
     public BasicAI getAI_instance() {

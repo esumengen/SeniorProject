@@ -19,7 +19,7 @@ public class Deck implements Serializable {
 
     public DevelopmentCardType pickDevelopmentCard() {
         Random randomGenerator = new Random(DevelopmentCardType.values().length);
-        DevelopmentCardType randomCard = DevelopmentCardType.values()[randomGenerator.nextInt()];
+        DevelopmentCardType randomCard = DevelopmentCardType.values()[randomGenerator.nextInt(DevelopmentCardType.values().length - 1)];
 
         if (deck.get(randomCard) > 0) {
             deck.replace(randomCard, (deck.get(randomCard) - 1));

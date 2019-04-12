@@ -19,7 +19,15 @@ public class TradeWithBank implements IAction, Serializable {
 
     @Override
     public void execute() {
+        if (board.isMain())
+            System.out.println(player.getResource());
+
         board.tradeBank(player.getIndex(), givenResources, takenResources);
+
+        if (board.isMain()) {
+            System.out.println("YAPTIM: " + this);
+            System.out.println(player.getResource());
+        }
     }
 
     @Override

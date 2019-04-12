@@ -85,35 +85,21 @@ public class Board extends PureBoard implements Serializable {
         return false;
     }
 
-    public void createSettlement(Player player, Location location) {
-        int settlementCount = -1;
-        if (isInitial)
-            settlementCount = countStructures(StructureType.SETTLEMENT, player);
-
-        Settlement settlement = new Settlement(location, player);
-        getStructures().add(settlement);
-
-        location.setOwner(player);
-        location.addStructures(settlement);
-
-        // Immediate Harvesting
-        if (settlementCount == 1) {
-            for (Land land : location.getAdjacentLands())
-                player.changeResource(land.getResourceType(), 1);
+    static Board deepCopy (Board board) {
+        ArrayList<BasicAI> AIs = new ArrayList<>();
+        for (Player player : board.getPlayers()) {
+            AIs.add(player.getAI_instance());
+            player.setAI(null);
         }
-        else {
-            if (!isInitial) {
-                player.changeResource(ResourceType.BRICK, -1);
-                player.changeResource(ResourceType.GRAIN, -1);
-                player.changeResource(ResourceType.WOOL, -1);
-                player.changeResource(ResourceType.LUMBER, -1);
-            }
-        }
+        System.gc();
 
-        syncPlayer(player);
-        changeUpdate();
+        Board _board = (Board) PureBoard.deepCopy(board);
+        _board.setMain(false);
 
-        addLog("ACTION: A settlement has been added on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
+        for (Player player : board.getPlayers())
+            player.setAI(AIs.get(player.getIndex()));
+
+        return _board;
     }
 
     public void createRoad(Player player, Location location_first, Location location_second) {
@@ -127,8 +113,8 @@ public class Board extends PureBoard implements Serializable {
         location_second.addStructures(road);
 
         if (!isInitial) {
-            player.changeResource(ResourceType.BRICK, -1);
-            player.changeResource(ResourceType.LUMBER, -1);
+            player.getResource().add(ResourceType.BRICK, -1);
+            player.getResource().add(ResourceType.LUMBER, -1);
         }
 
         syncPlayer(player);
@@ -148,8 +134,8 @@ public class Board extends PureBoard implements Serializable {
         }
 
         if (!isInitial) {
-            player.changeResource(ResourceType.GRAIN, -2);
-            player.changeResource(ResourceType.ORE, -3);
+            player.getResource().add(ResourceType.GRAIN, -2);
+            player.getResource().add(ResourceType.ORE, -3);
         }
 
         syncPlayer(player);
@@ -173,9 +159,9 @@ public class Board extends PureBoard implements Serializable {
         player.addDevelopmentCard(developmentCardType);
 
         if (!isInitial) {
-            player.changeResource(ResourceType.WOOL, -1);
-            player.changeResource(ResourceType.GRAIN, -1);
-            player.changeResource(ResourceType.ORE, -1);
+            player.getResource().add(ResourceType.WOOL, -1);
+            player.getResource().add(ResourceType.GRAIN, -1);
+            player.getResource().add(ResourceType.ORE, -1);
         }
 
         syncPlayer(player);
@@ -236,12 +222,16 @@ public class Board extends PureBoard implements Serializable {
 
             players.get(playerIndex).setGrain(players.get(playerIndex).getGrain() - givenResources.get(ResourceType.GRAIN)
                     + takenResources.get(ResourceType.GRAIN));
+
             players.get(playerIndex).setLumber(players.get(playerIndex).getLumber() - givenResources.get(ResourceType.LUMBER)
                     + takenResources.get(ResourceType.LUMBER));
+
             players.get(playerIndex).setWool(players.get(playerIndex).getWool() - givenResources.get(ResourceType.WOOL)
                     + takenResources.get(ResourceType.WOOL));
+
             players.get(playerIndex).setOre(players.get(playerIndex).getOre() - givenResources.get(ResourceType.ORE)
                     + takenResources.get(ResourceType.ORE));
+
             players.get(playerIndex).setBrick(players.get(playerIndex).getBrick() - givenResources.get(ResourceType.BRICK)
                     + takenResources.get(ResourceType.BRICK));
 
@@ -277,9 +267,9 @@ public class Board extends PureBoard implements Serializable {
                     if (location.hasOwner()) {
                         Player rewardedPlayer = location.getOwner();
 
-                        rewardedPlayer.changeResource(land.getResourceType(), location.hasCity() ? 2 : 1);
+                        rewardedPlayer.getResource().add(land.getResourceType(), location.hasCity() ? 2 : 1);
 
-                        addLog("?");
+                        //addLog("?");
                     }
                 }
             }
@@ -295,11 +285,35 @@ public class Board extends PureBoard implements Serializable {
             Global.addLog(log);
     }
 
-    static Board deepCopy (Board board) {
-        Board _board = (Board) PureBoard.deepCopy(board);
-        _board.setMain(false);
+    public void createSettlement(Player player, Location location) {
+        int settlementCount = -1;
+        if (isInitial)
+            settlementCount = countStructures(StructureType.SETTLEMENT, player.getIndex());
 
-        return _board;
+        Settlement settlement = new Settlement(location, player);
+        getStructures().add(settlement);
+
+        location.setOwner(player);
+        location.addStructures(settlement);
+
+        // Immediate Harvesting
+        if (settlementCount == 1) {
+            for (Land land : location.getAdjacentLands())
+                player.getResource().add(land.getResourceType(), 1);
+        }
+        else {
+            if (!isInitial) {
+                player.getResource().add(ResourceType.BRICK, -1);
+                player.getResource().add(ResourceType.GRAIN, -1);
+                player.getResource().add(ResourceType.WOOL, -1);
+                player.getResource().add(ResourceType.LUMBER, -1);
+            }
+        }
+
+        syncPlayer(player);
+        changeUpdate();
+
+        addLog("ACTION: A settlement has been added on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
     }
 
     void syncPlayer(Player player) {
@@ -357,8 +371,8 @@ public class Board extends PureBoard implements Serializable {
     public void changeUpdate() {
         if (isInitial) {
             for (Player player : players) {
-                if (countStructures(StructureType.SETTLEMENT, player) > 2
-                || countStructures(StructureType.ROAD, player) > 2) {
+                if (countStructures(StructureType.SETTLEMENT, player.getIndex()) > 2
+                        || countStructures(StructureType.ROAD, player.getIndex()) > 2) {
                     isInitial = false;
                     break;
                 }

@@ -31,9 +31,8 @@ public class Main {
                 if (!synchronizer.isSynchronized() && synchronizer.getState() == SynchronizerState.WAITING) {
                     File actionsFile = new File(Global.get_working_path(Global.ACTIONS_FILE));
 
-                    if (actionsFile.exists()) {
+                    if (actionsFile.exists())
                         synchronizer.sync(actionsFile);
-                    }
                 }
 
                 File communication_file = new File(Global.get_working_path(Global.COMMUNICATION_FILE));
@@ -81,8 +80,8 @@ public class Main {
 
                         if (isPlayed) {
                             if (playerMoved.getIndex() == Global.PLAYER_COUNT - 1 && !isInitial
-                                    || playerMoved.getIndex() == 0 && board.countStructures(StructureType.SETTLEMENT, players.get(Global.PLAYER_COUNT-1)) > 0 && isInitial
-                                    || playerMoved.getIndex() == Global.PLAYER_COUNT - 1 && board.countStructures(StructureType.SETTLEMENT, players.get(Global.PLAYER_COUNT-1)) == 0 && isInitial)
+                                    || playerMoved.getIndex() == 0 && board.countStructures(StructureType.SETTLEMENT, Global.PLAYER_COUNT - 1) > 0 && isInitial
+                                    || playerMoved.getIndex() == Global.PLAYER_COUNT - 1 && board.countStructures(StructureType.SETTLEMENT, Global.PLAYER_COUNT - 1) == 0 && isInitial)
                                 board.setTurn(board.getTurn() + 1);
 
                             break;

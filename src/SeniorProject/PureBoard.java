@@ -228,13 +228,13 @@ public class PureBoard implements Serializable {
             }
 
             // Herhangi bir ucunda rakip bina olmamalı. (?)
-            if ((start.hasOwner() && start.getOwner().getIndex() != road.getPlayer().getIndex())
+            /*if ((start.hasOwner() && start.getOwner().getIndex() != road.getPlayer().getIndex())
                     || (end.hasOwner() && end.getOwner().getIndex() != road.getPlayer().getIndex()))
-                return false;
+                return false;*/
 
             // İki ucunda en az bir tane kendi yapısı olmalı.
-            if (countStructures(StructureType.ROAD, start, road.getPlayer()) + countStructures(StructureType.ROAD, end, road.getPlayer())
-                    + countStructures(StructureType.SETTLEMENT, start, road.getPlayer()) + countStructures(StructureType.SETTLEMENT, end, road.getPlayer()) == 0)
+            if (countStructures(StructureType.ROAD, start, road.getPlayer().getIndex()) + countStructures(StructureType.ROAD, end, road.getPlayer().getIndex())
+                    + countStructures(StructureType.SETTLEMENT, start, road.getPlayer().getIndex()) + countStructures(StructureType.SETTLEMENT, end, road.getPlayer().getIndex()) == 0)
                 return false;
         } else if (structure instanceof Building) {
             Building settlement = (Building) structure;
@@ -250,7 +250,7 @@ public class PureBoard implements Serializable {
             // Başlangıç durumu değilse
             if (!isInitial) {
                 // Tam o location'a bağlı en az bir yolu bulunmalı.
-                if (countStructures(StructureType.ROAD, settlement.getLocation(), settlement.getPlayer()) == 0)
+                if (countStructures(StructureType.ROAD, settlement.getLocation(), settlement.getPlayer().getIndex()) == 0)
                     return false;
             }
             else {
@@ -298,20 +298,20 @@ public class PureBoard implements Serializable {
         return true;
     }
 
-    int countStructures(StructureType type, Player player) {
-        return countStructures(type, null, player);
+    int countStructures(StructureType type, int playerIndex) {
+        return countStructures(type, null, playerIndex);
     }
 
     int countStructures(StructureType type, Location location) {
-        return countStructures(type, location, null);
+        return countStructures(type, location, -1);
     }
 
-    int countStructures(StructureType type, Location location, Player player) {
+    int countStructures(StructureType type, Location location, int playerIndex) {
         int count = 0;
 
         if (location == null) {
             for (Location _location : locations)
-                count += countStructures(type, _location, player);
+                count += countStructures(type, _location, playerIndex);
 
             if (type == StructureType.ROAD)
                 count /= 2;
@@ -319,17 +319,17 @@ public class PureBoard implements Serializable {
         else {
             if (type == StructureType.ROAD) {
                 for (Structure structure : location.getStructures()) {
-                    if (structure instanceof Road && (player == null || structure.getPlayer().getIndex() == player.getIndex()))
+                    if (structure instanceof Road && (playerIndex == -1 || structure.getPlayer().getIndex() == playerIndex))
                         count++;
                 }
             } else if (type == StructureType.SETTLEMENT) {
                 for (Structure structure : location.getStructures()) {
-                    if (structure instanceof Settlement && (player == null || structure.getPlayer().getIndex() == player.getIndex()))
+                    if (structure instanceof Settlement && (playerIndex == -1 || structure.getPlayer().getIndex() == playerIndex))
                         count++;
                 }
             } else if (type == StructureType.CITY) {
                 for (Structure structure : location.getStructures()) {
-                    if (structure instanceof City && (player == null || structure.getPlayer().getIndex() == player.getIndex()))
+                    if (structure instanceof City && (playerIndex == -1 || structure.getPlayer().getIndex() == playerIndex))
                         count++;
                 }
             }

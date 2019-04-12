@@ -64,6 +64,9 @@ class Synchronizer {
                 isSynchronized_str = Global.getRidOf_quotationMarks(isSynchronized_str);
             }
         } catch (Exception e) {
+            // ? BUG?
+            // !
+            isSynchronized_str = "true";
             new Message(e.getMessage() + " - 3");
         }
 

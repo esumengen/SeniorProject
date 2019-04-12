@@ -3,7 +3,6 @@ package SeniorProject.Actions;
 import SeniorProject.Board;
 import SeniorProject.IAction;
 import SeniorProject.Player;
-import SeniorProject.ResourceType;
 
 import java.io.Serializable;
 
@@ -18,7 +17,7 @@ public class DrawDevelopmentCard implements IAction, Serializable {
 
     @Override
     public void execute () {
-        //board.drawDevelopmentCard(player);
+        board.drawDevelopmentCard(player);
     }
 
     @Override
