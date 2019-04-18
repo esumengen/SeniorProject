@@ -3,8 +3,7 @@ package SeniorProject;
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
 
 public class Board extends PureBoard implements Serializable {
     private ArrayList<Player> players;
@@ -119,6 +118,9 @@ public class Board extends PureBoard implements Serializable {
 
         syncPlayer(player);
         changeUpdate();
+
+        location_first.getAdjecentNodes_player(player.getIndex()).add(location_second);
+        location_second.getAdjecentNodes_player(player.getIndex()).add(location_first);
 
         addLog("ACTION: A road has been added between [Location " + location_first.getIndex() + " and Location " + location_second.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
     }
@@ -386,4 +388,69 @@ public class Board extends PureBoard implements Serializable {
     public State getState() {
         return state;
     }
+
+
+    public AbstractMap.SimpleEntry<Integer, Node> getFurthestNode(int playerIndex, Node node){
+        ArrayList<Road> playersRoads = new ArrayList<>();
+        ArrayList<Node> nodes = new ArrayList<>();
+
+        for(Structure structure : players.get(playerIndex).getStructures()){
+            if(structure instanceof Road)
+                playersRoads.add((Road) structure);
+        }
+
+        for(Road road : playersRoads) {
+            if(!nodes.contains(road.getEndLocation()))
+                nodes.add(road.getEndLocation());
+
+            if(!nodes.contains(road.getStartLocation()))
+                nodes.add(road.getStartLocation());
+        }
+
+        Map<Node, Integer> distanceMap = new HashMap<>();
+
+        for(Node _node : nodes)
+            distanceMap.put(_node, -1);
+
+        PriorityQueue<Node> queue = new PriorityQueue<>();
+
+        queue.add(node);
+
+        while(!queue.isEmpty()){
+
+            Node _node = queue.remove();
+
+            for (Node adjNode : _node.getAdjecentNodes_player(playerIndex)) {
+                if(distanceMap.get(adjNode) == -1) {
+                    queue.add(adjNode);
+                    distanceMap.replace(adjNode, distanceMap.get(_node) + 1);
+                }
+            }
+        }
+        Integer max = 0;
+        Node maxNode = null;
+        for(Node _node : distanceMap.keySet()) {
+            int value = distanceMap.get(_node);
+            if(value > max) {
+                max = value;
+                maxNode = _node;
+            }
+        }
+
+        return new AbstractMap.SimpleEntry<>(max, maxNode);
+
+    }
+
+    public int getLongestRoad_length(int playerIndex) {
+
+        int max = Math.max(
+                getFurthestNode(playerIndex,
+                        getFurthestNode(playerIndex,
+                ((Building) players.get(playerIndex).getStructures().get(0)).getLocation()).getValue()).getKey(),
+                getFurthestNode(playerIndex,
+                        getFurthestNode(playerIndex,
+                ((Building) players.get(playerIndex).getStructures().get(2)).getLocation()).getValue()).getKey());
+        return max;
+    }
+
 }
