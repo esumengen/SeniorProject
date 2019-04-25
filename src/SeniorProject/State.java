@@ -96,7 +96,7 @@ public class State implements Serializable {
         private Board realOwner;
         private int turn;
 
-        public StateBuilder () {
+        public StateBuilder() {
             initVariables();
             pureBoard = new PureBoard();
         }
