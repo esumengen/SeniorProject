@@ -19,6 +19,7 @@ public class Player implements Serializable, IObservable {
     private PureBoard pureBoard;
     private PlayerState state = PlayerState.IDLE;
     private ArrayList<IObserver> observers;
+    private int longestRoad_length = 0;
 
     public Player(int index) {
         this.index = index;
@@ -267,6 +268,14 @@ public class Player implements Serializable, IObservable {
 
     public void setPureBoard(PureBoard pureBoard) {
         this.pureBoard = pureBoard;
+    }
+
+    public void setLongestRoad_length(int longestRoad_length) {
+        this.longestRoad_length = longestRoad_length;
+    }
+
+    public int getLongestRoad_length() {
+        return longestRoad_length;
     }
 
     public void addDevelopmentCard(DevelopmentCardType developmentCardType) {

@@ -22,4 +22,6 @@ public class Road extends Structure implements Serializable {
     public Location getEndLocation() {
         return locations[1];
     }
+
+
 }

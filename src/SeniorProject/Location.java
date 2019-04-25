@@ -3,8 +3,8 @@ package SeniorProject;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Location implements Serializable {
-    private int index;
+public class Location extends Node implements Serializable {
+
     private HarborType harborType;
     private ArrayList<Land> adjacentLands;
     private ArrayList<Location> adjacentLocations;
@@ -16,17 +16,15 @@ public class Location implements Serializable {
     private PureBoard pureBoard;
 
     public Location(int index) {
+        super(index);
         this.adjacentLands = new ArrayList<>();
         this.adjacentLocations = new ArrayList<>();
         this.connectedRoads = new ArrayList<>();
         this.structures = new ArrayList<>();
-        this.index = index;
         this.harborType = null;
     }
 
-    public int getIndex() {
-        return index;
-    }
+
 
     public ArrayList<Land> getAdjacentLands() {
         return adjacentLands;
@@ -107,6 +105,6 @@ public class Location implements Serializable {
 
     @Override
     public String toString() {
-        return "Loc" + index;
+        return "Loc" + getIndex();
     }
 }
