@@ -20,9 +20,6 @@ public class RollDice implements IAction, Serializable {
     @Override
     public void execute () {
         board.rollDice(player, dices[0], dices[1]);
-
-        if (board.isMain())
-            System.out.println("DICE HAS BEEN ROLLED BY "+player+"! "+this);
     }
 
     @Override

@@ -38,9 +38,9 @@ public class Player implements Serializable, IObservable {
     }
 
     void writeMove(boolean isInitial) {
-        ///region Print States
         Board board = (Board) getPureBoard();
-
+        /*
+        ///region Print States
         State.StateBuilder stateBuilder = new State.StateBuilder(board);
         State currentState = stateBuilder.build();
 
@@ -59,6 +59,7 @@ public class Player implements Serializable, IObservable {
 
         System.out.println();
         ///endregion
+        */
 
         ArrayList<IAction> actionList = AI_instance.createActions(isInitial);
 
@@ -74,6 +75,8 @@ public class Player implements Serializable, IObservable {
 
         Global.createTextFile(fileName, actionList_str);
 
+        System.out.println("Before my move, Longest Path : "+board.getLongestRoad_length(0));
+/*
         ///region Print Actions
         if (!actionList_str.equals("")) {
             System.out.println("["+this+"'s Choice}:");
@@ -92,15 +95,15 @@ public class Player implements Serializable, IObservable {
         else
             System.out.println("[" + this + "'s Choice]: []");
         ///endregion
-
-        for (Player player : board.getPlayers()) {
+*/
+        /*for (Player player : board.getPlayers()) {
             for (ResourceType resourceType : player.getResource().keySet()) {
                 if (player.getResource().get(resourceType) < 0) {
                     for (int i = 0; i < 50; i++)
                         System.out.println("ERROR! Negative values.");
                 }
             }
-        }
+        }*/
 
         setState(PlayerState.IDLE);
     }

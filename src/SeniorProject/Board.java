@@ -119,8 +119,8 @@ public class Board extends PureBoard implements Serializable {
         syncPlayer(player);
         changeUpdate();
 
-        location_first.getAdjecentNodes_player(player.getIndex()).add(location_second);
-        location_second.getAdjecentNodes_player(player.getIndex()).add(location_first);
+        location_first.addAdjacentNodes_player(player.getIndex(), location_second);
+        location_second.addAdjacentNodes_player(player.getIndex(), location_first);
 
         addLog("ACTION: A road has been added between [Location " + location_first.getIndex() + " and Location " + location_second.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
     }
@@ -409,25 +409,28 @@ public class Board extends PureBoard implements Serializable {
 
         Map<Node, Integer> distanceMap = new HashMap<>();
 
-        for(Node _node : nodes)
-            distanceMap.put(_node, -1);
+        for (Node _node : nodes)
+            distanceMap.put(_node, _node.getIndex() == node.getIndex() ? 0 : -1);
 
-        PriorityQueue<Node> queue = new PriorityQueue<>();
+        ArrayDeque<Node> queue = new ArrayDeque<>(500);
+        queue.addFirst(node);
 
-        queue.add(node);
+        while (!queue.isEmpty()) {
+            Node _node = queue.removeFirst();
 
-        while(!queue.isEmpty()){
+            for (Node adjNode : _node.getAdjacentNodes_player(playerIndex)) {
+                if (distanceMap.get(adjNode) == -1) {
+                    if (distanceMap.get(adjNode) == -1) {
+                        queue.addFirst(adjNode);
+                    }
 
-            Node _node = queue.remove();
-
-            for (Node adjNode : _node.getAdjecentNodes_player(playerIndex)) {
-                if(distanceMap.get(adjNode) == -1) {
-                    queue.add(adjNode);
-                    distanceMap.replace(adjNode, distanceMap.get(_node) + 1);
+                    int newDistance = Math.max(distanceMap.get(adjNode), distanceMap.get(_node) + 1);
+                    distanceMap.put(adjNode, newDistance);
                 }
             }
         }
-        Integer max = 0;
+
+        Integer max = Integer.MIN_VALUE;
         Node maxNode = null;
         for(Node _node : distanceMap.keySet()) {
             int value = distanceMap.get(_node);
@@ -438,19 +441,23 @@ public class Board extends PureBoard implements Serializable {
         }
 
         return new AbstractMap.SimpleEntry<>(max, maxNode);
-
     }
 
     public int getLongestRoad_length(int playerIndex) {
+        if (getPlayers().get(playerIndex).getStructures().size() < 4)
+            return 0;
+        AbstractMap.SimpleEntry<Integer, Node> result1 = getFurthestNode(playerIndex, ((Building) players.get(playerIndex).getStructures().get(0)).getLocation());
+        AbstractMap.SimpleEntry<Integer, Node> result2 = getFurthestNode(playerIndex, result1.getValue());
 
-        int max = Math.max(
-                getFurthestNode(playerIndex,
-                        getFurthestNode(playerIndex,
-                ((Building) players.get(playerIndex).getStructures().get(0)).getLocation()).getValue()).getKey(),
-                getFurthestNode(playerIndex,
-                        getFurthestNode(playerIndex,
-                ((Building) players.get(playerIndex).getStructures().get(2)).getLocation()).getValue()).getKey());
-        return max;
+        if (playerIndex == 0) {
+            System.out.println("Distant to home: "+result1);
+            System.out.println("Final: "+result2);
+            System.out.println("Distance: "+result2.getValue());
+        }
+
+        /*AbstractMap.SimpleEntry<Integer, Node> _result1 = getFurthestNode(playerIndex, ((Building) players.get(playerIndex).getStructures().get(2)).getLocation());
+        AbstractMap.SimpleEntry<Integer, Node> _result2 = getFurthestNode(playerIndex, _result1.getValue());*/
+
+        return Math.max(result2.getKey(), -99/*_result2.getKey()*/);
     }
-
 }

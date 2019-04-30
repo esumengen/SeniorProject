@@ -237,7 +237,7 @@ public class State implements Serializable {
                         //possibleActions.add(new UseDevelopmentCard(DevelopmentCardType.MONOPOLY, player));
                     }
                     if (Board.isAffordable(MoveType.TradeBank, player.getResource())) {
-                        affordableMoves.add(MoveType.TradeBank);
+                        //affordableMoves.add(MoveType.TradeBank);
                     }
                     if (Board.isAffordable(MoveType.TradePlayer, player.getResource())) {
                         affordableMoves.add(MoveType.TradePlayer);
