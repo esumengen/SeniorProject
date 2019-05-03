@@ -18,6 +18,7 @@ public class PureBoard implements Serializable {
     private Deck deck;
     private Land robbedLand;
     private boolean isActive;
+    private int longestRoad_owner;
 
     public PureBoard(ArrayList<Land> lands, ArrayList<Location> locations) {
         init();
@@ -92,9 +93,11 @@ public class PureBoard implements Serializable {
         //region Mark the corner locations
         for (Land land : lands) {
             if (land.getType() == LandType.SEA) {
-                for (Location location:land.getAdjacentLocations()) {
+                for (Location location : land.getAdjacentLocations())
                     location.makeCorner();
-                }
+            } else {
+                for (Location location : land.getAdjacentLocations())
+                    location.setActive(true);
             }
         }
         //endregion
@@ -193,8 +196,6 @@ public class PureBoard implements Serializable {
     private void bind(Land land, Location location) {
         land.getAdjacentLocations().add(location);
         location.getAdjacentLands().add(land);
-        if (land.getType() != LandType.SEA)
-            location.setActive(true);
     }
 
     boolean isValid(Structure structure) {
@@ -255,8 +256,8 @@ public class PureBoard implements Serializable {
             }
             else {
                 // Köşede olmamalı.
-                if (((Building) structure).getLocation().isCorner())
-                    return false;
+                /*if (((Building) structure).getLocation().isCorner())
+                    return false;*/
             }
         }
 
@@ -418,5 +419,13 @@ public class PureBoard implements Serializable {
 
     public void setDeck(Deck deck) {
         this.deck = deck;
+    }
+
+    public int getLongestRoad_owner() {
+        return longestRoad_owner;
+    }
+
+    public void setLongestRoad_owner(int longestRoad_owner) {
+        this.longestRoad_owner = longestRoad_owner;
     }
 }

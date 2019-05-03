@@ -106,7 +106,7 @@ public class Main {
             }
         };
 
-        timer.schedule(task, 0, 333);
+        timer.schedule(task, 0, 1);
 
         // Debug Frame
         //DebugFrame debugFrame = new DebugFrame(board);

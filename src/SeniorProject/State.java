@@ -17,6 +17,8 @@ public class State implements Serializable {
     private Map<Integer, ArrayList<DevelopmentCardType>> allDevelopmentCards;
     private Map<Integer, ArrayList<IAction>> allPossibleActions;
     private Map<Integer, ArrayList<MoveType>> allAffordableMoves;
+    private Map<Integer, Integer> longestRoad_lengths;
+    private int longestRoad_owner;
     private PureBoard pureBoard;
     private boolean isInitial;
     private int turn;
@@ -27,16 +29,15 @@ public class State implements Serializable {
         allDevelopmentCards = stateBuilder.allDevelopmentCards;
         allPossibleActions = stateBuilder.allPossibleActions;
         allAffordableMoves = stateBuilder.allAffordableMoves;
+        longestRoad_lengths = stateBuilder.longestRoad_lengths;
+        longestRoad_owner = stateBuilder.longestRoad_owner;
         isInitial = stateBuilder.isInitial;
+        pureBoard = stateBuilder.pureBoard;
         turn = stateBuilder.turn;
     }
 
     public int getVictoryPoints(int playerIndex) {
         return victoryPoints[playerIndex];
-    }
-
-    public void setVictoryPoints(int playerIndex, int value) {
-        victoryPoints[playerIndex] = value;
     }
 
     public Map<ResourceType, Integer> getResources(int playerIndex) {
@@ -59,21 +60,16 @@ public class State implements Serializable {
         return isInitial;
     }
 
-    public void setInitial(boolean initial) {
-        isInitial = initial;
-    }
-
     public PureBoard getPureBoard() {
         return pureBoard;
-    }
-
-    public void setPureBoard(PureBoard pureBoard) {
-        this.pureBoard = pureBoard;
     }
 
     @Override
     public String toString() {
         String string = ""/*"Turn "+getTurn()+"\n"*/;
+
+        for (int i = 0; i < Global.PLAYER_COUNT; i++)
+            string += "P" + (i + 1) + "'s Longest Road: " + longestRoad_lengths.get(i) + "\n";
 
         for (int i = 0; i < Global.PLAYER_COUNT; i++)
             string += "P" + (i + 1) + "'s Resource: " + allResources.get(i) + ((i != Global.PLAYER_COUNT - 1) ? "\n" : "");
@@ -85,12 +81,22 @@ public class State implements Serializable {
         return turn;
     }
 
+    public Map<Integer, Integer> getLongestRoad_lengths() {
+        return longestRoad_lengths;
+    }
+
+    public int getLongestRoad_owner() {
+        return longestRoad_owner;
+    }
+
     public static class StateBuilder {
         private int[] victoryPoints;
         private Map<Integer, Resource> allResources;
         private Map<Integer, ArrayList<DevelopmentCardType>> allDevelopmentCards;
         private Map<Integer, ArrayList<IAction>> allPossibleActions;
         private Map<Integer, ArrayList<MoveType>> allAffordableMoves;
+        private Map<Integer, Integer> longestRoad_lengths;
+        private int longestRoad_owner;
         private PureBoard pureBoard;
         private boolean isInitial;
         private Board realOwner;
@@ -119,8 +125,10 @@ public class State implements Serializable {
 
             for (int i = 0; i < Global.PLAYER_COUNT; i++) {
                 victoryPoints[i] = board.getPlayers().get(i).getVictoryPoint();
-                allResources.replace(i, new Resource(board.getPlayers().get(i).getResource()));
-                allDevelopmentCards.replace(i, new ArrayList<>(board.getPlayers().get(i).getDevelopmentCards()));
+                allResources.put(i, new Resource(board.getPlayers().get(i).getResource()));
+                allDevelopmentCards.put(i, new ArrayList<>(board.getPlayers().get(i).getDevelopmentCards()));
+                longestRoad_lengths.put(i, board.getLongestRoad(i).getKey());
+                longestRoad_owner = board.getLongestRoad_owner();
             }
 
             isInitial = board.isInitial();
@@ -133,6 +141,7 @@ public class State implements Serializable {
             allDevelopmentCards = new HashMap<>();
             allPossibleActions = new HashMap<>();
             allAffordableMoves = new HashMap<>();
+            longestRoad_lengths = new HashMap<>();
             isInitial = false;
             turn = Integer.MAX_VALUE;
 
@@ -237,7 +246,7 @@ public class State implements Serializable {
                         //possibleActions.add(new UseDevelopmentCard(DevelopmentCardType.MONOPOLY, player));
                     }
                     if (Board.isAffordable(MoveType.TradeBank, player.getResource())) {
-                        //affordableMoves.add(MoveType.TradeBank);
+                        affordableMoves.add(MoveType.TradeBank);
                     }
                     if (Board.isAffordable(MoveType.TradePlayer, player.getResource())) {
                         affordableMoves.add(MoveType.TradePlayer);

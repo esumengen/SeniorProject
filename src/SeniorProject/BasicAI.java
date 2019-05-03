@@ -27,22 +27,19 @@ public class BasicAI implements IAI, Serializable {
 
     public ArrayList<IAction> createActions(boolean isInitial) {
         clearVirtualBoards();
-        if (isInitial)
-            this.virtualBoard = Board.deepCopy(board);
+        this.virtualBoard = Board.deepCopy(board);
 
         actionsDone.clear();
 
-        if (isInitial) {
-            ArrayList<IAction> possibleActions = virtualBoard.getState().getPossibleActions(owner.getIndex());
+        ArrayList<IAction> possibleActions = virtualBoard.getState().getPossibleActions(owner.getIndex());
 
-            while (possibleActions.size() != 0) {
-                IAction action = possibleActions.get(randomGenerator.nextInt(possibleActions.size()));
+        while (possibleActions.size() != 0) {
+            IAction action = possibleActions.get(randomGenerator.nextInt(possibleActions.size()));
 
-                actionsDone.add(action);
-                action.execute();
+            actionsDone.add(action);
+            action.execute();
 
-                possibleActions = virtualBoard.getState().getPossibleActions(owner.getIndex());
-            }
+            possibleActions = virtualBoard.getState().getPossibleActions(owner.getIndex());
         }
 
         return actionsDone;

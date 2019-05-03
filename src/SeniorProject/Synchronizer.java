@@ -1,10 +1,8 @@
 package SeniorProject;
 
-import SeniorProject.Actions.*;
 import org.ini4j.Wini;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 enum SynchronizerState {
@@ -43,6 +41,10 @@ class Synchronizer {
             }
 
             communication_ini.put("General", "isSynchronized", "\"true\"");
+
+            for (int i = 0; i < Global.PLAYER_COUNT; i++)
+                communication_ini.put("LongestRoad", "Player[" + i + "]", Integer.toString(board.getLongestRoad(i).getKey()));
+
             communication_ini.store();
 
         } catch (Exception e) {

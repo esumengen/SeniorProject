@@ -1,6 +1,8 @@
 package SeniorProject;
 
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
 import java.util.*;
@@ -389,8 +391,11 @@ public class Board extends PureBoard implements Serializable {
         return state;
     }
 
+    public AbstractMap.SimpleEntry<Integer, Node> getFurthestNode(int playerIndex, Node node) {
+        return getFurthestNode(playerIndex, node, false);
+    }
 
-    public AbstractMap.SimpleEntry<Integer, Node> getFurthestNode(int playerIndex, Node node){
+    public AbstractMap.SimpleEntry<Integer, Node> getFurthestNode(int playerIndex, Node node, boolean debug) {
         ArrayList<Road> playersRoads = new ArrayList<>();
         ArrayList<Node> nodes = new ArrayList<>();
 
@@ -412,20 +417,61 @@ public class Board extends PureBoard implements Serializable {
         for (Node _node : nodes)
             distanceMap.put(_node, _node.getIndex() == node.getIndex() ? 0 : -1);
 
-        ArrayDeque<Node> queue = new ArrayDeque<>(500);
-        queue.addFirst(node);
+        ArrayDeque<Node> stack = new ArrayDeque<>(500);
+        stack.addFirst(node);
 
-        while (!queue.isEmpty()) {
-            Node _node = queue.removeFirst();
+        ArrayDeque<ArrayList<Node>> chainStack = new ArrayDeque<>(500);
+        chainStack.addFirst(new ArrayList<>());
+
+        ArrayDeque<ArrayList<Pair<Integer, Integer>>> edgesStack = new ArrayDeque<>(500);
+        edgesStack.addFirst(new ArrayList<>());
+
+        while (!stack.isEmpty()) {
+            Node _node = stack.removeFirst();
+            ArrayList<Node> chain = chainStack.removeFirst();
+            ArrayList<Pair<Integer, Integer>> edges = edgesStack.removeFirst();
+
+            if (debug) {
+                System.out.println("Taken Node: " + _node);
+                System.out.println("Taken Chain: " + chain);
+            }
+
+            int newDistance = Math.max(distanceMap.get(_node), chain.size());
+            distanceMap.put(_node, newDistance);
+
+            ArrayList<Node> newChain = new ArrayList<>(chain);
+            ArrayList<Pair<Integer, Integer>> newEdges = new ArrayList<>(edges);
+
+            newChain.add(_node);
+            if (chain.size() > 0) {
+                newEdges.add(new ImmutablePair<>(_node.getIndex(), chain.get(chain.size() - 1).getIndex()));
+                newEdges.add(new ImmutablePair<>(chain.get(chain.size() - 1).getIndex(), _node.getIndex()));
+            }
 
             for (Node adjNode : _node.getAdjacentNodes_player(playerIndex)) {
-                if (distanceMap.get(adjNode) == -1) {
-                    if (distanceMap.get(adjNode) == -1) {
-                        queue.addFirst(adjNode);
-                    }
+                boolean doPush = false;
 
-                    int newDistance = Math.max(distanceMap.get(adjNode), distanceMap.get(_node) + 1);
-                    distanceMap.put(adjNode, newDistance);
+                if (!newEdges.contains(new ImmutablePair<>(_node.getIndex(), adjNode.getIndex()))) {
+                    for (Node sec_adjNode : adjNode.getAdjacentNodes_player(playerIndex)) {
+                        if (!chain.contains(sec_adjNode)) {
+                            doPush = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!newChain.contains(adjNode))
+                    doPush = true;
+
+                if (doPush) {
+                    stack.addFirst(adjNode);
+                    chainStack.addFirst(newChain);
+                    edgesStack.addFirst(newEdges);
+
+                    if (debug) {
+                        System.out.println("    Added Node: " + adjNode);
+                        System.out.println("    Added Chain: " + newChain);
+                    }
                 }
             }
         }
@@ -440,24 +486,54 @@ public class Board extends PureBoard implements Serializable {
             }
         }
 
+        if (debug) {
+            System.out.println("Max Distance: " + max);
+            System.out.println("Max Node: " + maxNode);
+        }
+
         return new AbstractMap.SimpleEntry<>(max, maxNode);
     }
 
-    public int getLongestRoad_length(int playerIndex) {
-        if (getPlayers().get(playerIndex).getStructures().size() < 4)
-            return 0;
-        AbstractMap.SimpleEntry<Integer, Node> result1 = getFurthestNode(playerIndex, ((Building) players.get(playerIndex).getStructures().get(0)).getLocation());
-        AbstractMap.SimpleEntry<Integer, Node> result2 = getFurthestNode(playerIndex, result1.getValue());
+    public AbstractMap.SimpleEntry<Integer, Node> getLongestRoad(int playerIndex) {
+        int structureCount = getPlayers().get(playerIndex).getStructures().size();
+        if (structureCount < 4)
+            return new AbstractMap.SimpleEntry<>((structureCount > 1) ? 1 : 0, new Node(-1));
 
-        if (playerIndex == 0) {
-            System.out.println("Distant to home: "+result1);
-            System.out.println("Final: "+result2);
-            System.out.println("Distance: "+result2.getValue());
+        ArrayList<AbstractMap.SimpleEntry<Integer, Node>> results = new ArrayList<>();
+        AbstractMap.SimpleEntry<Integer, Node> _r;
+
+        for (Structure structure : getPlayers().get(playerIndex).getStructures()) {
+            if (structure instanceof Road) {
+                Road road = (Road) structure;
+
+                if (road.getStartLocation().getConnectedRoads().size() == 1) {
+                    _r = getFurthestNode(playerIndex, road.getStartLocation());
+                    results.add(getFurthestNode(playerIndex, _r.getValue()));
+                }
+
+                if (road.getEndLocation().getConnectedRoads().size() == 1) {
+                    _r = getFurthestNode(playerIndex, road.getEndLocation());
+                    results.add(getFurthestNode(playerIndex, _r.getValue()));
+                }
+            }
         }
 
-        /*AbstractMap.SimpleEntry<Integer, Node> _result1 = getFurthestNode(playerIndex, ((Building) players.get(playerIndex).getStructures().get(2)).getLocation());
-        AbstractMap.SimpleEntry<Integer, Node> _result2 = getFurthestNode(playerIndex, _result1.getValue());*/
+        _r = getFurthestNode(playerIndex, ((Building) getPlayers().get(playerIndex).getStructures().get(0)).getLocation());
+        results.add(getFurthestNode(playerIndex, _r.getValue()));
 
-        return Math.max(result2.getKey(), -99/*_result2.getKey()*/);
+        _r = getFurthestNode(playerIndex, ((Building) getPlayers().get(playerIndex).getStructures().get(2)).getLocation());
+        results.add(getFurthestNode(playerIndex, _r.getValue()));
+
+        int maxIndex = 0;
+        int maxValue = 0;
+        for (int i = 0; i < results.size(); i++) {
+            AbstractMap.SimpleEntry<Integer, Node> result = results.get(i);
+            if (result.getKey() > maxValue) {
+                maxIndex = i;
+                maxValue = result.getKey();
+            }
+        }
+
+        return results.get(maxIndex);
     }
 }
