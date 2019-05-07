@@ -1,6 +1,9 @@
 package SeniorProject.Actions;
 
-import SeniorProject.*;
+import SeniorProject.Board;
+import SeniorProject.IAction;
+import SeniorProject.Location;
+import SeniorProject.Player;
 
 import java.io.Serializable;
 
@@ -9,14 +12,14 @@ public class CreateSettlement implements IAction, Serializable {
     Player player;
     Board board;
 
-    public CreateSettlement (int locationIndex, int playerIndex, Board board) {
+    public CreateSettlement(int locationIndex, int playerIndex, Board board) {
         this.location = board.getLocations().get(locationIndex);
         this.player = board.getPlayers().get(playerIndex);
         this.board = board;
     }
 
     @Override
-    public void execute () {
+    public void execute() {
         board.createSettlement(player, location);
     }
 

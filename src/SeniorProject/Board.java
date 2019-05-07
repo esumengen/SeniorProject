@@ -86,10 +86,10 @@ public class Board extends PureBoard implements Serializable {
         return false;
     }
 
-    static Board deepCopy (Board board) {
+    static Board deepCopy(Board board) {
         ArrayList<BasicAI> AIs = new ArrayList<>();
         for (Player player : board.getPlayers()) {
-            AIs.add(player.getAI_instance());
+            AIs.add(player.getAI());
             player.setAI(null);
         }
         System.gc();
@@ -158,7 +158,7 @@ public class Board extends PureBoard implements Serializable {
         addLog("ACTION: The robber has been moved to [Land " + land.getIndex() + "] by [Player " + (robber.getIndex() + 1) + "]");
     }
 
-    public void drawDevelopmentCard (Player player) {
+    public void drawDevelopmentCard(Player player) {
         DevelopmentCardType developmentCardType = getDeck().pickDevelopmentCard();
         player.addDevelopmentCard(developmentCardType);
 
@@ -171,7 +171,7 @@ public class Board extends PureBoard implements Serializable {
         syncPlayer(player);
         changeUpdate();
 
-        addLog("ACTION: A development card("+developmentCardType+") is drawn by [Player " + (player.getIndex() + 1) + "]");
+        addLog("ACTION: A development card(" + developmentCardType + ") is drawn by [Player " + (player.getIndex() + 1) + "]");
     }
 
     public void useDevelopmentCard_KNIGHT(Player player, Land land) {
@@ -184,7 +184,7 @@ public class Board extends PureBoard implements Serializable {
     }
 
     public void useDevelopmentCard_MONOPOLY(Player player, ResourceType resourceType) {
-        for(Player _player : players) {
+        for (Player _player : players) {
             if (_player.getIndex() != player.getIndex() && _player.getResource().get(resourceType) > 0) {
                 _player.getResource().add(resourceType, -1);
                 player.getResource().add(resourceType, 1);
@@ -304,8 +304,7 @@ public class Board extends PureBoard implements Serializable {
         if (settlementCount == 1) {
             for (Land land : location.getAdjacentLands())
                 player.getResource().add(land.getResourceType(), 1);
-        }
-        else {
+        } else {
             if (!isInitial) {
                 player.getResource().add(ResourceType.BRICK, -1);
                 player.getResource().add(ResourceType.GRAIN, -1);
@@ -399,16 +398,16 @@ public class Board extends PureBoard implements Serializable {
         ArrayList<Road> playersRoads = new ArrayList<>();
         ArrayList<Node> nodes = new ArrayList<>();
 
-        for(Structure structure : players.get(playerIndex).getStructures()){
-            if(structure instanceof Road)
+        for (Structure structure : players.get(playerIndex).getStructures()) {
+            if (structure instanceof Road)
                 playersRoads.add((Road) structure);
         }
 
-        for(Road road : playersRoads) {
-            if(!nodes.contains(road.getEndLocation()))
+        for (Road road : playersRoads) {
+            if (!nodes.contains(road.getEndLocation()))
                 nodes.add(road.getEndLocation());
 
-            if(!nodes.contains(road.getStartLocation()))
+            if (!nodes.contains(road.getStartLocation()))
                 nodes.add(road.getStartLocation());
         }
 
@@ -478,9 +477,9 @@ public class Board extends PureBoard implements Serializable {
 
         Integer max = Integer.MIN_VALUE;
         Node maxNode = null;
-        for(Node _node : distanceMap.keySet()) {
+        for (Node _node : distanceMap.keySet()) {
             int value = distanceMap.get(_node);
-            if(value > max) {
+            if (value > max) {
                 max = value;
                 maxNode = _node;
             }

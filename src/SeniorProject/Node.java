@@ -7,7 +7,7 @@ public class Node implements Serializable {
     private int index;
     private ArrayList<ArrayList<Node>> adjacentNodes;
 
-    public Node (int index) {
+    public Node(int index) {
         this.index = index;
         adjacentNodes = new ArrayList<>();
 

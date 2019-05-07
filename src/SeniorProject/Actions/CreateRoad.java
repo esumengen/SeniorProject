@@ -1,13 +1,16 @@
 package SeniorProject.Actions;
 
-import SeniorProject.*;
+import SeniorProject.Board;
+import SeniorProject.IAction;
+import SeniorProject.Location;
+import SeniorProject.Player;
 
 import java.io.Serializable;
 
 public class CreateRoad implements IAction, Serializable {
-    private Location[] locations = new Location[2];
     Player player;
     Board board;
+    private Location[] locations = new Location[2];
 
     public CreateRoad(int[] locationIndexes, int playerIndex, Board board) {
         this.locations[0] = board.getLocations().get(locationIndexes[0]);
@@ -17,7 +20,7 @@ public class CreateRoad implements IAction, Serializable {
     }
 
     @Override
-    public void execute () {
+    public void execute() {
         board.createRoad(player, locations[0], locations[1]);
     }
 

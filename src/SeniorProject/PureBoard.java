@@ -19,6 +19,7 @@ public class PureBoard implements Serializable {
     private Land robbedLand;
     private boolean isActive;
     private int longestRoad_owner;
+    private ArrayList<Integer> topLocationIndexes = new ArrayList<>();
 
     public PureBoard(ArrayList<Land> lands, ArrayList<Location> locations) {
         init();
@@ -103,11 +104,6 @@ public class PureBoard implements Serializable {
         //endregion
     }
 
-    private void init () {
-        this.isActive = false;
-        this.deck = new Deck();
-    }
-
     private static int calculateLocationCount() {
         int sum = 0;
 
@@ -115,6 +111,31 @@ public class PureBoard implements Serializable {
             sum += 2 * (2 * i + 1);
         }
         return sum;
+    }
+
+    public static PureBoard deepCopy(Serializable object) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ObjectOutputStream outputStrm = new ObjectOutputStream(outputStream);
+
+            outputStrm.writeObject(object);
+
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+            ObjectInputStream objInputStream = new ObjectInputStream(inputStream);
+
+            PureBoard pureBoard = (PureBoard) objInputStream.readObject();
+            pureBoard.setActive(false);
+
+            return pureBoard;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void init() {
+        this.isActive = false;
+        this.deck = new Deck();
     }
 
     private void makeAdjacent(Location location1, Location location2) {
@@ -151,7 +172,7 @@ public class PureBoard implements Serializable {
             for (Location location : locations) {
                 harbor_str = ini.get("HarborTypes", Integer.toString(location.getIndex()), String.class);
                 harbor_str = Global.getRidOf_quotationMarks(harbor_str);
-                if(!harbor_str.equals("null")){
+                if (!harbor_str.equals("null")) {
                     location.setHarborType(HarborType.valueOf(harbor_str));
                 }
             }
@@ -164,17 +185,14 @@ public class PureBoard implements Serializable {
         }
     }
 
-    private ArrayList<Integer> topLocationIndexes = new ArrayList<>();
-
-    private int getTopLocation_index (int landIndex) {
+    private int getTopLocation_index(int landIndex) {
         if (topLocationIndexes.size() > landIndex)
             return topLocationIndexes.get(landIndex);
         else if (landIndex == 0) {
             topLocationIndexes.add(1);
             return 1;
-        }
-        else {
-            int result = getTopLocation_index(landIndex-1) + 2;
+        } else {
+            int result = getTopLocation_index(landIndex - 1) + 2;
 
             int i = lands.get(landIndex).getI();
             int j = lands.get(landIndex).getJ();
@@ -224,7 +242,7 @@ public class PureBoard implements Serializable {
             // Eğer başlangıç hamlesiyse, iki ucundan birinde mutlaka bir ev olmalı ve hiç yol olmamalı.
             if (isInitial) {
                 if (!(countStructures(StructureType.SETTLEMENT, start) == 1 && countStructures(StructureType.ROAD, start) == 0)
-                && !(countStructures(StructureType.SETTLEMENT, end) == 1 && countStructures(StructureType.ROAD, end) == 0))
+                        && !(countStructures(StructureType.SETTLEMENT, end) == 1 && countStructures(StructureType.ROAD, end) == 0))
                     return false;
             }
 
@@ -253,8 +271,7 @@ public class PureBoard implements Serializable {
                 // Tam o location'a bağlı en az bir yolu bulunmalı.
                 if (countStructures(StructureType.ROAD, settlement.getLocation(), settlement.getPlayer().getIndex()) == 0)
                     return false;
-            }
-            else {
+            } else {
                 // Köşede olmamalı.
                 /*if (((Building) structure).getLocation().isCorner())
                     return false;*/
@@ -316,8 +333,7 @@ public class PureBoard implements Serializable {
 
             if (type == StructureType.ROAD)
                 count /= 2;
-        }
-        else {
+        } else {
             if (type == StructureType.ROAD) {
                 for (Structure structure : location.getStructures()) {
                     if (structure instanceof Road && (playerIndex == -1 || structure.getPlayer().getIndex() == playerIndex))
@@ -337,26 +353,6 @@ public class PureBoard implements Serializable {
         }
 
         return count;
-    }
-
-    public static PureBoard deepCopy(Serializable object) {
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            ObjectOutputStream outputStrm = new ObjectOutputStream(outputStream);
-
-            outputStrm.writeObject(object);
-
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
-            ObjectInputStream objInputStream = new ObjectInputStream(inputStream);
-
-            PureBoard pureBoard = (PureBoard) objInputStream.readObject();
-            pureBoard.setActive(false);
-
-            return pureBoard;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     public boolean isActive() {

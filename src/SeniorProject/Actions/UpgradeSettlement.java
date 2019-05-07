@@ -1,6 +1,9 @@
 package SeniorProject.Actions;
 
-import SeniorProject.*;
+import SeniorProject.Board;
+import SeniorProject.IAction;
+import SeniorProject.Location;
+import SeniorProject.Player;
 
 import java.io.Serializable;
 

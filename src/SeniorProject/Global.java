@@ -15,18 +15,17 @@ enum OSType {
 }
 
 public class Global {
-    static final int PLAYER_COUNT = 4;
-    static final OSType OS_TYPE = System.getProperty("os.name").toLowerCase().contains("windows") ? OSType.WINDOWS : OSType.MAC;
-    static final String WORKING_PATH = OS_TYPE == OSType.WINDOWS ? System.getProperty("user.home") + "\\AppData\\Local\\Catan" : "/Users/emresumengen/Desktop/deneme";
-    static final String ENVIRONMENT_FILE = "environment.ini";
-    static final String ACTIONS_FILE = "actions.txt";
-    static final String LOG_FILE = "log.txt";
-    static final String COMMUNICATION_FILE = "communication.ini";
+    public static final int PLAYER_COUNT = 4;
+    public static final OSType OS_TYPE = System.getProperty("os.name").toLowerCase().contains("windows") ? OSType.WINDOWS : OSType.MAC;
+    public static final String WORKING_PATH = OS_TYPE == OSType.WINDOWS ? System.getProperty("user.home") + "\\AppData\\Local\\Catan" : "/Users/emresumengen/Desktop/deneme";
+    public static final String ENVIRONMENT_FILE = "environment.ini";
+    public static final String ACTIONS_FILE = "actions.txt";
+    public static final String LOG_FILE = "log.txt";
+    public static final String COMMUNICATION_FILE = "communication.ini";
 
-    static public Random randomGenerator = new Random();
+    public static Random randomGenerator = new Random();
 
-
-    static String get_working_path(String filename) {
+    public static String get_working_path(String filename) {
         String file_path = Global.WORKING_PATH;
 
         if (Global.OS_TYPE == OSType.WINDOWS)
@@ -39,15 +38,15 @@ public class Global {
         return file_path;
     }
 
-    static String getRidOf_quotationMarks(String string) {
+    public static String getRidOf_quotationMarks(String string) {
         return String.copyValueOf(string.toCharArray(), 1, string.length() - 2);
     }
 
-    static void addLog(String text) {
+    public static void addLog(String text) {
         createTextFile(LOG_FILE, text);
     }
 
-    static void createTextFile(String filename, String text) {
+    public static void createTextFile(String filename, String text) {
         BufferedWriter bufferedWriter = null;
         FileWriter fileWriter = null;
 

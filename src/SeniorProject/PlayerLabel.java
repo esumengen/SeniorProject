@@ -7,7 +7,7 @@ public class PlayerLabel extends JLabel implements IObserver {
     Player player;
     boolean stateControl;
 
-    public PlayerLabel (Player player) {
+    public PlayerLabel(Player player) {
         super("");
 
         this.stateControl = false;
@@ -16,7 +16,7 @@ public class PlayerLabel extends JLabel implements IObserver {
         player.addObserver(this);
     }
 
-    public PlayerLabel (Player player, ResourceType resourceType) {
+    public PlayerLabel(Player player, ResourceType resourceType) {
         this(player);
 
         this.resourceType = resourceType;

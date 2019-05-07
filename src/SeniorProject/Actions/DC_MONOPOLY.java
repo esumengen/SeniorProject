@@ -20,7 +20,7 @@ public class DC_MONOPOLY implements IAction, Serializable {
 
     @Override
     public void execute() {
-        board.useDevelopmentCard_MONOPOLY(player,resourceType);
+        board.useDevelopmentCard_MONOPOLY(player, resourceType);
     }
 
     @Override

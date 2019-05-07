@@ -1,6 +1,8 @@
 package SeniorProject.Actions;
 
-import SeniorProject.*;
+import SeniorProject.Board;
+import SeniorProject.IAction;
+import SeniorProject.Player;
 
 import java.io.Serializable;
 
@@ -18,7 +20,7 @@ public class RollDice implements IAction, Serializable {
     }
 
     @Override
-    public void execute () {
+    public void execute() {
         board.rollDice(player, dices[0], dices[1]);
     }
 

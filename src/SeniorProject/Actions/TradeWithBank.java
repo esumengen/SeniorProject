@@ -60,7 +60,7 @@ public class TradeWithBank implements IAction, Serializable {
 
     @Override
     public String toString() {
-        return player + " TRA " + "Given: "+givenResources+", Taken: "+takenResources;
+        return player + " TRA " + "Given: " + givenResources + ", Taken: " + takenResources;
     }
 
 }

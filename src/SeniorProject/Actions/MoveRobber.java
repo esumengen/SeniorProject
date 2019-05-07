@@ -20,7 +20,7 @@ public class MoveRobber implements IAction, Serializable {
     }
 
     @Override
-    public void execute () {
+    public void execute() {
         board.moveRobber(player, land);
     }
 

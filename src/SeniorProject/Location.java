@@ -25,7 +25,6 @@ public class Location extends Node implements Serializable {
     }
 
 
-
     public ArrayList<Land> getAdjacentLands() {
         return adjacentLands;
     }

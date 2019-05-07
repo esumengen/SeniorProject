@@ -23,7 +23,7 @@ public class State implements Serializable {
     private boolean isInitial;
     private int turn;
 
-    public State (StateBuilder stateBuilder) {
+    public State(StateBuilder stateBuilder) {
         victoryPoints = stateBuilder.victoryPoints;
         allResources = stateBuilder.allResources;
         allDevelopmentCards = stateBuilder.allDevelopmentCards;
@@ -211,14 +211,13 @@ public class State implements Serializable {
                     int settlementCount_my = pureBoard.countStructures(StructureType.SETTLEMENT, player.getIndex());
                     int roadCount_my = pureBoard.countStructures(StructureType.ROAD, player.getIndex());
 
-                    if (settlementCount_my+roadCount_my < turn*2) {
+                    if (settlementCount_my + roadCount_my < turn * 2) {
                         if (settlementCount_my == roadCount_my)
                             affordableMoves.add(MoveType.CreateSettlement);
                         else
                             affordableMoves.add(MoveType.CreateRoad);
                     }
-                }
-                else {
+                } else {
                     if (Board.isAffordable(MoveType.CreateSettlement, player.getResource()))
                         affordableMoves.add(MoveType.CreateSettlement);
                     if (Board.isAffordable(MoveType.CreateRoad, player.getResource()))

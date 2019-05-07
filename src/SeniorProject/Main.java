@@ -20,6 +20,7 @@ public class Main {
         for (Player player : players) {
             player.setPureBoard(board);
             player.createAI();
+            player.createNegotiationAgent();
         }
 
         Synchronizer synchronizer = new Synchronizer(board);
@@ -41,8 +42,7 @@ public class Main {
                     Wini communication_ini = null;
                     try {
                         communication_ini = new Wini(communication_file);
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         new Message(e.getMessage() + " - 12");
                     }
 

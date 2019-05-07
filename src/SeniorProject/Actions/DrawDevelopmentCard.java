@@ -16,7 +16,7 @@ public class DrawDevelopmentCard implements IAction, Serializable {
     }
 
     @Override
-    public void execute () {
+    public void execute() {
         board.drawDevelopmentCard(player);
     }
 

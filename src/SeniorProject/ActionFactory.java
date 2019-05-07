@@ -5,7 +5,7 @@ import SeniorProject.Actions.*;
 import java.util.ArrayList;
 
 public class ActionFactory {
-    static public IAction getAction (String actionText, Board board) {
+    static public IAction getAction(String actionText, Board board) {
         int playerIndex;
         ArrayList<Integer> actionParam = new ArrayList<>();
         String actionType;
@@ -49,8 +49,7 @@ public class ActionFactory {
 
                 if (objectType.equals("B")) {  //P0 [TR 35 35 35 35 35 35 35 35 35 35] B
                     return new TradeWithBank(givenResources, takenResources, playerIndex, board);
-                }
-                else { //P0 [TR 35 35 35 35 35 35 35 35 35 35] 1
+                } else { //P0 [TR 35 35 35 35 35 35 35 35 35 35] 1
                     // TODO
                     return new TradeWithBank(givenResources, takenResources, playerIndex, board);
                 }
