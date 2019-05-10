@@ -1,5 +1,5 @@
 package SeniorProject;
 
 public enum ResourceType {
-    BRICK, ORE, GRAIN, LUMBER, WOOL
+    GRAIN, LUMBER, WOOL, ORE, BRICK
 }

@@ -161,12 +161,77 @@ public class BasicAI implements IAI, Serializable {
 
     @Override
     public void updateBidRanking() {
+        Resource desiredResource;
+        Action desiredAction;
         bidRanking.clear();
 
-        bidRanking.add(new Bid(new Resource(5, -1, 0, 0, 0)));
-        bidRanking.add(new Bid(new Resource(5, 0, -1, 0, 0)));
-        bidRanking.add(new Bid(new Resource(5, 0, 0, -1, 0)));
-        bidRanking.add(new Bid(new Resource(5, 0, 0, 0, -1)));
+        for(int i = 0; i < Action.values().length -1; i++) {
+            desiredResource = new Resource(owner.getResource());
+            desiredAction = Action.values()[i];
+            if(desiredAction == Action.CreateRoad) {
+                desiredResource.disjoin(Road.COST);
+                if(desiredResource.sum() >= 0)         // checks if the desired Resource have potential
+                    analyze(desiredResource);
+
+            }
+            else if (desiredAction == Action.CreateSettlement) {
+                desiredResource.disjoin(Settlement.COST);
+                if(desiredResource.sum() >= 0)         // checks if the desired Resource have potential
+                    analyze(desiredResource);
+            }
+            else if (desiredAction == Action.UpgradeSettlement) {
+                desiredResource.disjoin(City.COST);
+                if(desiredResource.sum() >= 0)         // checks if the desired Resource have potential
+                    analyze(desiredResource);
+            }
+            else if (desiredAction == Action.DrawDevCard) {
+                desiredResource.disjoin(DrawDevelopmentCard.COST);
+                if(desiredResource.sum() >= 0)         // checks if the desired Resource have potential
+                    analyze(desiredResource);
+            }
+            else {
+                //generic ranking
+                bidRanking.add(new Bid(new Resource(5, -1, 0, 0, 0)));
+                bidRanking.add(new Bid(new Resource(5, 0, -1, 0, 0)));
+                bidRanking.add(new Bid(new Resource(5, 0, 0, -1, 0)));
+                bidRanking.add(new Bid(new Resource(5, 0, 0, 0, -1)));
+
+            }
+        }
+    }
+
+    private void analyze(Resource desiredResource) {
+        Resource wantedResource = new Resource();
+        Resource freeResource = new Resource(desiredResource);
+        for(ResourceType type : desiredResource.keySet()){
+            if(freeResource.get(type) < 0) {
+                wantedResource.add(type, -freeResource.get(type));
+                freeResource.add(type, -freeResource.get(type));
+            }
+        }
+        for(ResourceType type : wantedResource.keySet()){
+            if(wantedResource.get(type) > 0){
+                createBids(type, wantedResource.get(type), freeResource);
+            }
+        }
+    }
+
+    private void createBids(ResourceType type, int need, Resource freeResource) {
+        if(need > 1)
+            createBids(type, need - 1, freeResource);
+
+        Resource bid = new Resource();
+
+
+        for(ResourceType _type : freeResource.keySet()){
+            bid.clear();
+            bid = new Resource();// lazım mı bu satır ?
+            bid.add(type, need);
+            if(freeResource.get(_type) == need) {
+                bid.add(_type, -need);
+                bidRanking.add(new Bid(bid));
+            }
+        }
     }
 
     public AbstractMap.SimpleEntry<Integer, ArrayList<Road>> getShortestPath (Location locationSource, Location locationTarget) {
