@@ -24,7 +24,7 @@ public class Land implements Serializable {
     private LandType type;
     private ArrayList<Location> adjacentLocations;
     private int diceNo;
-    private double diceChance = 0;
+    private double diceChance;
     private int i;
     private int j;
     private PureBoard pureBoard;
@@ -72,11 +72,13 @@ public class Land implements Serializable {
 
     private double calculateDiceChance() {
         double numerator = 0.0;
+
         for (int k = 1; k <= 6; k++) {
             for (int l = 1; l <= 6; l++) {
                 if (k + l == diceNo) numerator++;
             }
         }
+
         return numerator / 36;
     }
 

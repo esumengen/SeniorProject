@@ -72,7 +72,7 @@ public class Player implements Serializable, IObservable {
                 actionList_str += action_str + "\r\n";
         }
 
-        AI_instance.clearVirtualBoards();
+        AI_instance.clearSystem();
 
         Global.createTextFile(fileName, actionList_str);
 

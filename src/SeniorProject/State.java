@@ -68,8 +68,8 @@ public class State implements Serializable {
     public String toString() {
         String string = ""/*"Turn "+getTurn()+"\n"*/;
 
-        for (int i = 0; i < Global.PLAYER_COUNT; i++)
-            string += "P" + (i + 1) + "'s Longest Road: " + longestRoad_lengths.get(i) + "\n";
+        /*for (int i = 0; i < Global.PLAYER_COUNT; i++)
+            string += "P" + (i + 1) + "'s Longest Road: " + longestRoad_lengths.get(i) + "\n";*/
 
         for (int i = 0; i < Global.PLAYER_COUNT; i++)
             string += "P" + (i + 1) + "'s Resource: " + allResources.get(i) + ((i != Global.PLAYER_COUNT - 1) ? "\n" : "");

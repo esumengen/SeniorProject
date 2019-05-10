@@ -2,7 +2,9 @@ package SeniorProject.Negotiation;
 
 import SeniorProject.Player;
 
-public class BasicNegotiationAgent implements NegotiationAgent {
+import java.io.Serializable;
+
+public class BasicNegotiationAgent implements NegotiationAgent, Serializable {
     private Player owner;
 
     public BasicNegotiationAgent (Player owner) {

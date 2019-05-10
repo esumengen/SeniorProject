@@ -8,7 +8,7 @@ import SeniorProject.Player;
 import java.io.Serializable;
 
 public class CreateSettlement implements IAction, Serializable {
-    Location location;
+    private Location location;
     Player player;
     Board board;
 
@@ -16,6 +16,18 @@ public class CreateSettlement implements IAction, Serializable {
         this.location = board.getLocations().get(locationIndex);
         this.player = board.getPlayers().get(playerIndex);
         this.board = board;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public Board getBoard() {
+        return board;
     }
 
     @Override
