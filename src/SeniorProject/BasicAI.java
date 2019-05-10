@@ -39,6 +39,8 @@ public class BasicAI implements IAI, Serializable {
 
         ArrayList<NegotiationAgent> otherAgents = new ArrayList<>();
         for (Player player : virtualBoard.getPlayers()) {
+            player.getAI().updateBidRanking();
+
             if (player != owner)
                 otherAgents.add(player.getNegotiationAgent());
         }

@@ -1,5 +1,7 @@
 package SeniorProject.Negotiation;
 
+import SeniorProject.Global;
+
 public class Negotiator {
     private NegotiationSession session;
     private static Negotiator instance = new Negotiator();
@@ -12,29 +14,38 @@ public class Negotiator {
     }
 
     public void setSession(NegotiationSession session) {
-        session.destroy();
+        clearSession();
         this.session = session;
     }
 
     public void clearSession() {
         if (session != null)
-            session.destroy();
+            session.terminate();
 
         this.session = null;
     }
 
     public boolean startSession() {
-        int maximumOffers = 500;
+        int maximumOffers = 100;
         int countOffers = 0;
 
+        int sequentialPass = 0;
         while (countOffers++ < maximumOffers) {
             Bid offeredBid = session.getOwnerAgent().handleOffer(session);
             session.addGivenBid(offeredBid, session.getBidTarget());
 
+            if (offeredBid == null) {
+                sequentialPass++;
+                if (sequentialPass == Global.PLAYER_COUNT-1)
+                    break;
+            }
+            else
+                sequentialPass = 0;
+
             Bid response = session.getBidTarget().handleOffer(session, offeredBid);
             session.addTakenBid(response, session.getBidTarget());
 
-            boolean isAccepted = session.getOwnerAgent().isAccepted(session, response);
+            boolean isAccepted = (response != null) && session.getOwnerAgent().isAccepted(session, response);
 
             if (isAccepted) {
                 session.complete(response);

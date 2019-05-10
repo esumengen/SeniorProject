@@ -3,6 +3,8 @@ package SeniorProject;
 import java.io.Serializable;
 
 public class Road extends Structure implements Serializable {
+    public static final Resource COST = new Resource(0, 1, 0, 0, 1);
+
     private Location[] locations;
 
     public Road(Location startLocation, Location endLocation, Player player) {

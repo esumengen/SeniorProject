@@ -6,7 +6,6 @@ import java.util.HashMap;
 public class NegotiationSession {
     private NegotiationAgent ownerAgent;
     private ArrayList<NegotiationAgent> otherAgents;
-    private ArrayList<Bid> bidRanking;
     private NegotiationAgent bidTarget;
 
     private boolean isCompleted = false;
@@ -26,7 +25,6 @@ public class NegotiationSession {
 
         this.ownerAgent = ownerAgent;
         this.otherAgents = this.otherAgents;
-        this.bidRanking = bidRanking;
     }
 
     public void addGivenBid (Bid bid, NegotiationAgent agent) {
@@ -35,10 +33,6 @@ public class NegotiationSession {
 
     public void addTakenBid (Bid bid, NegotiationAgent agent) {
         takenBids.get(agent).add(bid);
-    }
-
-    public ArrayList<Bid> getBidRanking() {
-        return bidRanking;
     }
 
     public ArrayList<NegotiationAgent> getOtherAgents() {
@@ -64,7 +58,7 @@ public class NegotiationSession {
         complete(null);
     }
 
-    public void destroy() {
+    public void terminate() {
         isDestroyed = true;
     }
 
@@ -82,5 +76,13 @@ public class NegotiationSession {
 
     public void setCompleted(boolean completed) {
         isCompleted = completed;
+    }
+
+    public NegotiationAgent getAcceptedOffer_owner() {
+        return acceptedOffer_owner;
+    }
+
+    public Bid getAcceptedOffer() {
+        return acceptedOffer;
     }
 }
