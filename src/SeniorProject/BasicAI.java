@@ -134,9 +134,12 @@ public class BasicAI implements IAI, Serializable {
             createBids(type, need - 1, freeResource);
 
         Resource bid = new Resource();
-        bid.add(type, need);
+
 
         for(ResourceType _type : freeResource.keySet()){
+            bid.clear();
+            bid = new Resource();
+            bid.add(type, need);
             if(freeResource.get(_type) == need) {
                 bid.add(_type, -need);
                 bidRanking.add(new Bid(bid));
