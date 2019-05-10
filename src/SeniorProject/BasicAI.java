@@ -1,6 +1,8 @@
 package SeniorProject;
 
+import SeniorProject.Actions.Action;
 import SeniorProject.Actions.CreateSettlement;
+import SeniorProject.Actions.DrawDevelopmentCard;
 import SeniorProject.Negotiation.Bid;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -165,7 +167,7 @@ public class BasicAI implements IAI, Serializable {
         Action desiredAction;
         bidRanking.clear();
 
-        for(int i = 0; i < Action.values().length -1; i++) {
+        for(int i = 0; i < Action.values().length - 1; i++) {
             desiredResource = new Resource(owner.getResource());
             desiredAction = Action.values()[i];
             if(desiredAction == Action.CreateRoad) {
@@ -195,20 +197,24 @@ public class BasicAI implements IAI, Serializable {
                 bidRanking.add(new Bid(new Resource(5, 0, -1, 0, 0)));
                 bidRanking.add(new Bid(new Resource(5, 0, 0, -1, 0)));
                 bidRanking.add(new Bid(new Resource(5, 0, 0, 0, -1)));
-
             }
+
+            Bid.setBestType(ResourceType.BRICK);
+            Collections.sort(bidRanking);
         }
     }
 
     private void analyze(Resource desiredResource) {
         Resource wantedResource = new Resource();
         Resource freeResource = new Resource(desiredResource);
+
         for(ResourceType type : desiredResource.keySet()){
             if(freeResource.get(type) < 0) {
                 wantedResource.add(type, -freeResource.get(type));
-                freeResource.add(type, -freeResource.get(type));
+                freeResource.replace(type, 0);
             }
         }
+
         for(ResourceType type : wantedResource.keySet()){
             if(wantedResource.get(type) > 0){
                 createBids(type, wantedResource.get(type), freeResource);
@@ -220,16 +226,59 @@ public class BasicAI implements IAI, Serializable {
         if(need > 1)
             createBids(type, need - 1, freeResource);
 
-        Resource bid = new Resource();
+        Resource bid;
+        for(ResourceType givenType : freeResource.keySet()) {
+            if (freeResource.get(givenType) > 0) {
+                bid = new Resource();
 
+                bid.add(type, need);
 
-        for(ResourceType _type : freeResource.keySet()){
-            bid.clear();
-            bid = new Resource();// lazım mı bu satır ?
-            bid.add(type, need);
-            if(freeResource.get(_type) == need) {
-                bid.add(_type, -need);
-                bidRanking.add(new Bid(bid));
+                ArrayList<ResourceType> freeTypeList = new ArrayList<>();
+                for (int i = 0; i < ResourceType.values().length; i++) {
+                    if (ResourceType.values()[i] != type)
+                        freeTypeList.add(ResourceType.values()[i]);
+                }
+
+                int max[] = new int[4];
+                max[0] = freeTypeList.size() > 0 ? Math.min(freeResource.get(freeTypeList.get(0)), need + 2) : 0;
+                max[1] = freeTypeList.size() > 1 ? Math.min(freeResource.get(freeTypeList.get(1)), need + 2) : 0;
+                max[2] = freeTypeList.size() > 2 ? Math.min(freeResource.get(freeTypeList.get(2)), need + 2) : 0;
+                max[3] = freeTypeList.size() > 3 ? Math.min(freeResource.get(freeTypeList.get(3)), need + 2) : 0;
+
+                int givenCount[] = new int[4];
+                for (givenCount[0] = max[0]; givenCount[0] >= 0; givenCount[0]--) {
+                    for (givenCount[1] = Math.min(max[1], need + 2 - givenCount[0]); givenCount[1] >= 0; givenCount[1]--) {
+                        for (givenCount[2] = Math.min(max[2], need + 2 - givenCount[0] - givenCount[1]); givenCount[2] >= 0; givenCount[2]--) {
+                            for (givenCount[3] = Math.min(max[3], need + 2 - givenCount[0] - givenCount[1] - givenCount[2]); givenCount[3] >= 0; givenCount[3]--) {
+                                if (freeTypeList.size() > 0)
+                                    bid.add(freeTypeList.get(0), -givenCount[0]);
+
+                                if (freeTypeList.size() > 1)
+                                    bid.add(freeTypeList.get(1), -givenCount[1]);
+
+                                if (freeTypeList.size() > 2)
+                                    bid.add(freeTypeList.get(2), -givenCount[2]);
+
+                                if (freeTypeList.size() > 3)
+                                    bid.add(freeTypeList.get(3), -givenCount[3]);
+
+                                bidRanking.add(new Bid(bid));
+
+                                if (freeTypeList.size() > 0)
+                                    bid.add(freeTypeList.get(0), givenCount[0]);
+
+                                if (freeTypeList.size() > 1)
+                                    bid.add(freeTypeList.get(1), givenCount[1]);
+
+                                if (freeTypeList.size() > 2)
+                                    bid.add(freeTypeList.get(2), givenCount[2]);
+
+                                if (freeTypeList.size() > 3)
+                                    bid.add(freeTypeList.get(3), givenCount[3]);
+                            }
+                        }
+                    }
+                }
             }
         }
     }

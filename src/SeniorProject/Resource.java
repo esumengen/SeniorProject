@@ -28,13 +28,13 @@ public class Resource extends HashMap<ResourceType, Integer> {
             put(resourceType, get(resourceType) + value);
     }
 
-    public void join(Resource resource) {
+    public void join( Resource resource) {
         for(ResourceType type : this.keySet()){
             this.add(type, resource.get(type));
         }
     }
 
-    public void disjoin(Resource resource) {
+    public void disjoin (Resource resource) {
         for(ResourceType type : this.keySet()){
             this.add(type, -resource.get(type));
         }
