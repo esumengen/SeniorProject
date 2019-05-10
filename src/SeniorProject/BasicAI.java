@@ -1,5 +1,6 @@
 package SeniorProject;
 
+import SeniorProject.Actions.Action;
 import SeniorProject.Negotiation.Bid;
 import SeniorProject.Negotiation.NegotiationAgent;
 import SeniorProject.Negotiation.NegotiationSession;
@@ -70,7 +71,27 @@ public class BasicAI implements IAI, Serializable {
 
     @Override
     public void updateBidRanking() {
+        Resource desiredResource = new Resource();
+        desiredResource = owner.getResource();
+        Action desiredAction;
         bidRanking.clear();
+
+        for(int i = 0; i < Action.values().length -1; i++) {
+            desiredAction = Action.values()[i];
+            if(desiredAction == Action.CreateRoad) {
+            }
+            else if (desiredAction == Action.CreateSettlement) {
+
+            }
+            else if (desiredAction == Action.UpgradeSettlement) {
+
+            }
+            else if (desiredAction == Action.DrawDevCard) {
+
+            }
+        }
+
+
 
         bidRanking.add(new Bid(new Resource(5, -1, 0, 0, 0)));
         bidRanking.add(new Bid(new Resource(5, 0, -1, 0, 0)));

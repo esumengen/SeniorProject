@@ -28,6 +28,12 @@ public class Resource extends HashMap<ResourceType, Integer> {
             put(resourceType, get(resourceType) + value);
     }
 
+    public void join(Resource resource) {
+        for(ResourceType type : this.keySet()){
+            this.add(type, resource.get(type));
+        }
+    }
+
     @Override
     public String toString() {
         return "{GR(" + get(ResourceType.GRAIN) + ") LU(" + get(ResourceType.LUMBER) + ") WO(" + get(ResourceType.WOOL) + ") OR(" + get(ResourceType.ORE) + ") BR(" + get(ResourceType.BRICK) + ")}";
