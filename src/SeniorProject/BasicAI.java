@@ -79,28 +79,28 @@ public class BasicAI implements IAI, Serializable {
         bidRanking.clear();
 
         for(int i = 0; i < Action.values().length -1; i++) {
-            desiredResource = owner.getResource();
+            desiredResource = new Resource(owner.getResource());
             desiredAction = Action.values()[i];
             if(desiredAction == Action.CreateRoad) {
                 desiredResource.disjoin(Road.COST);
                 if(desiredResource.sum() >= 0)         // checks if the desired Resource have potential
-                    createBids(desiredResource);
+                    analyze(desiredResource);
 
             }
             else if (desiredAction == Action.CreateSettlement) {
                 desiredResource.disjoin(Settlement.COST);
                 if(desiredResource.sum() >= 0)         // checks if the desired Resource have potential
-                    createBids(desiredResource);
+                    analyze(desiredResource);
             }
             else if (desiredAction == Action.UpgradeSettlement) {
                 desiredResource.disjoin(City.COST);
                 if(desiredResource.sum() >= 0)         // checks if the desired Resource have potential
-                    createBids(desiredResource);
+                    analyze(desiredResource);
             }
             else if (desiredAction == Action.DrawDevCard) {
                 desiredResource.disjoin(DrawDevelopmentCard.COST);
                 if(desiredResource.sum() >= 0)         // checks if the desired Resource have potential
-                    createBids(desiredResource);
+                    analyze(desiredResource);
             }
             else {
                 //generic ranking
@@ -113,19 +113,34 @@ public class BasicAI implements IAI, Serializable {
         }
     }
 
-    private void createBids(Resource desiredResource) {
+    private void analyze(Resource desiredResource) {
         Resource wantedResource = new Resource();
+        Resource freeResource = new Resource(desiredResource);
         for(ResourceType type : desiredResource.keySet()){
-            if(desiredResource.get(type) < 0) {
-                wantedResource.add(type, -desiredResource.get(type));
-                desiredResource.add(type, -desiredResource.get(type));
+            if(freeResource.get(type) < 0) {
+                wantedResource.add(type, -freeResource.get(type));
+                freeResource.add(type, -freeResource.get(type));
             }
         }
+        for(ResourceType type : wantedResource.keySet()){
+            if(wantedResource.get(type) > 0){
+                createBids(type, wantedResource.get(type), freeResource);
+            }
+        }
+    }
 
+    private void createBids(ResourceType type, int need, Resource freeResource) {
+        if(need > 1)
+            createBids(type, need - 1, freeResource);
 
+        Resource bid = new Resource();
+        bid.add(type, need);
 
-
-
-
+        for(ResourceType _type : freeResource.keySet()){
+            if(freeResource.get(_type) == need) {
+                bid.add(_type, -need);
+                bidRanking.add(new Bid(bid));
+            }
+        }
     }
 }
