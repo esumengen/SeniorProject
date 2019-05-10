@@ -1,6 +1,7 @@
 package SeniorProject;
 
 import SeniorProject.Actions.Action;
+import SeniorProject.Actions.DrawDevelopmentCard;
 import SeniorProject.Negotiation.Bid;
 import SeniorProject.Negotiation.NegotiationAgent;
 import SeniorProject.Negotiation.NegotiationSession;
@@ -73,31 +74,58 @@ public class BasicAI implements IAI, Serializable {
 
     @Override
     public void updateBidRanking() {
-        Resource desiredResource = new Resource();
-        desiredResource = owner.getResource();
+        Resource desiredResource;
         Action desiredAction;
         bidRanking.clear();
 
         for(int i = 0; i < Action.values().length -1; i++) {
+            desiredResource = owner.getResource();
             desiredAction = Action.values()[i];
             if(desiredAction == Action.CreateRoad) {
+                desiredResource.disjoin(Road.COST);
+                if(desiredResource.sum() >= 0)         // checks if the desired Resource have potential
+                    createBids(desiredResource);
+
             }
             else if (desiredAction == Action.CreateSettlement) {
-
+                desiredResource.disjoin(Settlement.COST);
+                if(desiredResource.sum() >= 0)         // checks if the desired Resource have potential
+                    createBids(desiredResource);
             }
             else if (desiredAction == Action.UpgradeSettlement) {
-
+                desiredResource.disjoin(City.COST);
+                if(desiredResource.sum() >= 0)         // checks if the desired Resource have potential
+                    createBids(desiredResource);
             }
             else if (desiredAction == Action.DrawDevCard) {
+                desiredResource.disjoin(DrawDevelopmentCard.COST);
+                if(desiredResource.sum() >= 0)         // checks if the desired Resource have potential
+                    createBids(desiredResource);
+            }
+            else {
+                //generic ranking
+                bidRanking.add(new Bid(new Resource(5, -1, 0, 0, 0)));
+                bidRanking.add(new Bid(new Resource(5, 0, -1, 0, 0)));
+                bidRanking.add(new Bid(new Resource(5, 0, 0, -1, 0)));
+                bidRanking.add(new Bid(new Resource(5, 0, 0, 0, -1)));
 
+            }
+        }
+    }
+
+    private void createBids(Resource desiredResource) {
+        Resource wantedResource = new Resource();
+        for(ResourceType type : desiredResource.keySet()){
+            if(desiredResource.get(type) < 0) {
+                wantedResource.add(type, -desiredResource.get(type));
+                desiredResource.add(type, -desiredResource.get(type));
             }
         }
 
 
 
-        bidRanking.add(new Bid(new Resource(5, -1, 0, 0, 0)));
-        bidRanking.add(new Bid(new Resource(5, 0, -1, 0, 0)));
-        bidRanking.add(new Bid(new Resource(5, 0, 0, -1, 0)));
-        bidRanking.add(new Bid(new Resource(5, 0, 0, 0, -1)));
+
+
+
     }
 }
