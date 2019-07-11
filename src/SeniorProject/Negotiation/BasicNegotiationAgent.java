@@ -7,7 +7,7 @@ import java.io.Serializable;
 public class BasicNegotiationAgent implements NegotiationAgent, Serializable {
     private Player owner;
 
-    public BasicNegotiationAgent (Player owner) {
+    public BasicNegotiationAgent(Player owner) {
         this.owner = owner;
     }
 

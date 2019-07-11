@@ -25,5 +25,20 @@ public class Road extends Structure implements Serializable {
         return locations[1];
     }
 
+    @Override
+    public String toString() {
+        return "Road("+getStartLocation()+", "+getEndLocation()+")";
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Road) {
+            return ((Road) obj).getEndLocation().getIndex() == getEndLocation().getIndex()
+                    && ((Road) obj).getStartLocation().getIndex() == getStartLocation().getIndex() ||
+                    ((Road) obj).getStartLocation().getIndex() == getEndLocation().getIndex()
+                    && ((Road) obj).getEndLocation().getIndex() == getStartLocation().getIndex();
+        }
+
+        return false;
+    }
 }

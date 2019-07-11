@@ -33,6 +33,15 @@ public class Location extends Node implements Serializable {
         return structures;
     }
 
+    public Building getBuilding() {
+        for (Structure structure : structures) {
+            if (structure instanceof Building)
+                return (Building) structure;
+        }
+
+        return null;
+    }
+
     public void addStructures(Structure structure) {
         structures.add(structure);
     }
@@ -105,5 +114,14 @@ public class Location extends Node implements Serializable {
     @Override
     public String toString() {
         return "Loc" + getIndex();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Location) {
+            return ((Location) obj).getIndex() == getIndex();
+        }
+
+        return false;
     }
 }

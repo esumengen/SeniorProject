@@ -36,4 +36,9 @@ public class Node implements Serializable {
     public void setAdjacentNodes_manual(ArrayList<Node> adjacentNodes_manual) {
         this.adjacentNodes_manual = adjacentNodes_manual;
     }
+
+    @Override
+    public String toString() {
+        return "Index: " + index;
+    }
 }

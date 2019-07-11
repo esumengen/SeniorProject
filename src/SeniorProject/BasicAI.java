@@ -1,11 +1,10 @@
 package SeniorProject;
 
 import SeniorProject.Actions.Action;
+import SeniorProject.Actions.CreateRoad;
 import SeniorProject.Actions.CreateSettlement;
 import SeniorProject.Actions.DrawDevelopmentCard;
 import SeniorProject.Negotiation.Bid;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
 import java.util.*;
@@ -47,41 +46,200 @@ public class BasicAI implements IAI, Serializable {
 
         possibleActions = virtualBoard.getState().getPossibleActions(owner.getIndex());
 
-        ArrayList<CreateSettlement> actions_settlements = getActions_of(possibleActions, CreateSettlement.class);
+        while (true) {
+            ArrayList<CreateSettlement> actions_settlements = getActions_of(possibleActions, CreateSettlement.class);
+            ArrayList<CreateRoad> actions_roads = getActions_of(possibleActions, CreateRoad.class);
 
-        AbstractMap.SimpleEntry<Integer, ArrayList<Road>> minRoad_info = getShortestPath(virtualBoard.getLocations().get(17), virtualBoard.getLocations().get(82));
-        System.out.println("Length: "+minRoad_info.getKey());
-        for (Road road : minRoad_info.getValue()) {
-            System.out.println(road.getStartLocation()+", "+road.getEndLocation());
-        }
+            //region While a settlement can be built, build it.
+            Double[] _locScores = locScores.get(SETTLEMENT);
+            while (actions_settlements.size() > 0) {
+                for (int i = 0; i < _locScores.length; i++) {
+                    _locScores[i] = Math.abs(_locScores[i]);
+                    _locScores[i] *= -1;
+                }
 
-        //region While a settlement can be built, build it.
-        Double[] _locScores = locScores.get(SETTLEMENT);
-        while (actions_settlements.size() > 0) {
-            for (int i = 0; i < _locScores.length; i++) {
-                _locScores[i] = Math.abs(_locScores[i]);
-                _locScores[i] *= -1;
+                for (CreateSettlement createSettlement : actions_settlements)
+                    _locScores[createSettlement.getLocation().getIndex()] *= -1;
+
+                Location bestLocation = null;
+                for (int i = 0; i < _locScores.length; i++) {
+                    if (bestLocation == null || _locScores[i] > _locScores[bestLocation.getIndex()])
+                        bestLocation = virtualBoard.getLocations().get(i);
+                }
+
+                for (CreateSettlement createSettlement : actions_settlements) {
+                    if (createSettlement.getLocation().equals(bestLocation)) {
+                        doVirtually(createSettlement);
+                        break;
+                    }
+                }
+
+                actions_settlements = getActions_of(possibleActions, CreateSettlement.class);
+                actions_roads = getActions_of(possibleActions, CreateRoad.class);
             }
+            ///endregion
 
-            for (CreateSettlement createSettlement : actions_settlements)
-                _locScores[createSettlement.getLocation().getIndex()] *= -1;
+            updateLocationScores(SETTLEMENT);
 
-            Location bestLocation = null;
-            for (int i = 0; i < _locScores.length; i++) {
-                if (bestLocation == null || _locScores[i] > _locScores[bestLocation.getIndex()])
-                    bestLocation = virtualBoard.getLocations().get(i);
-            }
+            //region If a road can be built, build it else break the loop.
+            _locScores = locScores.get(SETTLEMENT);
 
-            for (CreateSettlement createSettlement : actions_settlements) {
-                if (createSettlement.getLocation().equals(bestLocation)) {
-                    doVirtually(createSettlement);
-                    break;
+            for (Location location : virtualBoard.getLocations()) {
+                if (location.getOwner() != null) {
+                    _locScores[location.getIndex()] = Math.abs(_locScores[location.getIndex()]);
+                    _locScores[location.getIndex()] *= -1;
+
+                    for (Location adjacentLocation : location.getAdjacentLocations()) {
+                        _locScores[adjacentLocation.getIndex()] = Math.abs(_locScores[adjacentLocation.getIndex()]);
+                        _locScores[adjacentLocation.getIndex()] *= -1;
+                    }
                 }
             }
 
-            actions_settlements = getActions_of(possibleActions, CreateSettlement.class);
+            if (actions_roads.size() > 0) {
+                Location[] best3Locations = new Location[3];
+                double[] best3Locations_score = new double[3];
+                for (int i = 0; i < _locScores.length; i++) {
+                    for (int j = 2; j >= 0; j--) {
+                        if (_locScores[i] > 0 && (best3Locations[j] == null || _locScores[i] > best3Locations_score[j])) {
+                            for (int k = best3Locations.length - 1; k >= j; k--) {
+                                if (k == 2) {
+                                    best3Locations[k] = null;
+                                    best3Locations_score[k] = -Double.MAX_VALUE;
+                                } else {
+                                    best3Locations[k + 1] = best3Locations[k];
+                                    best3Locations_score[k + 1] = best3Locations_score[k];
+                                }
+                            }
+
+                            best3Locations[j] = virtualBoard.getLocations().get(i);
+                            best3Locations_score[j] = _locScores[i];
+                            break;
+                        }
+                    }
+                }
+
+                ArrayList<Location> actionRoad_locations = new ArrayList();
+                for (CreateRoad createRoad : actions_roads) {
+                    if (!actionRoad_locations.contains(createRoad.getLocations()[0]))
+                        actionRoad_locations.add(createRoad.getLocations()[0]);
+
+                    if (!actionRoad_locations.contains(createRoad.getLocations()[1]))
+                        actionRoad_locations.add(createRoad.getLocations()[1]);
+                }
+
+                ArrayList<ArrayList<Road>> threeBestPaths = new ArrayList<>();
+                ArrayList<Integer> threeBestPaths_discounted_len = new ArrayList<>();
+                for (int i = 0; i < best3Locations.length; i++) {
+                    if (best3Locations[i] != null) {
+                        ArrayList<Road> bestPath = new ArrayList<>();
+                        int bestPath_discounted_len = Integer.MAX_VALUE;
+
+                        for (Location location : actionRoad_locations) {
+                            if (location.getOwner() != null && location.getOwner().getIndex() == owner.getIndex()) {
+                                ArrayList<Road> path = getShortestPath(location, best3Locations[i], false).getValue();
+
+                                boolean ignorePath = true;
+                                for (CreateRoad createRoad : actions_roads) {
+                                    if (path.contains(createRoad.getRoad())) {
+                                        ignorePath = false;
+                                        break;
+                                    }
+                                }
+
+                                if (ignorePath)
+                                    continue;
+
+                                int path_discounted_len = path.size();
+
+                                for (Road _road : path) {
+                                    path_discounted_len -= owner.getStructures().contains(_road) ? 1 : 0;
+                                }
+
+                                if (path_discounted_len < bestPath_discounted_len) {
+                                    bestPath = path;
+                                    bestPath_discounted_len = path_discounted_len;
+                                }
+                            }
+                        }
+
+                        threeBestPaths.add(bestPath);
+                        threeBestPaths_discounted_len.add(bestPath_discounted_len);
+                    } else {
+                        threeBestPaths.add(null);
+                        threeBestPaths_discounted_len.add(null);
+                    }
+                }
+
+                for (int i = 0; i < threeBestPaths.size(); i++) {
+                    System.out.println("    Path("+i+"): " + threeBestPaths.get(i));
+                    System.out.println("    Path("+i+") Discounted Length: " + threeBestPaths_discounted_len.get(i));
+                }
+
+                ArrayList<Double> threeBestPaths_scores = new ArrayList<>();
+
+                if (threeBestPaths.get(0) != null && threeBestPaths.get(0).size() > 0) {
+                    System.out.println(-threeBestPaths_discounted_len.get(0));
+                    System.out.println(_locScores[threeBestPaths.get(0).get(threeBestPaths.get(0).size() - 1).getEndLocation().getIndex()]);
+
+                    threeBestPaths_scores.add((double) -threeBestPaths_discounted_len.get(0)
+                    +_locScores[threeBestPaths.get(0).get(threeBestPaths.get(0).size() - 1).getEndLocation().getIndex()]);
+                } else
+                    threeBestPaths_scores.add(-Double.MAX_VALUE);
+
+                if (threeBestPaths.get(1) != null && threeBestPaths.get(1).size() > 0) {
+                    System.out.println(-threeBestPaths_discounted_len.get(1));
+                    System.out.println(_locScores[threeBestPaths.get(1).get(threeBestPaths.get(1).size() - 1).getEndLocation().getIndex()]);
+
+                    threeBestPaths_scores.add((double) -threeBestPaths_discounted_len.get(1)
+                    +_locScores[threeBestPaths.get(1).get(threeBestPaths.get(1).size() - 1).getEndLocation().getIndex()]);
+                } else
+                    threeBestPaths_scores.add(-Double.MAX_VALUE);
+
+                if (threeBestPaths.get(2) != null && threeBestPaths.get(2).size() > 0) {
+                    System.out.println(-threeBestPaths_discounted_len.get(2));
+                    System.out.println(_locScores[threeBestPaths.get(2).get(threeBestPaths.get(2).size() - 1).getEndLocation().getIndex()]);
+
+                    threeBestPaths_scores.add((double) -threeBestPaths_discounted_len.get(2)
+                    +_locScores[threeBestPaths.get(2).get(threeBestPaths.get(2).size() - 1).getEndLocation().getIndex()]);
+                } else
+                    threeBestPaths_scores.add(-Double.MAX_VALUE);
+
+                for (int i = 0; i < threeBestPaths.size(); i++) {
+                    System.out.println("    Path("+i+") Score: " + threeBestPaths_scores.get(i));
+                }
+
+                ArrayList<Road> chosenPath = new ArrayList<>();
+                Double chosenPath_score = -Double.MAX_VALUE;
+                for (int i = 0; i < threeBestPaths.size(); i++) {
+                    ArrayList<Road> path = threeBestPaths.get(i);
+
+                    if (path != null && path.size() != 0 && threeBestPaths_scores.get(i) > chosenPath_score) {
+                        chosenPath_score = threeBestPaths_scores.get(i);
+                        chosenPath = path;
+                    }
+                }
+
+                System.out.println("Ch. Path: "+chosenPath);
+                System.out.println("Ch. Path Sc.: "+chosenPath_score);
+
+                for (Road road : chosenPath) {
+                    int[] locationIndexes = new int[2];
+                    locationIndexes[0] = road.getStartLocation().getIndex();
+                    locationIndexes[1] = road.getEndLocation().getIndex();
+
+                    int index = actions_roads.indexOf(new CreateRoad(locationIndexes, owner.getIndex(), virtualBoard));
+                    if (index != -1) {
+                        doVirtually(actions_roads.get(index));
+                        break;
+                    }
+                }
+
+                break;
+            } else
+                break;
+            ///endregion
         }
-        ///endregion
 
         ///region Do actions randomly.
         while (possibleActions.size() != 0) {
@@ -90,8 +248,6 @@ public class BasicAI implements IAI, Serializable {
         }
         ///endregion
 
-        if (!isInitial)
-            actionsDone.clear();
         return actionsDone;
     }
 
@@ -125,7 +281,7 @@ public class BasicAI implements IAI, Serializable {
                 for (Land land : location.getAdjacentLands()) {
                     _locScores[i] += location.isActive() ? 0.01 : 0;
                     _locScores[i] += land.getDiceChance() * 36.0;
-                    _locScores[i] += (land.getResourceType() == LUMBER ? 3 : 0) + (land.getResourceType() == BRICK ? 3 : 0);
+                    _locScores[i] += (land.getResourceType() == LUMBER ? 3.0 : 0.0) + (land.getResourceType() == BRICK ? 3.0 : 0.0);
                 }
             }
         }
@@ -154,6 +310,8 @@ public class BasicAI implements IAI, Serializable {
         action.execute();
 
         possibleActions = virtualBoard.getState().getPossibleActions(owner.getIndex());
+
+        updateLocationScores(SETTLEMENT);
     }
 
     @Override
@@ -283,7 +441,7 @@ public class BasicAI implements IAI, Serializable {
         }
     }
 
-    public AbstractMap.SimpleEntry<Integer, ArrayList<Road>> getShortestPath (Location locationSource, Location locationTarget) {
+    public AbstractMap.SimpleEntry<Integer, ArrayList<Road>> getShortestPath(Location locationSource, Location locationTarget, boolean ignoreBuildings) {
         if (locationSource.getIndex() == locationTarget.getIndex())
             return new AbstractMap.SimpleEntry<>(0, null);
 
@@ -320,8 +478,11 @@ public class BasicAI implements IAI, Serializable {
                         nodes.add(_node);
                     }
 
-                    node.getAdjacentNodes_manual().add(_node);
-                    _node.getAdjacentNodes_manual().add(node);
+                    if (!node.getAdjacentNodes_manual().contains(_node))
+                        node.getAdjacentNodes_manual().add(_node);
+
+                    if (!_node.getAdjacentNodes_manual().contains(node))
+                        _node.getAdjacentNodes_manual().add(node);
                 }
             }
         }
@@ -350,12 +511,27 @@ public class BasicAI implements IAI, Serializable {
                                         break;
                                     }
                                 }
-                                //nodeDeleted.getAdjacentNodes_manual().remove(nodeDeleted2);
-                                //nodeDeleted2.getAdjacentNodes_manual().remove(nodeDeleted);
 
-                                System.out.println(nodeDeleted2.getIndex() + "is deleted from " + nodeDeleted.getIndex());
-                                System.out.println(nodeDeleted.getIndex() + "is deleted from " + nodeDeleted2.getIndex());
+                                /*System.out.println(nodeDeleted2.getIndex() + "is deleted from " + nodeDeleted.getIndex());
+                                System.out.println(nodeDeleted.getIndex() + "is deleted from " + nodeDeleted2.getIndex());*/
                             }
+                        }
+                    }
+                }
+            } else if (ignoreBuildings && structure instanceof Building && structure.getPlayer().getIndex() != owner.getIndex()) {
+                Building building = (Building) structure;
+
+                for (int i = 0; i < nodes.size(); i++) {
+                    if (nodes.get(i).getIndex() == building.getLocation().getIndex()) {
+                        Node nodeDisconnected = nodes.get(i);
+
+                        for (int j = 0; j < nodeDisconnected.getAdjacentNodes_manual().size(); j++) {
+                            Node adjacentNode = nodeDisconnected.getAdjacentNodes_manual().get(j);
+
+                            nodeDisconnected.getAdjacentNodes_manual().remove(adjacentNode);
+                            j--;
+
+                            adjacentNode.getAdjacentNodes_manual().remove(nodeDisconnected);
                         }
                     }
                 }

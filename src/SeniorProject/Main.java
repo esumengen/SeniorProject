@@ -1,9 +1,7 @@
 package SeniorProject;
 
-import SeniorProject.Negotiation.Bid;
 import org.ini4j.Wini;
 
-import javax.naming.spi.ResolveResult;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;

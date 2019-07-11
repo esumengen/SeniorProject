@@ -27,11 +27,11 @@ public class NegotiationSession {
         this.otherAgents = this.otherAgents;
     }
 
-    public void addGivenBid (Bid bid, NegotiationAgent agent) {
+    public void addGivenBid(Bid bid, NegotiationAgent agent) {
         givenBids.get(agent).add(bid);
     }
 
-    public void addTakenBid (Bid bid, NegotiationAgent agent) {
+    public void addTakenBid(Bid bid, NegotiationAgent agent) {
         takenBids.get(agent).add(bid);
     }
 

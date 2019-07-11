@@ -1,9 +1,6 @@
 package SeniorProject.Actions;
 
-import SeniorProject.Board;
-import SeniorProject.IAction;
-import SeniorProject.Location;
-import SeniorProject.Player;
+import SeniorProject.*;
 
 import java.io.Serializable;
 
@@ -19,6 +16,18 @@ public class CreateRoad implements IAction, Serializable {
         this.player = board.getPlayers().get(playerIndex);
     }
 
+    public Location[] getLocations() {
+        return locations;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public Road getRoad() {
+        return new Road(locations[0], locations[1], player);
+    }
+
     @Override
     public void execute() {
         board.createRoad(player, locations[0], locations[1]);
@@ -31,6 +40,18 @@ public class CreateRoad implements IAction, Serializable {
 
     @Override
     public String toString() {
-        return player + " RO " + locations[0].getIndex() + " -> " + locations[1].getIndex();
+        return player + " RO " + locations[0] + " -> " + locations[1];
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof CreateRoad) {
+            return ((CreateRoad) obj).getPlayer().getIndex() == getPlayer().getIndex()
+                    &&
+                    (((CreateRoad) obj).getLocations()[0].getIndex() == getLocations()[0].getIndex() && ((CreateRoad) obj).getLocations()[1].getIndex() == getLocations()[1].getIndex()
+                            || ((CreateRoad) obj).getLocations()[0].getIndex() == getLocations()[1].getIndex() && ((CreateRoad) obj).getLocations()[1].getIndex() == getLocations()[0].getIndex());
+        }
+
+        return false;
     }
 }

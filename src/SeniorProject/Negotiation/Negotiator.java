@@ -3,8 +3,8 @@ package SeniorProject.Negotiation;
 import SeniorProject.Global;
 
 public class Negotiator {
-    private NegotiationSession session;
     private static Negotiator instance = new Negotiator();
+    private NegotiationSession session;
 
     private Negotiator() {
     }
@@ -36,10 +36,9 @@ public class Negotiator {
 
             if (offeredBid == null) {
                 sequentialPass++;
-                if (sequentialPass == Global.PLAYER_COUNT-1)
+                if (sequentialPass == Global.PLAYER_COUNT - 1)
                     break;
-            }
-            else
+            } else
                 sequentialPass = 0;
 
             Bid response = session.getBidTarget().handleOffer(session, offeredBid);
@@ -50,8 +49,7 @@ public class Negotiator {
             if (isAccepted) {
                 session.complete(response);
                 return true;
-            }
-            else {
+            } else {
                 int bidTarget_index = session.getOtherAgents().indexOf(session.getBidTarget());
                 if (bidTarget_index + 1 < session.getOtherAgents().size())
                     session.setBidTarget(session.getOtherAgents().get(bidTarget_index + 1));
