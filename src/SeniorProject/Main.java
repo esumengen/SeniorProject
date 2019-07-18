@@ -1,5 +1,8 @@
 package SeniorProject;
 
+import SeniorProject.Negotiation.NegotiationAgent;
+import SeniorProject.Negotiation.NegotiationSession;
+import SeniorProject.Negotiation.Negotiator;
 import org.ini4j.Wini;
 
 import java.io.File;
@@ -62,6 +65,7 @@ public class Main {
                             if (turnMode.equals("waiting") && player.getState() != PlayerState.THINKING) {
                                 player.setState(PlayerState.THINKING);
 
+                                negotiationPhase(player, board);
                                 player.writeMove(isInitial);
                                 isPlayed = true;
                                 playerMoved = player;
@@ -111,6 +115,25 @@ public class Main {
         // Debug Frame
         //DebugFrame debugFrame = new DebugFrame(board);
         //debugFrame.setVisible(true);
+    }
+
+    private static void negotiationPhase(Player player, Board board) {
+        ///region
+        ArrayList<NegotiationAgent> otherAgents = new ArrayList<>();
+        for (Player _player : board.getPlayers()) {
+            _player.getAI().updateBidRanking();
+
+            if (_player != player)
+                otherAgents.add(player.getNegotiationAgent());
+        }
+
+        NegotiationSession session = new NegotiationSession(player.getNegotiationAgent(), otherAgents, player.getAI().getBidRanking());
+        Negotiator.getInstance().setSession(session);
+        Negotiator.getInstance().startSession();
+        if (session.isCompleted()) {
+
+        }
+        ///endregion
     }
 
     public static ArrayList<Player> createPlayers() {

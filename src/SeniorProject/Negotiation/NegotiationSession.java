@@ -18,13 +18,15 @@ public class NegotiationSession {
     private boolean isDestroyed = false;
 
     public NegotiationSession(NegotiationAgent owner, ArrayList<NegotiationAgent> otherAgents, ArrayList<Bid> bidRanking) {
+        this.ownerAgent = owner;
+        this.otherAgents = otherAgents;
+
+        this.bidTarget = otherAgents.get(0);
+
         for (NegotiationAgent agent : this.otherAgents) {
             givenBids.put(agent, new ArrayList<>());
             takenBids.put(agent, new ArrayList<>());
         }
-
-        this.ownerAgent = ownerAgent;
-        this.otherAgents = this.otherAgents;
     }
 
     public void addGivenBid(Bid bid, NegotiationAgent agent) {

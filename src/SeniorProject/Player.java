@@ -2,6 +2,9 @@ package SeniorProject;
 
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
 import SeniorProject.Negotiation.BasicNegotiationAgent;
+import SeniorProject.Negotiation.NegotiationAgent;
+import SeniorProject.Negotiation.NegotiationSession;
+import SeniorProject.Negotiation.Negotiator;
 
 import java.io.Serializable;
 import java.util.ArrayList;

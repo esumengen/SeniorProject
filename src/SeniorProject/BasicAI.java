@@ -5,6 +5,9 @@ import SeniorProject.Actions.CreateRoad;
 import SeniorProject.Actions.CreateSettlement;
 import SeniorProject.Actions.DrawDevelopmentCard;
 import SeniorProject.Negotiation.Bid;
+import SeniorProject.Negotiation.NegotiationAgent;
+import SeniorProject.Negotiation.NegotiationSession;
+import SeniorProject.Negotiation.Negotiator;
 
 import java.io.Serializable;
 import java.util.*;
@@ -41,8 +44,6 @@ public class BasicAI implements IAI, Serializable {
 
     public ArrayList<IAction> createActions(boolean isInitial) {
         clearSystem();
-
-        negotiationPhase();
 
         possibleActions = virtualBoard.getState().getPossibleActions(owner.getIndex());
 
@@ -249,25 +250,6 @@ public class BasicAI implements IAI, Serializable {
         ///endregion
 
         return actionsDone;
-    }
-
-    private void negotiationPhase() {
-        ///region
-        /*ArrayList<NegotiationAgent> otherAgents = new ArrayList<>();
-        for (Player player : virtualBoard.getPlayers()) {
-            player.getAI().updateBidRanking();
-
-            if (player != owner)
-                otherAgents.add(player.getNegotiationAgent());
-        }
-
-        NegotiationSession session = new NegotiationSession(owner.getNegotiationAgent(), otherAgents, bidRanking);
-        Negotiator.getInstance().setSession(session);
-        Negotiator.getInstance().startSession();
-        if (session.isCompleted()) {
-
-        }*/
-        ///endregion
     }
 
     private void updateLocationScores(StructureType structureType) {
