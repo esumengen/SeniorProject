@@ -252,9 +252,8 @@ public class PureBoard implements Serializable {
                 return false;*/
 
             // İki ucunda en az bir tane kendi yapısı olmalı.
-            if (countStructures(StructureType.ROAD, start, road.getPlayer().getIndex()) + countStructures(StructureType.ROAD, end, road.getPlayer().getIndex())
-                    + countStructures(StructureType.SETTLEMENT, start, road.getPlayer().getIndex()) + countStructures(StructureType.SETTLEMENT, end, road.getPlayer().getIndex()) == 0)
-                return false;
+            return countStructures(StructureType.ROAD, start, road.getPlayer().getIndex()) + countStructures(StructureType.ROAD, end, road.getPlayer().getIndex())
+                    + countStructures(StructureType.SETTLEMENT, start, road.getPlayer().getIndex()) + countStructures(StructureType.SETTLEMENT, end, road.getPlayer().getIndex()) != 0;
         } else if (structure instanceof Building) {
             Building settlement = (Building) structure;
 
@@ -269,8 +268,7 @@ public class PureBoard implements Serializable {
             // Başlangıç durumu değilse
             if (!isInitial) {
                 // Tam o location'a bağlı en az bir yolu bulunmalı.
-                if (countStructures(StructureType.ROAD, settlement.getLocation(), settlement.getPlayer().getIndex()) == 0)
-                    return false;
+                return countStructures(StructureType.ROAD, settlement.getLocation(), settlement.getPlayer().getIndex()) != 0;
             } else {
                 // Köşede olmamalı.
                 /*if (((Building) structure).getLocation().isCorner())

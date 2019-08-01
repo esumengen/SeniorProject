@@ -27,7 +27,7 @@ public class Road extends Structure implements Serializable {
 
     @Override
     public String toString() {
-        return "Road("+getStartLocation()+", "+getEndLocation()+")";
+        return "Road(" + getStartLocation() + ", " + getEndLocation() + ")";
     }
 
     @Override
@@ -36,7 +36,7 @@ public class Road extends Structure implements Serializable {
             return ((Road) obj).getEndLocation().getIndex() == getEndLocation().getIndex()
                     && ((Road) obj).getStartLocation().getIndex() == getStartLocation().getIndex() ||
                     ((Road) obj).getStartLocation().getIndex() == getEndLocation().getIndex()
-                    && ((Road) obj).getEndLocation().getIndex() == getStartLocation().getIndex();
+                            && ((Road) obj).getEndLocation().getIndex() == getStartLocation().getIndex();
         }
 
         return false;

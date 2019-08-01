@@ -50,8 +50,7 @@ public class ActionFactory {
                 if (objectType.equals("B")) {  //P0 [TR 35 35 35 35 35 35 35 35 35 35] B
                     return new TradeWithBank(givenResources, takenResources, playerIndex, board);
                 } else { //P0 [TR 35 35 35 35 35 35 35 35 35 35] 1
-                    // TODO
-                    return new TradeWithBank(givenResources, takenResources, playerIndex, board);
+                    return new TradeWithPlayer(givenResources, takenResources, playerIndex, Integer.parseInt(objectType) - 1, board);
                 }
             case "RD":  //P0 [RD 06 03] X q
                 return new RollDice(playerIndex, actionParam.get(0), actionParam.get(1), board);

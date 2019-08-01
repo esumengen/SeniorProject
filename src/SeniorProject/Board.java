@@ -70,9 +70,7 @@ public class Board extends PureBoard implements Serializable {
                 /*if (brick < 4 && grain < 4 && wool < 4 && ore < 4 && lumber < 4)
                     return false;*/
 
-                if (brick / 4 + grain / 4 + wool / 4 + ore / 4 + lumber / 4 == 0)
-                    return false;
-                return true;
+                return brick / 4 + grain / 4 + wool / 4 + ore / 4 + lumber / 4 != 0;
             case KnightCard:
                 return false;
             case MonopolyCard:
@@ -248,40 +246,81 @@ public class Board extends PureBoard implements Serializable {
         }
     }
 
-    void tradePlayer(int playerIndex1, int playerIndex2, Map<ResourceType, Integer> givenResources, Map<ResourceType, Integer> takenResources) {
-        // TODO
+    public void tradePlayer(int playerGiver, int playerTaker, Map<ResourceType, Integer> givenResources, Map<ResourceType, Integer> takenResources) {
+        players.get(playerGiver).setGrain(players.get(playerGiver).getGrain() - givenResources.get(ResourceType.GRAIN)
+                + takenResources.get(ResourceType.GRAIN));
 
-        syncPlayer(players.get(playerIndex1));
-        syncPlayer(players.get(playerIndex2));
+        players.get(playerGiver).setLumber(players.get(playerGiver).getLumber() - givenResources.get(ResourceType.LUMBER)
+                + takenResources.get(ResourceType.LUMBER));
+
+        players.get(playerGiver).setWool(players.get(playerGiver).getWool() - givenResources.get(ResourceType.WOOL)
+                + takenResources.get(ResourceType.WOOL));
+
+        players.get(playerGiver).setOre(players.get(playerGiver).getOre() - givenResources.get(ResourceType.ORE)
+                + takenResources.get(ResourceType.ORE));
+
+        players.get(playerGiver).setBrick(players.get(playerGiver).getBrick() - givenResources.get(ResourceType.BRICK)
+                + takenResources.get(ResourceType.BRICK));
+
+        players.get(playerTaker).setGrain(players.get(playerTaker).getGrain() - takenResources.get(ResourceType.GRAIN)
+                + givenResources.get(ResourceType.GRAIN));
+
+        players.get(playerTaker).setLumber(players.get(playerTaker).getLumber() - takenResources.get(ResourceType.LUMBER)
+                + givenResources.get(ResourceType.LUMBER));
+
+        players.get(playerTaker).setWool(players.get(playerTaker).getWool() - takenResources.get(ResourceType.WOOL)
+                + givenResources.get(ResourceType.WOOL));
+
+        players.get(playerTaker).setOre(players.get(playerTaker).getOre() - takenResources.get(ResourceType.ORE)
+                + givenResources.get(ResourceType.ORE));
+
+        players.get(playerTaker).setBrick(players.get(playerTaker).getBrick() - takenResources.get(ResourceType.BRICK)
+                + givenResources.get(ResourceType.BRICK));
+
+        syncPlayer(players.get(playerGiver));
+        syncPlayer(players.get(playerTaker));
         changeUpdate();
 
-        addLog("TO DO ACTION: A trade with [Player " + playerIndex2 + 1 + " has been done by [Player " + (playerIndex1 + 1) + "]");
+        addLog("ACTION: A trade with [Player " + (playerTaker + 1) + "] has been done by [Player " + (playerGiver + 1) + "]");
     }
 
     public void rollDice(Player player, int dice1, int dice2) {
         generateResource(dice1 + dice2);
 
-        addLog("ACTION: Dice are rolled " + dice1 + " " + dice2 + " by [Player " + (player.getIndex() + 1) + "]");
+        addLog("ACTION: Dice are rolled " + dice1 + " " + dice2 + " by " + player);
     }
 
     private void generateResource(int diceNo) {
+        ArrayList<Resource> rewards = new ArrayList<>();
+        for (int i = 0; i < Global.PLAYER_COUNT; i++) {
+            rewards.add(new Resource());
+        }
+
         for (Land land : getLands()) {
             if (land.getDiceNo() == diceNo && land != getRobbedLand()) {
                 for (Location location : land.getAdjacentLocations()) {
                     if (location.hasOwner()) {
                         Player rewardedPlayer = location.getOwner();
 
-                        rewardedPlayer.getResource().add(land.getResourceType(), location.hasCity() ? 2 : 1);
+                        int reward =  location.hasCity() ? 2 : 1;
+                        rewardedPlayer.getResource().add(land.getResourceType(), reward);
 
-                        //addLog("?");
+                        Resource newCumulativeReward = new Resource(rewards.get(rewardedPlayer.getIndex()));
+                        newCumulativeReward.put(land.getResourceType(), newCumulativeReward.get(land.getResourceType()) + reward);
+                        rewards.set(rewardedPlayer.getIndex(), newCumulativeReward);
                     }
                 }
             }
         }
 
-        changeUpdate();
+        for (int i = 0; i < rewards.size(); i++) {
+            /*if (isMain)
+                System.out.println("Dice: " + getPlayers().get(i) + " has reached " + getPlayers().get(i).getResource() + ".");*/
 
-        addLog("New resources are generated.");
+            addLog("Dice: " + getPlayers().get(i) + " has gained " + rewards.get(i) + ".");
+        }
+
+        changeUpdate();
     }
 
     void addLog(String log) {

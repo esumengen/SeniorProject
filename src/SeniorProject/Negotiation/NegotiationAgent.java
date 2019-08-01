@@ -9,5 +9,5 @@ public interface NegotiationAgent {
 
     boolean isAccepted(NegotiationSession session, Bid offer);
 
-    Player getOwner(Bid offer);
+    Player getOwner();
 }

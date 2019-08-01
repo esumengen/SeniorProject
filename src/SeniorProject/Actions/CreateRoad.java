@@ -49,7 +49,7 @@ public class CreateRoad implements IAction, Serializable {
             return ((CreateRoad) obj).getPlayer().getIndex() == getPlayer().getIndex()
                     &&
                     (((CreateRoad) obj).getLocations()[0].getIndex() == getLocations()[0].getIndex() && ((CreateRoad) obj).getLocations()[1].getIndex() == getLocations()[1].getIndex()
-                            || ((CreateRoad) obj).getLocations()[0].getIndex() == getLocations()[1].getIndex() && ((CreateRoad) obj).getLocations()[1].getIndex() == getLocations()[0].getIndex());
+                    || ((CreateRoad) obj).getLocations()[0].getIndex() == getLocations()[1].getIndex() && ((CreateRoad) obj).getLocations()[1].getIndex() == getLocations()[0].getIndex());
         }
 
         return false;

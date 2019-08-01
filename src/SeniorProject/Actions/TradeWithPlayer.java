@@ -4,22 +4,30 @@ import SeniorProject.*;
 
 import java.io.Serializable;
 
-public class TradeWithBank implements IAction, Serializable {
-    Player player;
+public class TradeWithPlayer implements IAction, Serializable {
+    Player playerGiver;
+    Player playerTaker;
     Resource givenResources;
     Resource takenResources;
     Board board;
 
-    public TradeWithBank(Resource givenResources, Resource takenResources, int playerIndex, Board board) {
+    public TradeWithPlayer(Resource givenResources, Resource takenResources, int playerGiver, int playerTaker, Board board) {
         this.givenResources = givenResources;
         this.takenResources = takenResources;
-        this.player = board.getPlayers().get(playerIndex);
+        this.playerGiver = board.getPlayers().get(playerGiver);
+        this.playerTaker = board.getPlayers().get(playerTaker);
         this.board = board;
+    }
+
+    public void setBoard(Board board) {
+        this.board = board;
+        this.playerGiver = board.getPlayers().get(playerGiver.getIndex());
+        this.playerTaker = board.getPlayers().get(playerTaker.getIndex());
     }
 
     @Override
     public void execute() {
-        board.tradeBank(player.getIndex(), givenResources, takenResources);
+        board.tradePlayer(playerGiver.getIndex(), playerTaker.getIndex(), givenResources, takenResources);
     }
 
     @Override
@@ -36,7 +44,7 @@ public class TradeWithBank implements IAction, Serializable {
         int takenOre = takenResources.get(ResourceType.ORE);
         int takenBrick = takenResources.get(ResourceType.BRICK);
 
-        return "P" + (player.getIndex() + 1)
+        return "P" + (playerGiver.getIndex() + 1)
                 + " [TR " + ((grain < 10) ? ("0" + grain) : grain)
                 + " " + ((lumber < 10) ? ("0" + lumber) : lumber)
                 + " " + ((wool < 10) ? ("0" + wool) : wool)
@@ -47,12 +55,11 @@ public class TradeWithBank implements IAction, Serializable {
                 + " " + ((takenWool < 10) ? ("0" + takenWool) : takenWool)
                 + " " + ((takenOre < 10) ? ("0" + takenOre) : takenOre)
                 + " " + ((takenBrick < 10) ? ("0" + takenBrick) : takenBrick)
-                + "] B";
+                + "] " + (playerTaker.getIndex() + 1);
     }
 
     @Override
     public String toString() {
-        return player + " TRA(B) " + "Given: " + givenResources + ", Taken: " + takenResources;
+        return playerGiver + " TRA(P) " + playerTaker + " Given: " + givenResources + ", Taken: " + takenResources;
     }
-
 }

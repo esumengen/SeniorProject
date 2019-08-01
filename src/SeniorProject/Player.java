@@ -2,9 +2,6 @@ package SeniorProject;
 
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
 import SeniorProject.Negotiation.BasicNegotiationAgent;
-import SeniorProject.Negotiation.NegotiationAgent;
-import SeniorProject.Negotiation.NegotiationSession;
-import SeniorProject.Negotiation.Negotiator;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -53,7 +50,7 @@ public class Player implements Serializable, IObservable {
 
         System.out.println(currentState);
         System.out.println("[My Affordable Moves]: " + currentState.getAffordableMoves(index));
-        System.out.print("[My Possible Actions]: ");
+        /*System.out.print("[My Possible Actions]: ");
 
         int size = currentState.getPossibleActions(index).size();
         for (int i = 0; i < size; i++)
@@ -62,7 +59,7 @@ public class Player implements Serializable, IObservable {
         if (size == 0)
             System.out.print("[]");
 
-        System.out.println();
+        System.out.println();*/
         ///endregion
 
         ArrayList<IAction> actionList = AI_instance.createActions(isInitial);
@@ -81,7 +78,7 @@ public class Player implements Serializable, IObservable {
 
         ///region Print Actions
         if (!actionList_str.equals("")) {
-            System.out.println("[" + this + "'s Choice}:");
+            System.out.println("[" + this + "'s Choice]:");
 
             Scanner scanner = new Scanner(actionList_str);
             String action;
@@ -225,12 +222,12 @@ public class Player implements Serializable, IObservable {
         this.NegotiationAgent_instance = new BasicNegotiationAgent(this);
     }
 
-    public void setAI(BasicAI ai) {
-        this.AI_instance = ai;
-    }
-
     public BasicAI getAI() {
         return AI_instance;
+    }
+
+    public void setAI(BasicAI ai) {
+        this.AI_instance = ai;
     }
 
     public ArrayList<DevelopmentCardType> getDevelopmentCards() {

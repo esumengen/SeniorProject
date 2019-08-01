@@ -1,35 +1,29 @@
 package SeniorProject;
 
-import SeniorProject.Actions.Action;
-import SeniorProject.Actions.CreateRoad;
-import SeniorProject.Actions.CreateSettlement;
-import SeniorProject.Actions.DrawDevelopmentCard;
+import SeniorProject.Actions.*;
 import SeniorProject.Negotiation.Bid;
-import SeniorProject.Negotiation.NegotiationAgent;
-import SeniorProject.Negotiation.NegotiationSession;
-import SeniorProject.Negotiation.Negotiator;
 
 import java.io.Serializable;
 import java.util.*;
 
 public class BasicAI implements IAI, Serializable {
-    private Player owner;
-    private Board board;
-
-    private ArrayList<IAction> actionsDone;
     private static final StructureType SETTLEMENT = StructureType.SETTLEMENT;
-    private Board virtualBoard;
-
-    private ArrayList<Bid> bidRanking;
     private static final ResourceType BRICK = ResourceType.BRICK;
     private static final ResourceType LUMBER = ResourceType.LUMBER;
+    private Player owner;
+    private Board board;
+    private ArrayList<IAction> actionsDone;
+    private Board virtualBoard;
+    private ArrayList<Bid> bidRanking;
     private ArrayList<IAction> possibleActions;
     private HashMap<StructureType, Double[]> locScores;
     private Random randomGenerator = new Random();
+    private ArrayList<IAction> negotiationActions;
 
     public BasicAI(Player player, Board board) {
         actionsDone = new ArrayList<>();
         possibleActions = new ArrayList<>();
+        negotiationActions = new ArrayList<>();
         bidRanking = new ArrayList<>();
 
         locScores = new HashMap<>();
@@ -44,6 +38,12 @@ public class BasicAI implements IAI, Serializable {
 
     public ArrayList<IAction> createActions(boolean isInitial) {
         clearSystem();
+
+        for (IAction negotiationAction : negotiationActions) {
+            ((TradeWithPlayer) negotiationAction).setBoard(virtualBoard);
+            doVirtually(negotiationAction);
+        }
+        clearNegotiationActions();
 
         possibleActions = virtualBoard.getState().getPossibleActions(owner.getIndex());
 
@@ -172,43 +172,42 @@ public class BasicAI implements IAI, Serializable {
                     }
                 }
 
-                for (int i = 0; i < threeBestPaths.size(); i++) {
-                    System.out.println("    Path("+i+"): " + threeBestPaths.get(i));
-                    System.out.println("    Path("+i+") Discounted Length: " + threeBestPaths_discounted_len.get(i));
-                }
+                /*for (int i = 0; i < threeBestPaths.size(); i++) {
+                    System.out.println("    Path(" + i + "): " + threeBestPaths.get(i));
+                    System.out.println("    Path(" + i + ") Discounted Length: " + threeBestPaths_discounted_len.get(i));
+                }*/
 
                 ArrayList<Double> threeBestPaths_scores = new ArrayList<>();
 
                 if (threeBestPaths.get(0) != null && threeBestPaths.get(0).size() > 0) {
-                    System.out.println(-threeBestPaths_discounted_len.get(0));
-                    System.out.println(_locScores[threeBestPaths.get(0).get(threeBestPaths.get(0).size() - 1).getEndLocation().getIndex()]);
+                    /*System.out.println(-threeBestPaths_discounted_len.get(0));
+                    System.out.println(_locScores[threeBestPaths.get(0).get(threeBestPaths.get(0).size() - 1).getEndLocation().getIndex()]);*/
 
                     threeBestPaths_scores.add((double) -threeBestPaths_discounted_len.get(0)
-                    +_locScores[threeBestPaths.get(0).get(threeBestPaths.get(0).size() - 1).getEndLocation().getIndex()]);
+                            + _locScores[threeBestPaths.get(0).get(threeBestPaths.get(0).size() - 1).getEndLocation().getIndex()]);
                 } else
                     threeBestPaths_scores.add(-Double.MAX_VALUE);
 
                 if (threeBestPaths.get(1) != null && threeBestPaths.get(1).size() > 0) {
-                    System.out.println(-threeBestPaths_discounted_len.get(1));
-                    System.out.println(_locScores[threeBestPaths.get(1).get(threeBestPaths.get(1).size() - 1).getEndLocation().getIndex()]);
+                    /*System.out.println(-threeBestPaths_discounted_len.get(1));
+                    System.out.println(_locScores[threeBestPaths.get(1).get(threeBestPaths.get(1).size() - 1).getEndLocation().getIndex()]);*/
 
                     threeBestPaths_scores.add((double) -threeBestPaths_discounted_len.get(1)
-                    +_locScores[threeBestPaths.get(1).get(threeBestPaths.get(1).size() - 1).getEndLocation().getIndex()]);
+                            + _locScores[threeBestPaths.get(1).get(threeBestPaths.get(1).size() - 1).getEndLocation().getIndex()]);
                 } else
                     threeBestPaths_scores.add(-Double.MAX_VALUE);
 
                 if (threeBestPaths.get(2) != null && threeBestPaths.get(2).size() > 0) {
-                    System.out.println(-threeBestPaths_discounted_len.get(2));
-                    System.out.println(_locScores[threeBestPaths.get(2).get(threeBestPaths.get(2).size() - 1).getEndLocation().getIndex()]);
+                    /*System.out.println(-threeBestPaths_discounted_len.get(2));
+                    System.out.println(_locScores[threeBestPaths.get(2).get(threeBestPaths.get(2).size() - 1).getEndLocation().getIndex()]);*/
 
                     threeBestPaths_scores.add((double) -threeBestPaths_discounted_len.get(2)
-                    +_locScores[threeBestPaths.get(2).get(threeBestPaths.get(2).size() - 1).getEndLocation().getIndex()]);
+                            + _locScores[threeBestPaths.get(2).get(threeBestPaths.get(2).size() - 1).getEndLocation().getIndex()]);
                 } else
                     threeBestPaths_scores.add(-Double.MAX_VALUE);
 
-                for (int i = 0; i < threeBestPaths.size(); i++) {
-                    System.out.println("    Path("+i+") Score: " + threeBestPaths_scores.get(i));
-                }
+                /*for (int i = 0; i < threeBestPaths.size(); i++)
+                    System.out.println("    Path(" + i + ") Score: " + threeBestPaths_scores.get(i));*/
 
                 ArrayList<Road> chosenPath = new ArrayList<>();
                 Double chosenPath_score = -Double.MAX_VALUE;
@@ -221,8 +220,8 @@ public class BasicAI implements IAI, Serializable {
                     }
                 }
 
-                System.out.println("Ch. Path: "+chosenPath);
-                System.out.println("Ch. Path Sc.: "+chosenPath_score);
+                /*System.out.println("Ch. Path: " + chosenPath);
+                System.out.println("Ch. Path Sc.: " + chosenPath_score);*/
 
                 for (Road road : chosenPath) {
                     int[] locationIndexes = new int[2];
@@ -243,11 +242,14 @@ public class BasicAI implements IAI, Serializable {
         }
 
         ///region Do actions randomly.
-        while (possibleActions.size() != 0) {
+        /*while (possibleActions.size() != 0) {
             IAction action = possibleActions.get(randomGenerator.nextInt(possibleActions.size()));
             doVirtually(action);
-        }
+        }*/
         ///endregion
+
+        for (Player player : virtualBoard.getPlayers())
+            System.out.println("   " + player + "'s Last Resource: " + player.getResource());
 
         return actionsDone;
     }
@@ -267,13 +269,6 @@ public class BasicAI implements IAI, Serializable {
                 }
             }
         }
-    }
-
-    public void clearSystem() {
-        virtualBoard = Board.deepCopy(board);
-        actionsDone.clear();
-        possibleActions.clear();
-        System.gc();
     }
 
     public <T> ArrayList<T> getActions_of(ArrayList<IAction> actions, Class T) {
@@ -302,75 +297,87 @@ public class BasicAI implements IAI, Serializable {
     }
 
     @Override
+    public void clearNegotiationActions() {
+        negotiationActions.clear();
+    }
+
+    @Override
+    public void addNegotiationAction(IAction action) {
+        negotiationActions.add(action);
+    }
+
+    @Override
     public void updateBidRanking() {
         Resource desiredResource;
         Action desiredAction;
         bidRanking.clear();
 
-        for(int i = 0; i < Action.values().length - 1; i++) {
+        Bid.setBestType(ResourceType.BRICK);
+
+        for (int i = 0; i < Action.values().length; i++) {
             desiredResource = new Resource(owner.getResource());
             desiredAction = Action.values()[i];
-            if(desiredAction == Action.CreateRoad) {
+
+            // Ignore the ineffective action
+            if (desiredAction == Action.ZeroCost)
+                continue;
+
+            if (desiredAction == Action.CreateRoad) {
                 desiredResource.disjoin(Road.COST);
-                if(desiredResource.sum() >= 0)         // checks if the desired Resource have potential
-                    analyze(desiredResource);
-
-            }
-            else if (desiredAction == Action.CreateSettlement) {
+                if (desiredResource.getSum() >= 0)         // checks if the desired Resource have potential
+                    resourceAnalyze(desiredResource);
+            } else if (desiredAction == Action.CreateSettlement) {
                 desiredResource.disjoin(Settlement.COST);
-                if(desiredResource.sum() >= 0)         // checks if the desired Resource have potential
-                    analyze(desiredResource);
-            }
-            else if (desiredAction == Action.UpgradeSettlement) {
+                if (desiredResource.getSum() >= 0) {       // checks if the desired Resource have potential
+                    resourceAnalyze(desiredResource);
+                }
+            } else if (desiredAction == Action.UpgradeSettlement) {
                 desiredResource.disjoin(City.COST);
-                if(desiredResource.sum() >= 0)         // checks if the desired Resource have potential
-                    analyze(desiredResource);
-            }
-            else if (desiredAction == Action.DrawDevCard) {
+                if (desiredResource.getSum() >= 0)         // checks if the desired Resource have potential
+                    resourceAnalyze(desiredResource);
+            } else if (desiredAction == Action.DrawDevCard) {
                 desiredResource.disjoin(DrawDevelopmentCard.COST);
-                if(desiredResource.sum() >= 0)         // checks if the desired Resource have potential
-                    analyze(desiredResource);
+                if (desiredResource.getSum() >= 0)         // checks if the desired Resource have potential
+                    resourceAnalyze(desiredResource);
             }
-            else {
-                //generic ranking
-                bidRanking.add(new Bid(new Resource(5, -1, 0, 0, 0)));
-                bidRanking.add(new Bid(new Resource(5, 0, -1, 0, 0)));
-                bidRanking.add(new Bid(new Resource(5, 0, 0, -1, 0)));
-                bidRanking.add(new Bid(new Resource(5, 0, 0, 0, -1)));
-            }
+        }
 
-            Bid.setBestType(ResourceType.BRICK);
-            Collections.sort(bidRanking);
+        Collections.sort(bidRanking);
+
+        if (owner.getState() == PlayerState.THINKING) {
+            System.out.println("\n    " + owner + "'s Negotiation Session has been started.");
+            System.out.println("    " + owner + "'s Bid Ranking:");
+            for (Bid bid : bidRanking)
+                System.out.println("    " + bid);
         }
     }
 
-    private void analyze(Resource desiredResource) {
+    private void resourceAnalyze(Resource desiredResource) {
         Resource wantedResource = new Resource();
         Resource freeResource = new Resource(desiredResource);
 
-        for(ResourceType type : desiredResource.keySet()){
-            if(freeResource.get(type) < 0) {
+        for (ResourceType type : freeResource.keySet()) {
+            if (freeResource.get(type) < 0) {
                 wantedResource.add(type, -freeResource.get(type));
                 freeResource.replace(type, 0);
             }
         }
 
-        for(ResourceType type : wantedResource.keySet()){
-            if(wantedResource.get(type) > 0){
+        for (ResourceType type : wantedResource.keySet()) {
+            if (wantedResource.get(type) > 0) {
                 createBids(type, wantedResource.get(type), freeResource);
             }
         }
     }
 
     private void createBids(ResourceType type, int need, Resource freeResource) {
-        if(need > 1)
+        if (need > 1)
             createBids(type, need - 1, freeResource);
 
         Resource bid;
-        for(ResourceType givenType : freeResource.keySet()) {
+        for (ResourceType givenType : freeResource.keySet()) {
             if (freeResource.get(givenType) > 0) {
                 bid = new Resource();
-
                 bid.add(type, need);
 
                 ArrayList<ResourceType> freeTypeList = new ArrayList<>();
@@ -379,42 +386,38 @@ public class BasicAI implements IAI, Serializable {
                         freeTypeList.add(ResourceType.values()[i]);
                 }
 
-                int max[] = new int[4];
+                int[] max = new int[4];
                 max[0] = freeTypeList.size() > 0 ? Math.min(freeResource.get(freeTypeList.get(0)), need + 2) : 0;
                 max[1] = freeTypeList.size() > 1 ? Math.min(freeResource.get(freeTypeList.get(1)), need + 2) : 0;
                 max[2] = freeTypeList.size() > 2 ? Math.min(freeResource.get(freeTypeList.get(2)), need + 2) : 0;
                 max[3] = freeTypeList.size() > 3 ? Math.min(freeResource.get(freeTypeList.get(3)), need + 2) : 0;
 
-                int givenCount[] = new int[4];
+                int[] givenCount = new int[4];
                 for (givenCount[0] = max[0]; givenCount[0] >= 0; givenCount[0]--) {
                     for (givenCount[1] = Math.min(max[1], need + 2 - givenCount[0]); givenCount[1] >= 0; givenCount[1]--) {
                         for (givenCount[2] = Math.min(max[2], need + 2 - givenCount[0] - givenCount[1]); givenCount[2] >= 0; givenCount[2]--) {
                             for (givenCount[3] = Math.min(max[3], need + 2 - givenCount[0] - givenCount[1] - givenCount[2]); givenCount[3] >= 0; givenCount[3]--) {
-                                if (freeTypeList.size() > 0)
-                                    bid.add(freeTypeList.get(0), -givenCount[0]);
+                                Resource bidBefore = new Resource(bid);
 
-                                if (freeTypeList.size() > 1)
-                                    bid.add(freeTypeList.get(1), -givenCount[1]);
+                                for (int i = 0; i < freeTypeList.size() - 1; i++)
+                                    bid.add(freeTypeList.get(i), -givenCount[i]);
 
-                                if (freeTypeList.size() > 2)
-                                    bid.add(freeTypeList.get(2), -givenCount[2]);
+                                // ?
+                                // At least one resourceType must be negative.
+                                boolean isValid = false;
+                                for (ResourceType resourceType : ResourceType.values()) {
+                                    if (bid.get(resourceType) < 0) {
+                                        isValid = true;
+                                        break;
+                                    }
+                                }
 
-                                if (freeTypeList.size() > 3)
-                                    bid.add(freeTypeList.get(3), -givenCount[3]);
+                                // ?
+                                Bid addedBid = new Bid(bid);
+                                if (isValid && !bidRanking.contains(addedBid))
+                                    bidRanking.add(addedBid);
 
-                                bidRanking.add(new Bid(bid));
-
-                                if (freeTypeList.size() > 0)
-                                    bid.add(freeTypeList.get(0), givenCount[0]);
-
-                                if (freeTypeList.size() > 1)
-                                    bid.add(freeTypeList.get(1), givenCount[1]);
-
-                                if (freeTypeList.size() > 2)
-                                    bid.add(freeTypeList.get(2), givenCount[2]);
-
-                                if (freeTypeList.size() > 3)
-                                    bid.add(freeTypeList.get(3), givenCount[3]);
+                                bid = bidBefore;
                             }
                         }
                     }
@@ -443,8 +446,7 @@ public class BasicAI implements IAI, Serializable {
                             node = nnode;
                             node_exists = true;
                             continue;
-                        }
-                        else if (nnode.getIndex() == _location.getIndex()) {
+                        } else if (nnode.getIndex() == _location.getIndex()) {
                             _node = nnode;
                             _node_exists = true;
                             continue;
@@ -525,8 +527,7 @@ public class BasicAI implements IAI, Serializable {
         for (int i = 0; i < nodes.size(); i++) {
             if (nodes.get(i).getIndex() == locationSource.getIndex()) {
                 startNode = nodes.get(i);
-            }
-            else if (nodes.get(i).getIndex() == locationTarget.getIndex()) {
+            } else if (nodes.get(i).getIndex() == locationTarget.getIndex()) {
                 targetNode = nodes.get(i);
             }
         }
@@ -570,10 +571,17 @@ public class BasicAI implements IAI, Serializable {
         }
 
         ArrayList<Road> resultRoads = new ArrayList<>();
-        for (int i = 0; i < minChain.size()-1; i++) {
+        for (int i = 0; i < minChain.size() - 1; i++) {
             resultRoads.add(new Road(virtualBoard.getLocations().get(minChain.get(i).getIndex()), virtualBoard.getLocations().get(minChain.get(i + 1).getIndex()), owner));
         }
 
         return new AbstractMap.SimpleEntry<>(minDistance, resultRoads);
+    }
+
+    public void clearSystem() {
+        virtualBoard = Board.deepCopy(board);
+        actionsDone.clear();
+        possibleActions.clear();
+        System.gc();
     }
 }

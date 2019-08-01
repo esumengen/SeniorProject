@@ -8,9 +8,9 @@ import SeniorProject.Player;
 import java.io.Serializable;
 
 public class CreateSettlement implements IAction, Serializable {
-    private Location location;
     Player player;
     Board board;
+    private Location location;
 
     public CreateSettlement(int locationIndex, int playerIndex, Board board) {
         this.location = board.getLocations().get(locationIndex);

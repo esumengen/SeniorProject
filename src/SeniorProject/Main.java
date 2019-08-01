@@ -7,41 +7,33 @@ import org.ini4j.Wini;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Main {
+    static ArrayList<Player> players;
+    public static Board board; // public ?
+    static Synchronizer synchronizer;
+
+    static File actionsFile = new File(Global.get_working_path(Global.ACTIONS_FILE));
+    static File communication_file = new File(Global.get_working_path(Global.COMMUNICATION_FILE));
+    static Timer timer = new Timer();
+
     public static void main(String[] args) {
-        ArrayList<Player> players = createPlayers();
+        initialization();
 
-        Board board = new Board(players);
-        board.setActive(true);
-        board.setMain(true);
-
-        for (Player player : players) {
-            player.setPureBoard(board);
-            player.createAI();
-            player.createNegotiationAgent();
-        }
-
-        Synchronizer synchronizer = new Synchronizer(board);
-
-        Timer timer = new Timer();
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
                 if (!synchronizer.isSynchronized() && synchronizer.getState() == SynchronizerState.WAITING) {
-                    File actionsFile = new File(Global.get_working_path(Global.ACTIONS_FILE));
-
                     if (actionsFile.exists())
                         synchronizer.sync(actionsFile);
                 }
 
-                File communication_file = new File(Global.get_working_path(Global.COMMUNICATION_FILE));
                 if (communication_file.exists()) {
-
                     Wini communication_ini = null;
                     try {
                         communication_ini = new Wini(communication_file);
@@ -50,7 +42,7 @@ public class Main {
                     }
 
                     boolean isPlayed = false;
-                    Player playerMoved = null;
+                    Player player_lastMoved = null;
 
                     for (Player player : players) {
                         boolean isInitial = true;
@@ -65,10 +57,13 @@ public class Main {
                             if (turnMode.equals("waiting") && player.getState() != PlayerState.THINKING) {
                                 player.setState(PlayerState.THINKING);
 
-                                negotiationPhase(player, board);
+                                if (!isInitial)
+                                    negotiationPhase(player, board);
+
                                 player.writeMove(isInitial);
+
                                 isPlayed = true;
-                                playerMoved = player;
+                                player_lastMoved = player;
 
                                 communication_ini.put("General", "turnMode[" + player.getIndex() + "]", "\"done\"");
 
@@ -77,15 +72,15 @@ public class Main {
                                 } catch (Exception e) {
                                     new Message(e.getMessage() + " - 11");
                                 }
-
-                                //break;
                             }
                         }
 
+                        // May be problematic.
+                        // This part is agent side controlled turn management.
                         if (isPlayed) {
-                            if (playerMoved.getIndex() == Global.PLAYER_COUNT - 1 && !isInitial
-                                    || playerMoved.getIndex() == 0 && board.countStructures(StructureType.SETTLEMENT, Global.PLAYER_COUNT - 1) > 0 && isInitial
-                                    || playerMoved.getIndex() == Global.PLAYER_COUNT - 1 && board.countStructures(StructureType.SETTLEMENT, Global.PLAYER_COUNT - 1) == 0 && isInitial)
+                            if (player_lastMoved.getIndex() == Global.PLAYER_COUNT - 1 && !isInitial
+                                    || player_lastMoved.getIndex() == 0 && board.countStructures(StructureType.SETTLEMENT, Global.PLAYER_COUNT - 1) > 0 && isInitial
+                                    || player_lastMoved.getIndex() == Global.PLAYER_COUNT - 1 && board.countStructures(StructureType.SETTLEMENT, Global.PLAYER_COUNT - 1) == 0 && isInitial)
                                 board.setTurn(board.getTurn() + 1);
 
                             break;
@@ -93,51 +88,70 @@ public class Main {
                     }
                 }
 
-                ///region Automatic Termination
-                ProcessBuilder processBuilder = new ProcessBuilder("tasklist.exe");
-                Process process = null;
-                try {
-                    process = processBuilder.start();
-                } catch (Exception e) {
-                    new Message(e.getMessage() + " - 13");
-                }
-                String tasksList = stream_toString(process.getInputStream());
-
-                if (!tasksList.contains("Catan.exe") && !tasksList.contains("Runner.exe")) {
-                    System.exit(0);
-                }
-                ///endregion
+                programTermination();
             }
         };
 
         timer.schedule(task, 0, 1);
-
-        // Debug Frame
-        //DebugFrame debugFrame = new DebugFrame(board);
-        //debugFrame.setVisible(true);
     }
 
     private static void negotiationPhase(Player player, Board board) {
-        ///region
         ArrayList<NegotiationAgent> otherAgents = new ArrayList<>();
+
         for (Player _player : board.getPlayers()) {
+            if (_player.getType() == PlayerType.HUMAN)
+                continue;
+
             _player.getAI().updateBidRanking();
 
-            if (_player != player)
-                otherAgents.add(player.getNegotiationAgent());
+            if (_player.getIndex() != player.getIndex()) {
+                otherAgents.add(_player.getNegotiationAgent());
+            }
         }
 
-        NegotiationSession session = new NegotiationSession(player.getNegotiationAgent(), otherAgents, player.getAI().getBidRanking());
-        Negotiator.getInstance().setSession(session);
-        Negotiator.getInstance().startSession();
-        if (session.isCompleted()) {
+        if (player.getAI().getBidRanking().size() > 0) {
+            NegotiationSession session = new NegotiationSession(player.getNegotiationAgent(), otherAgents, player.getAI().getBidRanking());
+            Negotiator.getInstance().startSession(session);
+            if (session.isCompleted()) {
 
+            }
         }
-        ///endregion
+    }
+
+    private static void initialization() {
+        players = createPlayers();
+
+        board = new Board(players);
+        board.setActive(true);
+        board.setMain(true);
+
+        for (Player player : players) {
+            player.setPureBoard(board);
+            player.createAI();
+            player.createNegotiationAgent();
+        }
+
+        synchronizer = new Synchronizer(board);
+    }
+
+    private static void programTermination() {
+        ProcessBuilder processBuilder = new ProcessBuilder("tasklist.exe");
+        Process process = null;
+        try {
+            process = processBuilder.start();
+        } catch (Exception e) {
+            new Message(e.getMessage() + " - 13");
+        }
+        String tasksList = stream_toString(process.getInputStream());
+
+        if (!tasksList.contains("Catan.exe") && !tasksList.contains("Runner.exe")) {
+            System.exit(0);
+        }
     }
 
     public static ArrayList<Player> createPlayers() {
         ArrayList<Player> players = new ArrayList<>();
+
         for (int i = 0; i < Global.PLAYER_COUNT; i++) {
             Player player = new Player(i);
 
@@ -146,11 +160,12 @@ public class Main {
 
             players.add(player);
         }
+
         return players;
     }
 
     private static String stream_toString(InputStream inputStream) {
-        Scanner scanner = new Scanner(inputStream, "UTF-8").useDelimiter("\\A");
+        Scanner scanner = new Scanner(inputStream, StandardCharsets.UTF_8).useDelimiter("\\A");
         String string = scanner.hasNext() ? scanner.next() : "";
         scanner.close();
 
