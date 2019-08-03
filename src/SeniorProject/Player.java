@@ -2,6 +2,7 @@ package SeniorProject;
 
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
 import SeniorProject.Negotiation.BasicNegotiationAgent;
+import SeniorProject.Negotiation.NegotiationAgent;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.Scanner;
 
 public class Player implements Serializable, IObservable {
     private BasicAI AI_instance;
-    private BasicNegotiationAgent NegotiationAgent_instance;
+    private NegotiationAgent NegotiationAgent_instance;
     private String name;
     private int index;
     private int victoryPoint;
@@ -218,8 +219,10 @@ public class Player implements Serializable, IObservable {
         this.AI_instance = new BasicAI(this, (Board) pureBoard);
     }
 
-    void createNegotiationAgent() {
-        this.NegotiationAgent_instance = new BasicNegotiationAgent(this);
+    void createNegotiationAgent(NegotiationAgent negotiationAgent) {
+        this.NegotiationAgent_instance = negotiationAgent;
+        negotiationAgent.setOwner(getIndex());
+        negotiationAgent.setBidRanking(getAI().getBidRanking());
     }
 
     public BasicAI getAI() {
@@ -291,11 +294,11 @@ public class Player implements Serializable, IObservable {
         return "P" + (index + 1);
     }
 
-    public BasicNegotiationAgent getNegotiationAgent() {
+    public NegotiationAgent getNegotiationAgent() {
         return NegotiationAgent_instance;
     }
 
-    public void setNegotiationAgent(BasicNegotiationAgent negotiationAgent_instance) {
+    public void setNegotiationAgent(NegotiationAgent negotiationAgent_instance) {
         NegotiationAgent_instance = negotiationAgent_instance;
     }
 }

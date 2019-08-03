@@ -1,5 +1,6 @@
 package SeniorProject;
 
+import SeniorProject.Negotiation.BasicNegotiationAgent;
 import SeniorProject.Negotiation.NegotiationAgent;
 import SeniorProject.Negotiation.NegotiationSession;
 import SeniorProject.Negotiation.Negotiator;
@@ -7,6 +8,10 @@ import org.ini4j.Wini;
 
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -128,10 +133,33 @@ public class Main {
         for (Player player : players) {
             player.setPureBoard(board);
             player.createAI();
-            player.createNegotiationAgent();
+
+            NegotiationAgent negotiationAgent = null;
+
+            try {
+                Class clss = new URLClassLoader(new URL[]{ new File(System.getProperty("user.home")).toURI().toURL() })
+                        .loadClass("NewNegotiationAgent");
+
+                Constructor constructor = clss.getDeclaredConstructor();
+
+                negotiationAgent = (NegotiationAgent) constructor.newInstance();
+                negotiationAgent.setOwner(player.getIndex());
+            } catch (Exception e) {
+                System.out.println(e.fillInStackTrace());
+            }
+
+            player.createNegotiationAgent(negotiationAgent);
         }
 
         synchronizer = new Synchronizer(board);
+    }
+
+    private static Class getClassFromFile(String fullClassName) throws Exception {
+        URLClassLoader loader = new URLClassLoader(new URL[] {
+                new URL(fullClassName)
+        });
+
+        return loader.loadClass(fullClassName);
     }
 
     private static void programTermination() {
