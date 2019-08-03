@@ -154,14 +154,6 @@ public class Main {
         synchronizer = new Synchronizer(board);
     }
 
-    private static Class getClassFromFile(String fullClassName) throws Exception {
-        URLClassLoader loader = new URLClassLoader(new URL[] {
-                new URL(fullClassName)
-        });
-
-        return loader.loadClass(fullClassName);
-    }
-
     private static void programTermination() {
         ProcessBuilder processBuilder = new ProcessBuilder("tasklist.exe");
         Process process = null;

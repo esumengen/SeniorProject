@@ -221,8 +221,11 @@ public class Player implements Serializable, IObservable {
 
     void createNegotiationAgent(NegotiationAgent negotiationAgent) {
         this.NegotiationAgent_instance = negotiationAgent;
-        negotiationAgent.setOwner(getIndex());
-        negotiationAgent.setBidRanking(getAI().getBidRanking());
+
+        if (negotiationAgent != null) {
+            negotiationAgent.setOwner(getIndex());
+            negotiationAgent.setBidRanking(getAI().getBidRanking());
+        }
     }
 
     public BasicAI getAI() {

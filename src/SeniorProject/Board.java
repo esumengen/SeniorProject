@@ -1,6 +1,7 @@
 package SeniorProject;
 
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
+import SeniorProject.Negotiation.NegotiationAgent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -86,17 +87,22 @@ public class Board extends PureBoard implements Serializable {
 
     static Board deepCopy(Board board) {
         ArrayList<BasicAI> AIs = new ArrayList<>();
+        ArrayList<NegotiationAgent> agents = new ArrayList<>();
         for (Player player : board.getPlayers()) {
             AIs.add(player.getAI());
+            agents.add(player.getNegotiationAgent());
             player.setAI(null);
+            player.setNegotiationAgent(null);
         }
         System.gc();
 
         Board _board = (Board) PureBoard.deepCopy(board);
         _board.setMain(false);
 
-        for (Player player : board.getPlayers())
+        for (Player player : board.getPlayers()) {
             player.setAI(AIs.get(player.getIndex()));
+            player.setNegotiationAgent(agents.get(player.getIndex()));
+        }
 
         return _board;
     }
