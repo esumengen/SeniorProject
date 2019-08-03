@@ -30,8 +30,8 @@ public abstract class NegotiationAgent implements Serializable {
         return owner;
     }
 
-    public final void setOwner(int ownerIndex) {
-        owner = Main.board.getPlayers().get(ownerIndex);
+    public final void setOwner(Player owner) {
+        this.owner = owner;
     }
 
     public final void setBidRanking(ArrayList<Bid> bidRanking) {

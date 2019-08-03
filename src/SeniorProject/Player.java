@@ -223,7 +223,7 @@ public class Player implements Serializable, IObservable {
         this.NegotiationAgent_instance = negotiationAgent;
 
         if (negotiationAgent != null) {
-            negotiationAgent.setOwner(getIndex());
+            negotiationAgent.setOwner(this);
             negotiationAgent.setBidRanking(getAI().getBidRanking());
         }
     }

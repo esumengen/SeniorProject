@@ -143,7 +143,7 @@ public class Main {
                 Constructor constructor = clss.getDeclaredConstructor();
 
                 negotiationAgent = (NegotiationAgent) constructor.newInstance();
-                negotiationAgent.setOwner(player.getIndex());
+                negotiationAgent.setOwner(player);
             } catch (Exception e) {
                 System.out.println(e.fillInStackTrace());
             }
