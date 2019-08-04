@@ -132,15 +132,23 @@ public class Main {
 
         for (Player player : players) {
             player.setPureBoard(board);
-            player.createAI();
 
             NegotiationAgent negotiationAgent = null;
+            AI AI_instance = null;
 
             try {
                 Class clss = new URLClassLoader(new URL[]{ new File(System.getProperty("user.home")).toURI().toURL() })
                         .loadClass("NewNegotiationAgent");
 
+                Class clss2 = new URLClassLoader(new URL[]{ new File(System.getProperty("user.home")).toURI().toURL() })
+                        .loadClass("NewAI");
+
                 Constructor constructor = clss.getDeclaredConstructor();
+                Constructor constructor2 = clss2.getDeclaredConstructor();
+
+                AI_instance = (AI) constructor2.newInstance();
+                AI_instance.setBoard(board);
+                AI_instance.setOwner(player);
 
                 negotiationAgent = (NegotiationAgent) constructor.newInstance();
                 negotiationAgent.setOwner(player);
@@ -148,6 +156,7 @@ public class Main {
                 System.out.println(e.fillInStackTrace());
             }
 
+            player.createAI(AI_instance);
             player.createNegotiationAgent(negotiationAgent);
         }
 

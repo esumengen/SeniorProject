@@ -6,50 +6,24 @@ import SeniorProject.Negotiation.Bid;
 import java.io.Serializable;
 import java.util.*;
 
-public class BasicAI implements IAI, Serializable {
+public class BasicAI extends AI {
     private static final StructureType SETTLEMENT = StructureType.SETTLEMENT;
     private static final ResourceType BRICK = ResourceType.BRICK;
     private static final ResourceType LUMBER = ResourceType.LUMBER;
-    private Player owner;
-    private Board board;
-    private ArrayList<IAction> actionsDone;
-    private Board virtualBoard;
-    private ArrayList<Bid> bidRanking;
-    private ArrayList<IAction> possibleActions;
+
     private HashMap<StructureType, Double[]> locScores;
     private Random randomGenerator = new Random();
-    private ArrayList<IAction> negotiationActions;
 
-    public BasicAI(Player player, Board board) {
-        actionsDone = new ArrayList<>();
-        possibleActions = new ArrayList<>();
-        negotiationActions = new ArrayList<>();
-        bidRanking = new ArrayList<>();
-
-        locScores = new HashMap<>();
-        locScores.put(SETTLEMENT, new Double[board.getLocations().size()]);
-
-        this.owner = player;
-        this.board = board;
-
-        updateBidRanking();
-        updateLocationScores(SETTLEMENT);
-    }
-
+    @Override
     public ArrayList<IAction> createActions(boolean isInitial) {
-        clearSystem();
+        locScores = new HashMap<>();
+        locScores.put(SETTLEMENT, new Double[getBoard().getLocations().size()]);
 
-        for (IAction negotiationAction : negotiationActions) {
-            ((TradeWithPlayer) negotiationAction).setBoard(virtualBoard);
-            doVirtually(negotiationAction);
-        }
-        clearNegotiationActions();
-
-        possibleActions = virtualBoard.getState().getPossibleActions(owner.getIndex());
+        updateLocationScores(SETTLEMENT);
 
         while (true) {
-            ArrayList<CreateSettlement> actions_settlements = getActions_of(possibleActions, CreateSettlement.class);
-            ArrayList<CreateRoad> actions_roads = getActions_of(possibleActions, CreateRoad.class);
+            ArrayList<CreateSettlement> actions_settlements = getActions_of(getPossibleActions(), CreateSettlement.class);
+            ArrayList<CreateRoad> actions_roads = getActions_of(getPossibleActions(), CreateRoad.class);
 
             //region While a settlement can be built, build it.
             Double[] _locScores = locScores.get(SETTLEMENT);
@@ -65,18 +39,19 @@ public class BasicAI implements IAI, Serializable {
                 Location bestLocation = null;
                 for (int i = 0; i < _locScores.length; i++) {
                     if (bestLocation == null || _locScores[i] > _locScores[bestLocation.getIndex()])
-                        bestLocation = virtualBoard.getLocations().get(i);
+                        bestLocation = getVirtualBoard().getLocations().get(i);
                 }
 
                 for (CreateSettlement createSettlement : actions_settlements) {
                     if (createSettlement.getLocation().equals(bestLocation)) {
                         doVirtually(createSettlement);
+                        updateLocationScores(SETTLEMENT);
                         break;
                     }
                 }
 
-                actions_settlements = getActions_of(possibleActions, CreateSettlement.class);
-                actions_roads = getActions_of(possibleActions, CreateRoad.class);
+                actions_settlements = getActions_of(getPossibleActions(), CreateSettlement.class);
+                actions_roads = getActions_of(getPossibleActions(), CreateRoad.class);
             }
             ///endregion
 
@@ -85,7 +60,7 @@ public class BasicAI implements IAI, Serializable {
             //region If a road can be built, build it else break the loop.
             _locScores = locScores.get(SETTLEMENT);
 
-            for (Location location : virtualBoard.getLocations()) {
+            for (Location location : getVirtualBoard().getLocations()) {
                 if (location.getOwner() != null) {
                     _locScores[location.getIndex()] = Math.abs(_locScores[location.getIndex()]);
                     _locScores[location.getIndex()] *= -1;
@@ -137,7 +112,7 @@ public class BasicAI implements IAI, Serializable {
                         int bestPath_discounted_len = Integer.MAX_VALUE;
 
                         for (Location location : actionRoad_locations) {
-                            if (location.getOwner() != null && location.getOwner().getIndex() == owner.getIndex()) {
+                            if (location.getOwner() != null && location.getOwner().getIndex() == getOwner().getIndex()) {
                                 ArrayList<Road> path = getShortestPath(location, best3Locations[i], false).getValue();
 
                                 boolean ignorePath = true;
@@ -154,7 +129,7 @@ public class BasicAI implements IAI, Serializable {
                                 int path_discounted_len = path.size();
 
                                 for (Road _road : path) {
-                                    path_discounted_len -= owner.getStructures().contains(_road) ? 1 : 0;
+                                    path_discounted_len -= getOwner().getStructures().contains(_road) ? 1 : 0;
                                 }
 
                                 if (path_discounted_len < bestPath_discounted_len) {
@@ -228,9 +203,10 @@ public class BasicAI implements IAI, Serializable {
                     locationIndexes[0] = road.getStartLocation().getIndex();
                     locationIndexes[1] = road.getEndLocation().getIndex();
 
-                    int index = actions_roads.indexOf(new CreateRoad(locationIndexes, owner.getIndex(), virtualBoard));
+                    int index = actions_roads.indexOf(new CreateRoad(locationIndexes, getOwner().getIndex(), virtualBoard));
                     if (index != -1) {
                         doVirtually(actions_roads.get(index));
+                        updateLocationScores(SETTLEMENT);
                         break;
                     }
                 }
@@ -242,16 +218,17 @@ public class BasicAI implements IAI, Serializable {
         }
 
         ///region Do actions randomly.
-        /*while (possibleActions.size() != 0) {
-            IAction action = possibleActions.get(randomGenerator.nextInt(possibleActions.size()));
+        while (getPossibleActions().size() != 0) {
+            IAction action = getPossibleActions().get(randomGenerator.nextInt(getPossibleActions().size()));
             doVirtually(action);
-        }*/
+            updateLocationScores(SETTLEMENT);
+        }
         ///endregion
 
-        for (Player player : virtualBoard.getPlayers())
+        for (Player player : getVirtualBoard().getPlayers())
             System.out.println("   " + player + "'s Last Resource: " + player.getResource());
 
-        return actionsDone;
+        return getActionsDone();
     }
 
     private void updateLocationScores(StructureType structureType) {
@@ -259,7 +236,7 @@ public class BasicAI implements IAI, Serializable {
 
         if (structureType == SETTLEMENT) {
             for (int i = 0; i < _locScores.length; i++) {
-                Location location = board.getLocations().get(i);
+                Location location = getBoard().getLocations().get(i);
 
                 _locScores[i] = 0.0;
                 for (Land land : location.getAdjacentLands()) {
@@ -282,40 +259,16 @@ public class BasicAI implements IAI, Serializable {
         return selectedActions;
     }
 
-    public void doVirtually(IAction action) {
-        actionsDone.add(action);
-        action.execute();
-
-        possibleActions = virtualBoard.getState().getPossibleActions(owner.getIndex());
-
-        updateLocationScores(SETTLEMENT);
-    }
-
-    @Override
-    public ArrayList<Bid> getBidRanking() {
-        return bidRanking;
-    }
-
-    @Override
-    public void clearNegotiationActions() {
-        negotiationActions.clear();
-    }
-
-    @Override
-    public void addNegotiationAction(IAction action) {
-        negotiationActions.add(action);
-    }
-
     @Override
     public void updateBidRanking() {
         Resource desiredResource;
         Action desiredAction;
-        bidRanking.clear();
+        clearBidRanking();
 
         Bid.setBestType(ResourceType.BRICK);
 
         for (int i = 0; i < Action.values().length; i++) {
-            desiredResource = new Resource(owner.getResource());
+            desiredResource = new Resource(getOwner().getResource());
             desiredAction = Action.values()[i];
 
             // Ignore the ineffective action
@@ -342,12 +295,10 @@ public class BasicAI implements IAI, Serializable {
             }
         }
 
-        Collections.sort(bidRanking);
-
-        if (owner.getState() == PlayerState.THINKING) {
-            System.out.println("\n    " + owner + "'s Negotiation Session has been started.");
-            System.out.println("    " + owner + "'s Bid Ranking:");
-            for (Bid bid : bidRanking)
+        if (getOwner().getState() == PlayerState.THINKING) {
+            System.out.println("\n    " + getOwner() + "'s Negotiation Session has been started.");
+            System.out.println("    " + getOwner() + "'s Bid Ranking:");
+            for (Bid bid : getBidRanking())
                 System.out.println("    " + bid);
         }
     }
@@ -414,8 +365,8 @@ public class BasicAI implements IAI, Serializable {
 
                                 // ?
                                 Bid addedBid = new Bid(bid);
-                                if (isValid && !bidRanking.contains(addedBid))
-                                    bidRanking.add(addedBid);
+                                if (isValid && !getBidRanking().contains(addedBid))
+                                    addBidToBidRanking(addedBid);
 
                                 bid = bidBefore;
                             }
@@ -472,7 +423,7 @@ public class BasicAI implements IAI, Serializable {
         }
 
         for (Structure structure : virtualBoard.getStructures()) {
-            if (structure instanceof Road && structure.getPlayer().getIndex() != owner.getIndex()) {
+            if (structure instanceof Road && structure.getPlayer().getIndex() != getOwner().getIndex()) {
                 Road road = (Road) structure;
 
                 for (int i = 0; i < nodes.size(); i++) {
@@ -502,7 +453,7 @@ public class BasicAI implements IAI, Serializable {
                         }
                     }
                 }
-            } else if (ignoreBuildings && structure instanceof Building && structure.getPlayer().getIndex() != owner.getIndex()) {
+            } else if (ignoreBuildings && structure instanceof Building && structure.getPlayer().getIndex() != getOwner().getIndex()) {
                 Building building = (Building) structure;
 
                 for (int i = 0; i < nodes.size(); i++) {
@@ -572,16 +523,9 @@ public class BasicAI implements IAI, Serializable {
 
         ArrayList<Road> resultRoads = new ArrayList<>();
         for (int i = 0; i < minChain.size() - 1; i++) {
-            resultRoads.add(new Road(virtualBoard.getLocations().get(minChain.get(i).getIndex()), virtualBoard.getLocations().get(minChain.get(i + 1).getIndex()), owner));
+            resultRoads.add(new Road(virtualBoard.getLocations().get(minChain.get(i).getIndex()), virtualBoard.getLocations().get(minChain.get(i + 1).getIndex()), getOwner()));
         }
 
         return new AbstractMap.SimpleEntry<>(minDistance, resultRoads);
-    }
-
-    public void clearSystem() {
-        virtualBoard = Board.deepCopy(board);
-        actionsDone.clear();
-        possibleActions.clear();
-        System.gc();
     }
 }
