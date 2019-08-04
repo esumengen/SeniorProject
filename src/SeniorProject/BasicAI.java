@@ -1,9 +1,6 @@
 package SeniorProject;
 
-import SeniorProject.Actions.Action;
-import SeniorProject.Actions.CreateRoad;
-import SeniorProject.Actions.CreateSettlement;
-import SeniorProject.Actions.DrawDevelopmentCard;
+import SeniorProject.Actions.*;
 import SeniorProject.Negotiation.Bid;
 
 import java.util.*;
