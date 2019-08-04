@@ -90,8 +90,7 @@ public class Bid implements Comparable<Bid>, Serializable {
             }
 
             return true;
-        }
-        else
+        } else
             return false;
     }
 

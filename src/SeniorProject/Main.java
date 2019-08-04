@@ -9,7 +9,6 @@ import org.ini4j.Wini;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
@@ -130,28 +129,73 @@ public class Main {
         board.setActive(true);
         board.setMain(true);
 
+        String[] negotiationDirectories = new String[Global.PLAYER_COUNT];
+        String[] AIDirectories = new String[Global.PLAYER_COUNT];
+
         for (Player player : players) {
+            if (player.getType() == PlayerType.HUMAN)
+                continue;
+
+            try {
+                Wini ini = new Wini(new File(Global.get_working_path(Global.ENVIRONMENT_FILE)));
+
+                String negotiationDirectory = ini.get("NegotiationSetup", Integer.toString(player.getIndex()), String.class);
+                negotiationDirectory = Global.getRidOf_quotationMarks(negotiationDirectory);
+
+                String AIDirectory = ini.get("AISetup", Integer.toString(player.getIndex()), String.class);
+                AIDirectory = Global.getRidOf_quotationMarks(AIDirectory);
+
+                negotiationDirectories[player.getIndex()] = negotiationDirectory;
+                AIDirectories[player.getIndex()] = AIDirectory;
+            } catch (Exception e) {
+                new Message(e.getMessage() + " - 23");
+            }
+        }
+
+        for (Player player : players) {
+            if (player.getType() == PlayerType.HUMAN)
+                continue;
+
             player.setPureBoard(board);
 
             NegotiationAgent negotiationAgent = null;
             AI AI_instance = null;
 
+            if (negotiationDirectories[player.getIndex()] == "Default")
+                negotiationAgent = new BasicNegotiationAgent();
+
+            if (AIDirectories[player.getIndex()] == "Default")
+                AI_instance = new BasicAI();
+
             try {
-                Class clss = new URLClassLoader(new URL[]{ new File(System.getProperty("user.home")).toURI().toURL() })
-                        .loadClass("NewNegotiationAgent");
+                Class clss, clss2;
+                Constructor constructor, constructor2;
 
-                Class clss2 = new URLClassLoader(new URL[]{ new File(System.getProperty("user.home")).toURI().toURL() })
-                        .loadClass("NewAI");
+                if (negotiationDirectories[player.getIndex()] != "Default") {
+                    File file = new File(negotiationDirectories[player.getIndex()]);
+                    String name = file.getName().substring(0, file.getName().indexOf("."));
 
-                Constructor constructor = clss.getDeclaredConstructor();
-                Constructor constructor2 = clss2.getDeclaredConstructor();
+                    clss = new URLClassLoader(new URL[]{file.getParentFile().toURI().toURL()})
+                            .loadClass(name);
+                    constructor = clss.getDeclaredConstructor();
 
-                AI_instance = (AI) constructor2.newInstance();
-                AI_instance.setBoard(board);
-                AI_instance.setOwner(player);
+                    negotiationAgent = (NegotiationAgent) constructor.newInstance();
+                    System.out.println(player.getIndex());
+                    negotiationAgent.setOwner(player);
+                }
 
-                negotiationAgent = (NegotiationAgent) constructor.newInstance();
-                negotiationAgent.setOwner(player);
+                if (AIDirectories[player.getIndex()] != "Default") {
+                    File file = new File(AIDirectories[player.getIndex()]);
+                    String name = file.getName().substring(0, file.getName().indexOf("."));
+
+                    clss2 = new URLClassLoader(new URL[]{file.getParentFile().toURI().toURL()})
+                            .loadClass(name);
+                    constructor2 = clss2.getDeclaredConstructor();
+
+                    AI_instance = (AI) constructor2.newInstance();
+                    AI_instance.setBoard(board);
+                    AI_instance.setOwner(player);
+                }
             } catch (Exception e) {
                 System.out.println(e.fillInStackTrace());
             }

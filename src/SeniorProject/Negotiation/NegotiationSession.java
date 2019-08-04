@@ -1,8 +1,6 @@
 package SeniorProject.Negotiation;
 
-import SeniorProject.Actions.Action;
 import SeniorProject.Actions.TradeWithPlayer;
-import SeniorProject.Board;
 import SeniorProject.IAction;
 import SeniorProject.Main;
 

@@ -4,12 +4,11 @@ import SeniorProject.Global;
 import SeniorProject.Resource;
 import SeniorProject.ResourceType;
 
-import java.util.ArrayList;
 import java.util.Collections;
 
 public class Negotiator {
-    private static Negotiator instance = new Negotiator();
     public static final int maximumMutualOffers = 100;
+    private static Negotiator instance = new Negotiator();
     private NegotiationSession session;
 
     private Negotiator() {
@@ -46,37 +45,37 @@ public class Negotiator {
                 if (!targetAgent.getOwner().getAI().getBidRanking().contains(offeredBid.getReversed()))
                     addBid(targetAgent, offeredBid.getReversed());
 
-                    lastBid = offeredBid;
+                lastBid = offeredBid;
 
-                    if (offeredBid == null) {
-                        sequentialPass++;
-                        if (sequentialPass == Global.PLAYER_COUNT - 1)
-                            break;
-                    } else
-                        sequentialPass = 0;
+                if (offeredBid == null) {
+                    sequentialPass++;
+                    if (sequentialPass == Global.PLAYER_COUNT - 1)
+                        break;
+                } else
+                    sequentialPass = 0;
 
-                    isAccepted = targetAgent.isAccepted(session, offeredBid.getReversed());
+                isAccepted = targetAgent.isAccepted(session, offeredBid.getReversed());
 
-                    if (!isAccepted) {
-                        Bid response = targetAgent.handleOffer(session, offeredBid.getReversed());
-                        session.addTakenBid(response.getReversed(), targetAgent);
+                if (!isAccepted) {
+                    Bid response = targetAgent.handleOffer(session, offeredBid.getReversed());
+                    session.addTakenBid(response.getReversed(), targetAgent);
 
-                        if (isAffordable(response, ownerAgent)) {
-                            if (!ownerAgent.getOwner().getAI().getBidRanking().contains(response.getReversed()))
-                                addBid(ownerAgent, response.getReversed());
+                    if (isAffordable(response, ownerAgent)) {
+                        if (!ownerAgent.getOwner().getAI().getBidRanking().contains(response.getReversed()))
+                            addBid(ownerAgent, response.getReversed());
 
-                            isAccepted = (response != null) && ownerAgent.isAccepted(session, response.getReversed());
-                            if (isAccepted) {
-                                lastBid = response.getReversed();
-                                System.out.println("    " + targetAgent.getOwner() + ": " + response + "/" + lastBid);
-                            }
+                        isAccepted = (response != null) && ownerAgent.isAccepted(session, response.getReversed());
+                        if (isAccepted) {
+                            lastBid = response.getReversed();
+                            System.out.println("    " + targetAgent.getOwner() + ": " + response + "/" + lastBid);
                         }
                     }
+                }
             }
 
             if (isAccepted) {
                 session.complete(lastBid, targetAgent);
-                System.out.println("    Negotiation Ended: Agreement between "+ownerAgent.getOwner()+" and "+targetAgent.getOwner());
+                System.out.println("    Negotiation Ended: Agreement between " + ownerAgent.getOwner() + " and " + targetAgent.getOwner());
                 System.out.println("    Agreed on " + lastBid.getChange());
 
                 return true;
@@ -101,7 +100,7 @@ public class Negotiator {
         System.out.println("    " + bid + " is added to " + agent.getOwner() + "'s list. [" + (agent.getOwner().getAI().getBidRanking().indexOf(bid) + 1) + ". order]");
     }
 
-    public boolean isAffordable (Bid offeredBid, NegotiationAgent agent) {
+    public boolean isAffordable(Bid offeredBid, NegotiationAgent agent) {
         if (offeredBid != null) {
             Resource _resource = new Resource(agent.getOwner().getResource());
             _resource.disjoin(offeredBid.getChange());

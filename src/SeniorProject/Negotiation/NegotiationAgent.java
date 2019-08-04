@@ -1,8 +1,7 @@
 package SeniorProject.Negotiation;
 
-import SeniorProject.Board;
-import SeniorProject.Main;
 import SeniorProject.Player;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -10,7 +9,7 @@ public abstract class NegotiationAgent implements Serializable {
     private Player owner = null;
     private ArrayList<Bid> bidRanking = null;
 
-    public NegotiationAgent () {
+    public NegotiationAgent() {
 
     }
 
@@ -34,11 +33,11 @@ public abstract class NegotiationAgent implements Serializable {
         this.owner = owner;
     }
 
-    public final void setBidRanking(ArrayList<Bid> bidRanking) {
-        this.bidRanking = bidRanking;
-    }
-
     public final ArrayList<Bid> getBidRanking() {
         return bidRanking;
+    }
+
+    public final void setBidRanking(ArrayList<Bid> bidRanking) {
+        this.bidRanking = bidRanking;
     }
 }

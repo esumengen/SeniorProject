@@ -1,15 +1,11 @@
 package SeniorProject.Negotiation;
 
-import SeniorProject.Player;
-
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Random;
 
 public class BasicNegotiationAgent extends NegotiationAgent {
     private Random randomizer = new Random();
 
-    public BasicNegotiationAgent () {
+    public BasicNegotiationAgent() {
         super();
     }
 
@@ -21,8 +17,7 @@ public class BasicNegotiationAgent extends NegotiationAgent {
     public Bid handleOffer(NegotiationSession session, Bid offer) {
         if (offer == null) {
             return getBidRanking().get(0);
-        }
-        else {
+        } else {
             return getBidRanking().get((int) (getBaseRatio(session) + randomizer.nextDouble() * 0.1) * getBidRanking().size() / 4);
         }
     }

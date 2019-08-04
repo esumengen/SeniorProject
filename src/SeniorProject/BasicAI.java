@@ -1,9 +1,11 @@
 package SeniorProject;
 
-import SeniorProject.Actions.*;
+import SeniorProject.Actions.Action;
+import SeniorProject.Actions.CreateRoad;
+import SeniorProject.Actions.CreateSettlement;
+import SeniorProject.Actions.DrawDevelopmentCard;
 import SeniorProject.Negotiation.Bid;
 
-import java.io.Serializable;
 import java.util.*;
 
 public class BasicAI extends AI {
