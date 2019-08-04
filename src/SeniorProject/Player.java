@@ -1,7 +1,7 @@
 package SeniorProject;
 
+import SeniorProject.Actions.TradeWithPlayer;
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
-import SeniorProject.Negotiation.BasicNegotiationAgent;
 import SeniorProject.Negotiation.NegotiationAgent;
 
 import java.io.Serializable;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Player implements Serializable, IObservable {
-    private BasicAI AI_instance;
+    private AI AI_instance;
     private NegotiationAgent NegotiationAgent_instance;
     private String name;
     private int index;
@@ -63,7 +63,17 @@ public class Player implements Serializable, IObservable {
         System.out.println();*/
         ///endregion
 
+        AI_instance.virtualBoard = Board.deepCopy(AI_instance.getBoard());
+        AI_instance.resetAI();
+        AI_instance.possibleActions = AI_instance.virtualBoard.getState().getPossibleActions(AI_instance.getOwner().getIndex());
+        System.gc();
+
+        for (IAction negotiationAction : AI_instance.getNegotiationActions()) {
+            ((TradeWithPlayer) negotiationAction).setBoard(AI_instance.getVirtualBoard());
+            AI_instance.doVirtually(negotiationAction);
+        }
         ArrayList<IAction> actionList = AI_instance.createActions(isInitial);
+        AI_instance.clearNegotiationActions();
 
         String fileName = "actions_temp" + index + ".txt";
         String actionList_str = "";
@@ -73,7 +83,10 @@ public class Player implements Serializable, IObservable {
                 actionList_str += action_str + "\r\n";
         }
 
-        AI_instance.clearSystem();
+        AI_instance.virtualBoard = Board.deepCopy(AI_instance.getBoard());
+        AI_instance.resetAI();
+        AI_instance.possibleActions = AI_instance.virtualBoard.getState().getPossibleActions(AI_instance.getOwner().getIndex());
+        System.gc();
 
         Global.createTextFile(fileName, actionList_str);
 
@@ -106,7 +119,7 @@ public class Player implements Serializable, IObservable {
         setState(PlayerState.IDLE);
     }
 
-    PlayerState getState() {
+    public PlayerState getState() {
         return state;
     }
 
@@ -215,8 +228,8 @@ public class Player implements Serializable, IObservable {
         updateSubscribers();
     }*/
 
-    void createAI() {
-        this.AI_instance = new BasicAI(this, (Board) pureBoard);
+    void createAI(AI AI_instance) {
+        this.AI_instance = AI_instance;
     }
 
     void createNegotiationAgent(NegotiationAgent negotiationAgent) {
@@ -228,11 +241,11 @@ public class Player implements Serializable, IObservable {
         }
     }
 
-    public BasicAI getAI() {
+    public AI getAI() {
         return AI_instance;
     }
 
-    public void setAI(BasicAI ai) {
+    public void setAI(AI ai) {
         this.AI_instance = ai;
     }
 

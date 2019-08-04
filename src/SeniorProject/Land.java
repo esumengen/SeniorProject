@@ -62,7 +62,7 @@ public class Land implements Serializable {
         this.type = type;
     }
 
-    ResourceType getResourceType() {
+    public ResourceType getResourceType() {
         return type.toResourceType();
     }
 

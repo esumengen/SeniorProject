@@ -86,7 +86,7 @@ public class Board extends PureBoard implements Serializable {
     }
 
     static Board deepCopy(Board board) {
-        ArrayList<BasicAI> AIs = new ArrayList<>();
+        ArrayList<AI> AIs = new ArrayList<>();
         ArrayList<NegotiationAgent> agents = new ArrayList<>();
         for (Player player : board.getPlayers()) {
             AIs.add(player.getAI());

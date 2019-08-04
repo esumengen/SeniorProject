@@ -54,7 +54,7 @@ public class Location extends Node implements Serializable {
         connectedRoads.add(road);
     }
 
-    Player getOwner() {
+    public Player getOwner() {
         return owner;
     }
 
@@ -70,7 +70,7 @@ public class Location extends Node implements Serializable {
         this.harborType = harborType;
     }
 
-    boolean hasCity() {
+    public boolean hasCity() {
         for (Structure structure : structures) {
             if (structure instanceof City)
                 return true;
