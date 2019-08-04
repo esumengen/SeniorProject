@@ -14,6 +14,8 @@ public class Board extends PureBoard implements Serializable {
     private boolean isMain;
     private State state;
     private boolean isInitial;
+    private int totalDice;
+    private boolean hasRobberPlayedRecently;
 
     public Board(ArrayList<Player> players) {
         super();
@@ -152,14 +154,15 @@ public class Board extends PureBoard implements Serializable {
         addLog("ACTION: A settlement has been upgraded on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
     }
 
-    public void moveRobber(Player robber, Land land) {
-        setRobbedLand(land);
-        robber.getResource().add(land.getResourceType(), 1);
+    public void moveRobber(int landIndex, int playerIndex, int victimIndex, ResourceType resourceType) {
+        setRobbedLand(getLands().get(landIndex));
+        getPlayers().get(playerIndex).getResource().add(getLands().get(landIndex).getResourceType(), 1);
+        hasRobberPlayedRecently = true;
 
-        syncPlayer(robber);
-        //changeUpdate();
+        syncPlayer(getPlayers().get(playerIndex));
+        changeUpdate();
 
-        addLog("ACTION: The robber has been moved to [Land " + land.getIndex() + "] by [Player " + (robber.getIndex() + 1) + "]");
+        addLog("ACTION: The robber has been moved to [Land " + getLands().get(landIndex).getIndex() + "] by [Player " + (playerIndex + 1) + "]");
     }
 
     public void drawDevelopmentCard(Player player) {
@@ -178,13 +181,14 @@ public class Board extends PureBoard implements Serializable {
         addLog("ACTION: A development card(" + developmentCardType + ") is drawn by [Player " + (player.getIndex() + 1) + "]");
     }
 
-    public void useDevelopmentCard_KNIGHT(Player player, Land land) {
-        moveRobber(player, land);
+    public void useDevelopmentCard_KNIGHT(int landIndex, int playerIndex, int victimIndex, ResourceType resourceType) {
+        getPlayers().get(playerIndex).setKnight(getPlayers().get(playerIndex).getKnight() + 1);
+        moveRobber(landIndex, playerIndex, victimIndex, resourceType);
 
-        syncPlayer(player);
+        syncPlayer(players.get(playerIndex));
         changeUpdate();
 
-        addLog("ACTION: Knight card is used by [Player " + (player.getIndex() + 1) + "]");
+        addLog("ACTION: Knight card is used by [Player " + (playerIndex + 1) + "]");
     }
 
     public void useDevelopmentCard_MONOPOLY(Player player, ResourceType resourceType) {
@@ -291,9 +295,15 @@ public class Board extends PureBoard implements Serializable {
     }
 
     public void rollDice(Player player, int dice1, int dice2) {
+        hasRobberPlayedRecently = false;
+
         generateResource(dice1 + dice2);
 
         addLog("ACTION: Dice are rolled " + dice1 + " " + dice2 + " by " + player);
+
+        totalDice = dice1 + dice2;
+
+        changeUpdate();
     }
 
     private void generateResource(int diceNo) {
@@ -579,5 +589,13 @@ public class Board extends PureBoard implements Serializable {
         }
 
         return results.get(maxIndex);
+    }
+
+    public int getTotalDice() {
+        return totalDice;
+    }
+
+    public boolean hasRobberPlayedRecently() {
+        return hasRobberPlayedRecently;
     }
 }

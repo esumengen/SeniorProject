@@ -1,26 +1,36 @@
 package SeniorProject.Actions;
 
-import SeniorProject.Board;
-import SeniorProject.IAction;
-import SeniorProject.Land;
-import SeniorProject.Player;
+import SeniorProject.*;
+import SeniorProject.DevelopmentCards.DevelopmentCardType;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class DC_KNIGHT implements IAction, Serializable {
-    Player player;
-    Land land;
+    int landIndex;
+    int playerIndex;
+    int victimIndex;
+    ResourceType resourceType;
     Board board;
 
-    public DC_KNIGHT(Player player, Land land, Board board) {
-        this.player = player;
-        this.land = land;
+    public DC_KNIGHT(int landIndex, int playerIndex, int victimIndex, ResourceType resourceType, Board board) {
+        this.landIndex = landIndex;
+        this.playerIndex = playerIndex;
+        this.victimIndex = victimIndex;
+        this.resourceType = resourceType;
         this.board = board;
     }
 
     @Override
     public void execute() {
-        board.useDevelopmentCard_KNIGHT(player, land);
+        ArrayList<DevelopmentCardType> developmentCardTypes = board.getPlayers().get(playerIndex).getDevelopmentCards();
+        for (DevelopmentCardType developmentCardType : developmentCardTypes) {
+            if (developmentCardType == DevelopmentCardType.KNIGHT) {
+                developmentCardTypes.remove(developmentCardType);
+            }
+        }
+
+        board.useDevelopmentCard_KNIGHT(landIndex, playerIndex, victimIndex, resourceType);
     }
 
     @Override

@@ -1,9 +1,6 @@
 package SeniorProject;
 
-import SeniorProject.Actions.CreateRoad;
-import SeniorProject.Actions.CreateSettlement;
-import SeniorProject.Actions.TradeWithBank;
-import SeniorProject.Actions.UpgradeSettlement;
+import SeniorProject.Actions.*;
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
 
 import java.io.Serializable;
@@ -22,6 +19,8 @@ public class State implements Serializable {
     private PureBoard pureBoard;
     private boolean isInitial;
     private int turn;
+    private int totalDice;
+    private boolean hasRobberPlayedRecently;
 
     public State(StateBuilder stateBuilder) {
         victoryPoints = stateBuilder.victoryPoints;
@@ -34,10 +33,20 @@ public class State implements Serializable {
         isInitial = stateBuilder.isInitial;
         pureBoard = stateBuilder.pureBoard;
         turn = stateBuilder.turn;
+        totalDice = stateBuilder.totalDice;
+        hasRobberPlayedRecently = stateBuilder.hasRobberPlayedRecently;
     }
 
     public int getVictoryPoints(int playerIndex) {
         return victoryPoints[playerIndex];
+    }
+
+    public boolean hasRobberPlayedRecently () {
+        return hasRobberPlayedRecently;
+    }
+
+    public int getTotalDice () {
+        return totalDice;
     }
 
     public Map<ResourceType, Integer> getResources(int playerIndex) {
@@ -101,6 +110,8 @@ public class State implements Serializable {
         private boolean isInitial;
         private Board realOwner;
         private int turn;
+        private int totalDice;
+        private boolean hasRobberPlayedRecently;
 
         public StateBuilder() {
             initVariables();
@@ -122,6 +133,8 @@ public class State implements Serializable {
             realOwner = board;
             pureBoard = board;
             turn = board.getTurn();
+            totalDice = board.getTotalDice();
+            hasRobberPlayedRecently = board.hasRobberPlayedRecently();
 
             for (int i = 0; i < Global.PLAYER_COUNT; i++) {
                 victoryPoints[i] = board.getPlayers().get(i).getVictoryPoint();
@@ -144,6 +157,7 @@ public class State implements Serializable {
             longestRoad_lengths = new HashMap<>();
             isInitial = false;
             turn = Integer.MAX_VALUE;
+            totalDice = 0;
 
             ArrayList<Player> players = new ArrayList<>();
             for (int playerIndex = 0; playerIndex < Global.PLAYER_COUNT; playerIndex++) {
@@ -278,26 +292,37 @@ public class State implements Serializable {
                     }
                 }
 
+                Player activePlayer = null;
+                for (Player _player : realOwner.getPlayers()) {
+                    if (_player.getState() == PlayerState.THINKING)
+                        activePlayer = _player;
+                }
+
                 for (Location location : pureBoard.getLocations()) {
-                    if (affordableMoves.contains(MoveType.CreateRoad)) {
-                        for (Location endLocation : location.getAdjacentLocations()) {
-                            Road road = new Road(location, endLocation, player);
+                    if (totalDice != 7 || player.getIndex() != activePlayer.getIndex() || hasRobberPlayedRecently) {
+                        if (affordableMoves.contains(MoveType.CreateRoad)) {
+                            for (Location endLocation : location.getAdjacentLocations()) {
+                                Road road = new Road(location, endLocation, player);
 
-                            if (endLocation.getIndex() > location.getIndex() && pureBoard.isValid(road, isInitial)) {
-                                int[] locations = new int[2];
-                                locations[0] = location.getIndex();
-                                locations[1] = endLocation.getIndex();
+                                if (endLocation.getIndex() > location.getIndex() && pureBoard.isValid(road, isInitial)) {
+                                    int[] locations = new int[2];
+                                    locations[0] = location.getIndex();
+                                    locations[1] = endLocation.getIndex();
 
-                                possibleActions.add(new CreateRoad(locations, player.getIndex(), realOwner));
+                                    possibleActions.add(new CreateRoad(locations, player.getIndex(), realOwner));
+                                }
                             }
                         }
+
+                        if (affordableMoves.contains(MoveType.CreateSettlement) && pureBoard.isValid(new Settlement(location, player), isInitial))
+                            possibleActions.add(new CreateSettlement(location.getIndex(), player.getIndex(), realOwner));
+
+                        if (affordableMoves.contains(MoveType.UpgradeSettlement) && location.hasOwner() && location.getOwner().getIndex() == player.getIndex())
+                            possibleActions.add(new UpgradeSettlement(location.getIndex(), player.getIndex(), realOwner));
                     }
-
-                    if (affordableMoves.contains(MoveType.CreateSettlement) && pureBoard.isValid(new Settlement(location, player), isInitial))
-                        possibleActions.add(new CreateSettlement(location.getIndex(), player.getIndex(), realOwner));
-
-                    if (affordableMoves.contains(MoveType.UpgradeSettlement) && location.hasOwner() && location.getOwner().getIndex() == player.getIndex())
-                        possibleActions.add(new UpgradeSettlement(location.getIndex(), player.getIndex(), realOwner));
+                    else {
+                        possibleActions.add(new MoveRobber(0, activePlayer.getIndex(), 0, ResourceType.BRICK, realOwner));
+                    }
                 }
             }
 

@@ -230,6 +230,11 @@ public class BasicAI extends AI {
         return getActionsDone();
     }
 
+    @Override
+    public void moveRobberTrigger(int key) {
+        doVirtually(possibleActions.get(0));
+    }
+
     private void updateLocationScores(StructureType structureType) {
         Double[] _locScores = locScores.get(structureType);
 
@@ -247,11 +252,11 @@ public class BasicAI extends AI {
         }
     }
 
-    public <T> ArrayList<T> getActions_of(ArrayList<IAction> actions, Class T) {
+    public <T> ArrayList<T> getActions_of(ArrayList<IAction> actions, Class<T> A) {
         ArrayList<T> selectedActions = new ArrayList<>();
 
         for (IAction action : actions) {
-            if (action.getClass() == T)
+            if (action.getClass() == A)
                 selectedActions.add((T) action);
         }
 
