@@ -3,7 +3,6 @@ package SeniorProject;
 import SeniorProject.Actions.*;
 import SeniorProject.Negotiation.Bid;
 
-import java.io.Serializable;
 import java.util.*;
 
 public class BasicAI extends AI {
