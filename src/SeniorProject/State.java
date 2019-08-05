@@ -321,7 +321,13 @@ public class State implements Serializable {
                             possibleActions.add(new UpgradeSettlement(location.getIndex(), player.getIndex(), realOwner));
                     }
                     else {
-                        possibleActions.add(new MoveRobber(0, activePlayer.getIndex(), 0, ResourceType.BRICK, realOwner));
+                        for(Land land : getPureBoard().getLands()) {
+                            for(Location location1 : land.getAdjacentLocations()) {
+                                if (location1.hasOwner() && location1.getOwner() != player) {
+                                    possibleActions.add(new MoveRobber(land.getIndex(), activePlayer.getIndex(), location1.getOwner().getIndex(), ResourceType.BRICK, realOwner));
+                                }
+                            }
+                        }
                     }
                 }
             }

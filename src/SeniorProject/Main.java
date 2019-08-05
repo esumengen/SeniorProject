@@ -161,17 +161,25 @@ public class Main {
             NegotiationAgent negotiationAgent = null;
             AI AI_instance = null;
 
-            if (negotiationDirectories[player.getIndex()] == "Default")
+            if (negotiationDirectories[player.getIndex()].equals("Default")) {
                 negotiationAgent = new BasicNegotiationAgent();
 
-            if (AIDirectories[player.getIndex()] == "Default")
+                negotiationAgent.setOwner(player);
+            }
+
+            if (AIDirectories[player.getIndex()].equals("Default")) {
                 AI_instance = new BasicAI();
+
+                AI_instance.setBoard(board);
+                AI_instance.setOwner(player);
+            }
 
             try {
                 Class clss, clss2;
                 Constructor constructor, constructor2;
 
-                if (negotiationDirectories[player.getIndex()] != "Default") {
+                if (!negotiationDirectories[player.getIndex()].equals("Default")) {
+                    System.out.println("!= Default NEG" + negotiationDirectories[player.getIndex()]);
                     File file = new File(negotiationDirectories[player.getIndex()]);
                     String name = file.getName().substring(0, file.getName().indexOf("."));
 
@@ -184,7 +192,8 @@ public class Main {
                     negotiationAgent.setOwner(player);
                 }
 
-                if (AIDirectories[player.getIndex()] != "Default") {
+                if (!AIDirectories[player.getIndex()].equals("Default")) {
+                    System.out.println("!= Default AI" + AIDirectories[player.getIndex()]);
                     File file = new File(AIDirectories[player.getIndex()]);
                     String name = file.getName().substring(0, file.getName().indexOf("."));
 

@@ -1,5 +1,6 @@
 package SeniorProject;
 
+import SeniorProject.Actions.*;
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
 import SeniorProject.Negotiation.NegotiationAgent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -75,13 +76,13 @@ public class Board extends PureBoard implements Serializable {
 
                 return brick / 4 + grain / 4 + wool / 4 + ore / 4 + lumber / 4 != 0;
             case KnightCard:
-                return false;
+                return player.getDevelopmentCards().contains(DC_KNIGHT.class);
             case MonopolyCard:
-                return false;
+                return player.getDevelopmentCards().contains(DC_MONOPOLY.class);
             case RoadBuildingCard:
-                return false;
+                return player.getDevelopmentCards().contains(DC_ROADBUILDING.class);
             case YearOfPlentyCard:
-                return false;
+                return player.getDevelopmentCards().contains(DC_YEAROFPLENTY.class);
         }
 
         return false;
@@ -175,6 +176,9 @@ public class Board extends PureBoard implements Serializable {
             player.getResource().add(ResourceType.ORE, -1);
         }
 
+        if(developmentCardType == DevelopmentCardType.VICTORYPOINT)
+            new DC_VICTORYPOINT(player.getIndex(), this).execute();
+
         syncPlayer(player);
         changeUpdate();
 
@@ -191,38 +195,47 @@ public class Board extends PureBoard implements Serializable {
         addLog("ACTION: Knight card is used by [Player " + (playerIndex + 1) + "]");
     }
 
-    public void useDevelopmentCard_MONOPOLY(Player player, ResourceType resourceType) {
+    public void useDevelopmentCard_MONOPOLY(int playerIndex, ResourceType resourceType) {
         for (Player _player : players) {
-            if (_player.getIndex() != player.getIndex() && _player.getResource().get(resourceType) > 0) {
+            if (_player.getIndex() != playerIndex && _player.getResource().get(resourceType) > 0) {
                 _player.getResource().add(resourceType, -1);
-                player.getResource().add(resourceType, 1);
+                players.get(playerIndex).getResource().add(resourceType, 1);
             }
         }
 
-        syncPlayer(player);
+        syncPlayer(players.get(playerIndex));
         changeUpdate();
 
-        addLog("ACTION: Monopoly card is used by [Player " + (player.getIndex() + 1) + "]");
+        addLog("ACTION: Monopoly card is used by [Player " + (playerIndex + 1) + "]");
     }
 
-    public void useDevelopmentCard_ROADBUILDING(Player player, Location loc1, Location loc2, Location loc3, Location loc4) {
-        createRoad(player, loc1, loc2);
-        createRoad(player, loc3, loc4);
+    public void useDevelopmentCard_ROADBUILDING(int playerIndex, Location loc1, Location loc2, Location loc3, Location loc4) {
+        createRoad(players.get(playerIndex), loc1, loc2);
+        createRoad(players.get(playerIndex), loc3, loc4);
 
-        syncPlayer(player);
+        syncPlayer(players.get(playerIndex));
         changeUpdate();
 
-        addLog("ACTION: Road Building card is used by [Player " + (player.getIndex() + 1) + "]");
+        addLog("ACTION: Road Building card is used by [Player " + (playerIndex + 1) + "]");
     }
 
-    public void useDevelopmentCard_YEAROFPLENTY(Player player, ResourceType resourceType1, ResourceType resourceType2) {
-        player.getResource().add(resourceType1, 1);
-        player.getResource().add(resourceType2, 1);
+    public void useDevelopmentCard_VICTORYPOINT(int playerIndex) {
+        players.get(playerIndex).setVictoryPoint(players.get(playerIndex).getVictoryPoint() + 1);
 
-        syncPlayer(player);
+        syncPlayer(players.get(playerIndex));
         changeUpdate();
 
-        addLog("ACTION: Year Of Plenty card is used by [Player " + (player.getIndex() + 1) + "]");
+        addLog("ACTION: Victory Point card is used by [Player " + (playerIndex + 1) + "]");
+    }
+
+    public void useDevelopmentCard_YEAROFPLENTY(int playerIndex, ResourceType resourceType1, ResourceType resourceType2) {
+        players.get(playerIndex).getResource().add(resourceType1, 1);
+        players.get(playerIndex).getResource().add(resourceType2, 1);
+
+        syncPlayer(players.get(playerIndex));
+        changeUpdate();
+
+        addLog("ACTION: Year Of Plenty card is used by [Player " + (playerIndex + 1) + "]");
     }
 
     public void tradeBank(int playerIndex, Resource givenResources, Resource takenResources) {
@@ -335,6 +348,8 @@ public class Board extends PureBoard implements Serializable {
 
             addLog("Dice: " + getPlayers().get(i) + " has gained " + rewards.get(i) + ".");
         }
+        if(isMain)
+            System.out.println("-");
 
         changeUpdate();
     }

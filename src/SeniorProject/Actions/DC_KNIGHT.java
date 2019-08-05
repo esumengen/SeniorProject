@@ -27,10 +27,11 @@ public class DC_KNIGHT implements IAction, Serializable {
         for (DevelopmentCardType developmentCardType : developmentCardTypes) {
             if (developmentCardType == DevelopmentCardType.KNIGHT) {
                 developmentCardTypes.remove(developmentCardType);
+                board.useDevelopmentCard_KNIGHT(landIndex, playerIndex, victimIndex, resourceType);
             }
         }
 
-        board.useDevelopmentCard_KNIGHT(landIndex, playerIndex, victimIndex, resourceType);
+
     }
 
     @Override
