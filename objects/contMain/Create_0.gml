@@ -1,3 +1,5 @@
+randomize()
+
 global.player_active = 1
 
 global.initialPhase = true
@@ -5,6 +7,8 @@ global.turn_ready = 1
 global.turn = 1
 
 global.isDiceRolled = false
+global.dice[0] = 0
+global.dice[1] = 0
 global.diceTotal = 0
 
 global.locations = ds_list_create()
@@ -24,6 +28,11 @@ for (var i = 1; i <= PLAYER_COUNT; i++) {
 	ds_grid_add(global.resources, i, resource_wool, 0)
 	
 	global.playerScore[i] = 0
+	global.longestRoad[i] = 0
+	global.knights[i] = 0
+	global.victoryCards[i] = 0
+	
+	global.totalCards[i] = 0
 }
 
 #region CREATE BOARD
@@ -45,11 +54,49 @@ for (var i = 0; i < landCount_vertical; i++) {
 		var land = instance_create_layer(0, 0, "lyLand", objLand)
 		ds_list_add(global.lands, land)
 		
-		land.type = choose(ltype_forest, ltype_mountains, ltype_pasture, ltype_fields, ltype_hills)
+		//land.type = choose(ltype_forest, ltype_mountains, ltype_pasture, ltype_fields, ltype_hills)
+		if (landIndex == 5)
+			land.type = ltype_forest
+		else if (landIndex == 6)
+			land.type = ltype_pasture
+		else if (landIndex == 7)
+			land.type = ltype_fields
+		else if (landIndex == 10)
+			land.type = ltype_hills
+		else if (landIndex == 11)
+			land.type = ltype_mountains
+		else if (landIndex == 12)
+			land.type = ltype_hills
+		else if (landIndex == 13)
+			land.type = ltype_pasture
+		else if (landIndex == 16)
+			land.type = ltype_desert
+		else if (landIndex == 17)
+			land.type = ltype_forest
+		else if (landIndex == 18)
+			land.type = ltype_fields
+		else if (landIndex == 19)
+			land.type = ltype_forest
+		else if (landIndex == 20)
+			land.type = ltype_fields
+		else if (landIndex == 23)
+			land.type = ltype_hills
+		else if (landIndex == 24)
+			land.type = ltype_pasture
+		else if (landIndex == 25)
+			land.type = ltype_pasture
+		else if (landIndex == 26)
+			land.type = ltype_mountains
+		else if (landIndex == 29)
+			land.type = ltype_mountains
+		else if (landIndex == 30)
+			land.type = ltype_fields
+		else if (landIndex == 31)
+			land.type = ltype_forest
 		
 		// Type Initialization and Customization
-		if (i == floor(landCount_vertical/2) and j == floor(landCount_horizontal_max/2)) {
-			land.type = ltype_desert
+		if (land.type == ltype_desert/*i == floor(landCount_vertical/2) and j == floor(landCount_horizontal_max/2)*/) {
+			land.type = ltype_desert // I know it's weird.
 			global.robberLand = land
 		}
 		else if (i == 0 or i == landCount_vertical-1 or j == 0 or j == landCount_horizontal-1) {
@@ -173,46 +220,28 @@ ds_list_destroy(upsideLocs)
 	}
 #endregion
 
-#region INIT FILES
-file_delete("environment.ini")
-
-file_delete("communication.ini")
-ini_open("communication.ini")
-	ini_write_string("General", "isSynchronized", "true")
-	
-	for (var i = 1; i < PLAYER_COUNT; i++)
-		ini_write_string("General", "turnMode["+string(i)+"]", "normal")
-		
-	ini_write_string("Game State", "isInitial", global.initialPhase ? "true" : "false")
-ini_close()
-
-file_delete("actions.txt")
-var fileActions = file_text_open_write("actions.txt")
-	file_text_write_string(fileActions, "")
-file_text_close(fileActions)
-
-file_delete("log.txt")
-
-for (var i = 1; i < PLAYER_COUNT; i++)
-	file_delete("actions_temp"+string(i)+".txt")
-#endregion
-
 #region SET LAND TYPES
 ini_open("environment.ini")
-	var fieldsLeft = FIELDS_COUNT
+	/*var fieldsLeft = FIELDS_COUNT
 	var pastureLeft = PASTURE_COUNT
 	var forestLeft = FOREST_COUNT
 	var mountainsLeft = MOUNTAINS_COUNT
-	var hillsLeft = HILLS_COUNT
+	var hillsLeft = HILLS_COUNT*/
 	
 	for (var i = 0; i < ds_list_size(global.lands); i++) {
 		var land = ds_list_find_value(global.lands, i)
 	
-		diceList = [0, 0, 0, 0, 0, 11, 12, 9, 0, 0, 4, 6, 5, 10, 0, 0, 3, 11, 0, 4, 8, 0, 0, 10, 8, 9, 3, 0, 0, 5, 2, 6, 0, 0, 0, 0, 0]
+		diceList = [0, 0, 0, 0, 0, 11, 12, 9, 0, 0, 4, 6, 5, 10, 0, 0, 0, 3, 11, 4, 8, 0, 0, 8, 10, 9, 3, 0, 0, 5, 2, 6, 0, 0, 0, 0, 0]
+		
 		with (land) {
 			diceNo = other.diceList[i]
 			
-			if (type != ltype_sea and type != ltype_desert) { 
+			diceChance = 0
+            for (var k = 1; k <= 6; k++)
+                for (var l = 1; l <= 6; l++)
+                    if (k + l == diceNo) diceChance++
+			
+			/*if (type != ltype_sea and type != ltype_desert) { 
 				while (fieldsLeft+pastureLeft+forestLeft+mountainsLeft+hillsLeft > 0) {
 					var selectedType = ltypeStart+irandom(ltypeCount-2)
 			
@@ -242,16 +271,36 @@ ini_open("environment.ini")
 						break
 					}
 				}
-			}
+			}*/
 		
 			image_blend = get_land_color(type)
+			
+			if (type == ltype_sea) {
+				for (var j = 0; j < ds_list_size(adjacentLocations); j++) {
+					var location = ds_list_find_value(adjacentLocations, j)
+					
+					location.isCorner = true
+				}
+			}
 		
 			ini_write_string("LandTypes", i, get_type_name(type))
 			ini_write_string("Dice", i, string(diceNo))
 		}
 	}
+	
+	for (var i = 0; i < ds_list_size(global.locations); i++) {
+		var location = ds_list_find_value(global.locations, i)
+		
+		if (location.harborType == htype_none)
+			ini_write_string("HarborTypes", i, "null")
+		else
+			ini_write_string("HarborTypes", i, "null")
+	}
 ini_close()
 #endregion
+
+global.camera = view_get_camera(0)
+global.stopGame = false
 
 // Move Variables
 global.robberAddition_mode = false
@@ -264,9 +313,8 @@ period = 0
 periodUp = true
 
 // AI Loop
-alarm[11] = 0.5*sec
+alarm[11] = 1//0.5*sec
 
-randomize()
 draw_set_font(fontMain)
 
 #region START Game
@@ -275,3 +323,4 @@ global.addStructure_object = objSettlement
 #endregion
 
 alarm[9] = sec
+alarm[1] = sec/2

@@ -64,18 +64,48 @@ else if (argument[1] == objSettlement) {
 				for (var i = 0; i < ds_list_size(adjacentLands); i++) {
 					var land = ds_list_find_value(adjacentLands, i)
 					
-					add_resource(settlementObject.playerIndex, get_resource(land.type), 1)
+					change_resource(settlementObject.playerIndex, get_resource(land.type), 1)
 				}
 			}
 		}
 		
 		if (global.actionWriting_mode)
 			action_write(argument[0], action_create, argument[2].index, actionObject_settlement)
-			
-		global.playerScore[global.player_active] += 1
 	}
 	else
 		instance_destroy(settlementObject)
+}
+else if (argument[1] == objCity) {
+	var cityObject = instance_create_layer(-500, -500, "lyBuilding", objCity)
+	
+	with (cityObject) {
+		location = argument[2]
+		
+		x = location.x
+		y = location.y
+		
+		set_owner(argument[0])
+		
+		event_user(9)
+	}
+	
+	if (cityObject.condition) {
+		isCreated = true
+		
+		ds_list_add(argument[2].structures, cityObject)
+		
+		if (global.initialPhase and structure_count(global.player_active, objCity) == 2) {
+			with (cityObject.location) {
+				for (var i = 0; i < ds_list_size(adjacentLands); i++) {
+					var land = ds_list_find_value(adjacentLands, i)
+					
+					change_resource(cityObject.playerIndex, get_resource(land.type), 1)
+				}
+			}
+		}
+	}
+	else
+		instance_destroy(cityObject)
 }
 
 return isCreated

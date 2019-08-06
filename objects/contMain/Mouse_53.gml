@@ -1,3 +1,6 @@
+if (contDraw.mouseOn_dice and global.player_active == human and can_dice())
+	roll_dice(1+irandom(5), 1+irandom(5))
+
 #region Moves
 if (global.player_active == human or global.debugMode)
 {
@@ -49,6 +52,14 @@ else {
 		var isCreated = create(human, objRoad, nearestLocation[0], nearestLocation[1])
 		
 		if (isCreated) {
+			leave_held()
+		}
+	}
+	else if (is_holding(objCity)) {
+		var nearestLocation = instance_nearest(mouse_x, mouse_y, objLocation)
+		var isUpgraded = upgrade(human, nearestLocation)
+		
+		if (isUpgraded) {
 			leave_held()
 		}
 	}

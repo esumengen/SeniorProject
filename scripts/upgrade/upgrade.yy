@@ -1,8 +1,8 @@
 {
-    "id": "ce47b7cc-d5f0-4f12-b888-8bf79944742e",
+    "id": "e02eb5ad-6744-49d1-9c6c-a10a9b514972",
     "modelName": "GMScript",
     "mvc": "1.0",
-    "name": "add_resource",
+    "name": "upgrade",
     "IsCompatibility": false,
     "IsDnD": false
 }

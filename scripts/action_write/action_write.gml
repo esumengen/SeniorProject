@@ -10,7 +10,7 @@ var actionType = argument[1]
 var actionObject = argument[argument_count-1]
 
 for (var i = 3; i < argument_count-1; i++)
-	paramPart += " "+(argument[i] < 10 ? ("0"+string(argument[i])) : string(argument[i]))
+	paramPart += " "+(argument[i] < 10 ? (argument[i] == -1 ? string(argument[i]) : ("0"+string(argument[i]))) : string(argument[i]))
 	
 var fileActions = file_text_open_append("actions.txt")
 	file_text_write_string(

@@ -23,7 +23,7 @@ ini_open("communication.ini")
 	}
 ini_close()
 
-if (areAllSync) {	
+if (areAllSync and !global.stopGame) {
 	global.turn_ready = global.turn
 	
 	if (global.player_active != human) {
@@ -42,4 +42,4 @@ if (areAllSync) {
 	file_text_close(fileActions)
 }
 else
-	alarm[10] = 5
+	alarm[10] = 1//5

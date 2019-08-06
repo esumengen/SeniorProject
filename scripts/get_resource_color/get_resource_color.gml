@@ -3,7 +3,7 @@ var landType = argument[0]
 if (landType == resource_lumber)
 	return c_green
 else if (landType == resource_wool)
-	return c_lime
+	return make_color_rgb(70, 235, 70)
 else if (landType == resource_grain)
 	return c_fields
 else if (landType == resource_brick)
