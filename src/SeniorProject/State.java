@@ -20,6 +20,7 @@ public class State implements Serializable {
     private boolean isInitial;
     private int turn;
     private int totalDice;
+    private Player diceOwner;
     private boolean hasRobberPlayedRecently;
 
     public State(StateBuilder stateBuilder) {
@@ -35,6 +36,7 @@ public class State implements Serializable {
         turn = stateBuilder.turn;
         totalDice = stateBuilder.totalDice;
         hasRobberPlayedRecently = stateBuilder.hasRobberPlayedRecently;
+        diceOwner = stateBuilder.diceOwner;
     }
 
     public int getVictoryPoints(int playerIndex) {
@@ -111,6 +113,7 @@ public class State implements Serializable {
         private Board realOwner;
         private int turn;
         private int totalDice;
+        private Player diceOwner;
         private boolean hasRobberPlayedRecently;
 
         public StateBuilder() {
@@ -135,6 +138,7 @@ public class State implements Serializable {
             turn = board.getTurn();
             totalDice = board.getTotalDice();
             hasRobberPlayedRecently = board.hasRobberPlayedRecently();
+            diceOwner = board.getDiceOwner();
 
             for (int i = 0; i < Global.PLAYER_COUNT; i++) {
                 victoryPoints[i] = board.getPlayers().get(i).getVictoryPoint();
@@ -158,6 +162,7 @@ public class State implements Serializable {
             isInitial = false;
             turn = Integer.MAX_VALUE;
             totalDice = 0;
+            diceOwner = null;
 
             ArrayList<Player> players = new ArrayList<>();
             for (int playerIndex = 0; playerIndex < Global.PLAYER_COUNT; playerIndex++) {
@@ -242,7 +247,7 @@ public class State implements Serializable {
                         affordableMoves.add(MoveType.DevelopmentCard);
                         //possibleActions.add(new DrawDevelopmentCard(player.getIndex(), realOwner));
                     }
-                    if (Board.isAffordable(MoveType.KnightCard, player.getResource())) {
+                    /*if (Board.isAffordable(MoveType.KnightCard, player.getResource())) {
                         affordableMoves.add(MoveType.KnightCard);
                         //possibleActions.add(new UseDevelopmentCard(DevelopmentCardType.KNIGHT, player));
                     }
@@ -257,7 +262,7 @@ public class State implements Serializable {
                     if (Board.isAffordable(MoveType.MonopolyCard, player.getResource())) {
                         affordableMoves.add(MoveType.MonopolyCard);
                         //possibleActions.add(new UseDevelopmentCard(DevelopmentCardType.MONOPOLY, player));
-                    }
+                    }*/
                     if (Board.isAffordable(MoveType.TradeBank, player.getResource())) {
                         affordableMoves.add(MoveType.TradeBank);
                     }
@@ -292,14 +297,20 @@ public class State implements Serializable {
                     }
                 }
 
-                Player activePlayer = null;
-                for (Player _player : realOwner.getPlayers()) {
-                    if (_player.getState() == PlayerState.THINKING)
-                        activePlayer = _player;
-                }
-
                 for (Location location : pureBoard.getLocations()) {
-                    if (totalDice != 7 || player.getIndex() != activePlayer.getIndex() || hasRobberPlayedRecently) {
+                    if (totalDice == 7 && player.getIndex() == diceOwner.getIndex() && !hasRobberPlayedRecently) {
+                        ArrayList<Integer> temporaryLocationList_index = new ArrayList<>();
+                        for (Land land : getPureBoard().getLands()) {
+                            if (land.getType() != LandType.SEA) {
+                                for (Location _location : land.getAdjacentLocations()) {
+                                    if ((!_location.hasOwner() || _location.getOwner().getIndex() != player.getIndex()) && !temporaryLocationList_index.contains(_location.getIndex())) {
+                                        possibleActions.add(new MoveRobber(land.getIndex(), diceOwner.getIndex(), _location.hasOwner() ? _location.getOwner().getIndex() : -1, realOwner));
+                                        temporaryLocationList_index.add(location.getIndex());
+                                    }
+                                }
+                            }
+                        }
+                    } else {
                         if (affordableMoves.contains(MoveType.CreateRoad)) {
                             for (Location endLocation : location.getAdjacentLocations()) {
                                 Road road = new Road(location, endLocation, player);
@@ -319,15 +330,6 @@ public class State implements Serializable {
 
                         if (affordableMoves.contains(MoveType.UpgradeSettlement) && location.hasOwner() && location.getOwner().getIndex() == player.getIndex())
                             possibleActions.add(new UpgradeSettlement(location.getIndex(), player.getIndex(), realOwner));
-                    }
-                    else {
-                        for(Land land : getPureBoard().getLands()) {
-                            for(Location location1 : land.getAdjacentLocations()) {
-                                if (location1.hasOwner() && location1.getOwner() != player) {
-                                    possibleActions.add(new MoveRobber(land.getIndex(), activePlayer.getIndex(), location1.getOwner().getIndex(), ResourceType.BRICK, realOwner));
-                                }
-                            }
-                        }
                     }
                 }
             }

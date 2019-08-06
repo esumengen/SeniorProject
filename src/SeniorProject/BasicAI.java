@@ -1,6 +1,9 @@
 package SeniorProject;
 
-import SeniorProject.Actions.*;
+import SeniorProject.Actions.Action;
+import SeniorProject.Actions.CreateRoad;
+import SeniorProject.Actions.CreateSettlement;
+import SeniorProject.Actions.DrawDevelopmentCard;
 import SeniorProject.Negotiation.Bid;
 
 import java.util.*;
@@ -228,11 +231,6 @@ public class BasicAI extends AI {
             System.out.println("   " + player + "'s Last Resource: " + player.getResource());
 
         return getActionsDone();
-    }
-
-    @Override
-    public void moveRobberTrigger(int key) {
-        doVirtually(possibleActions.get(0));
     }
 
     private void updateLocationScores(StructureType structureType) {

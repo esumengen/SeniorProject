@@ -179,7 +179,6 @@ public class Main {
                 Constructor constructor, constructor2;
 
                 if (!negotiationDirectories[player.getIndex()].equals("Default")) {
-                    System.out.println("!= Default NEG" + negotiationDirectories[player.getIndex()]);
                     File file = new File(negotiationDirectories[player.getIndex()]);
                     String name = file.getName().substring(0, file.getName().indexOf("."));
 
@@ -188,12 +187,10 @@ public class Main {
                     constructor = clss.getDeclaredConstructor();
 
                     negotiationAgent = (NegotiationAgent) constructor.newInstance();
-                    System.out.println(player.getIndex());
                     negotiationAgent.setOwner(player);
                 }
 
                 if (!AIDirectories[player.getIndex()].equals("Default")) {
-                    System.out.println("!= Default AI" + AIDirectories[player.getIndex()]);
                     File file = new File(AIDirectories[player.getIndex()]);
                     String name = file.getName().substring(0, file.getName().indexOf("."));
 

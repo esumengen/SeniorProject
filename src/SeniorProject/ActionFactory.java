@@ -40,8 +40,8 @@ public class ActionFactory {
                     return new UpgradeSettlement(actionParam.get(0), playerIndex, board);
                 break;
             case "MO":
-                if (objectType.equals("T")) //P1 [MO 11 01 01] T
-                    return new MoveRobber(actionParam.get(0), playerIndex, actionParam.get(1), ResourceType.values()[actionParam.get(2)], board);
+                if (objectType.equals("T")) //P1 [MO 11 01] T
+                    return new MoveRobber(actionParam.get(0), playerIndex, actionParam.get(1), board);
                 break;
             case "TR":
                 Resource givenResources = new Resource(actionParam.get(0), actionParam.get(1), actionParam.get(2), actionParam.get(3), actionParam.get(4));

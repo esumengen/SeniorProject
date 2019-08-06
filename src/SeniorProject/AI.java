@@ -1,6 +1,5 @@
 package SeniorProject;
 
-import SeniorProject.Actions.MoveRobber;
 import SeniorProject.Negotiation.Bid;
 
 import java.io.Serializable;
@@ -34,16 +33,12 @@ public abstract class AI implements Serializable {
         return null;
     }
 
-    public final MoveRobber moveRobber (int landIndex, int victimIndex, ResourceType c, int key) {
+    /*public final MoveRobber moveRobber (int landIndex, int victimIndex, ResourceType c, int key) {
         if (key == 23)
             return new MoveRobber(landIndex, getOwner().getIndex(), victimIndex, c, board);
         else
             return null;
-    }
-
-    public void moveRobberTrigger (int key) {
-
-    }
+    }*/
 
     public final ArrayList<Bid> getBidRanking() {
         return bidRanking;

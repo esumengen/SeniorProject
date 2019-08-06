@@ -3,7 +3,6 @@ package SeniorProject.Actions;
 import SeniorProject.Board;
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
 import SeniorProject.IAction;
-import SeniorProject.Player;
 import SeniorProject.ResourceType;
 
 import java.io.Serializable;

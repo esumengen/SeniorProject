@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class Deck implements Serializable {
-
     private HashMap<DevelopmentCardType, Integer> deck;
 
     public Deck() {

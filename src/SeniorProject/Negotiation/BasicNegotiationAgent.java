@@ -13,8 +13,7 @@ public class BasicNegotiationAgent extends NegotiationAgent {
     public Bid handleOffer(NegotiationSession negotiationSession, Bid bid) {
         if (bid == null) {
             return getBidRanking().get(0);
-        }
-        else {
+        } else {
             return getBidRanking().get((int) (getBaseRatio(negotiationSession) + randomizer.nextDouble() * 0.1) * getBidRanking().size() / 4);
         }
     }
