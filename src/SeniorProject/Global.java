@@ -19,7 +19,7 @@ public class Global {
     public static final OSType OS_TYPE = System.getProperty("os.name").toLowerCase().contains("windows") ? OSType.WINDOWS : OSType.MAC;
     public static final String WORKING_PATH = OS_TYPE == OSType.WINDOWS ? System.getProperty("user.home") + "\\AppData\\Local\\Catan" : "/Users/emresumengen/Desktop/deneme";
     public static final String ENVIRONMENT_FILE = "environment.ini";
-    public static final String ACTIONS_FILE = "actions.txt";
+    public static final String GAME_PLATFORM_ACTIONS = "actions_gamePlatform.txt";
     public static final String LOG_FILE = "log.txt";
     public static final String COMMUNICATION_FILE = "communication.ini";
     public static final String LONGEST_ROADS_FILE = "longest_roads.ini";

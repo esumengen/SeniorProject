@@ -10,23 +10,15 @@ enum SynchronizerState {
 }
 
 class Synchronizer {
-    private static File communicationFile = new File(Global.get_working_path(Global.COMMUNICATION_FILE));
     private SynchronizerState state;
-    private Wini communication_ini;
     private Board board;
 
     Synchronizer(Board board) {
         this.state = SynchronizerState.WAITING;
         this.board = board;
-
-        try {
-            communication_ini = new Wini(communicationFile);
-        } catch (Exception e) {
-            new Message(e.getMessage() + " (Err: 4)");
-        }
     }
 
-    void sync(File file) {
+    void sync(File file, Wini communication_ini) {
         setState(SynchronizerState.RUNNING);
 
         try {
@@ -42,7 +34,6 @@ class Synchronizer {
             }
 
             communication_ini.put("General", "isSynchronized", "\"true\"");
-            communication_ini.store();
         } catch (Exception e) {
             new Message(e.getMessage() + "(Err: 2)");
         }
@@ -50,24 +41,8 @@ class Synchronizer {
         setState(SynchronizerState.WAITING);
     }
 
-    boolean isSynchronized() {
-        String isSynchronized_str = "true";
-
-        try {
-            File communicationFile = new File(Global.get_working_path(Global.COMMUNICATION_FILE));
-            if (communicationFile.exists()) {
-                communication_ini = new Wini(communicationFile);
-                isSynchronized_str = communication_ini.get("General", "isSynchronized", String.class);
-
-                isSynchronized_str = Global.getRidOf_quotationMarks(isSynchronized_str);
-            } else
-                new Message("communication.ini does not exists. (Err: 95)");
-        } catch (Exception e) {
-            // ? BUG?
-            // !
-            isSynchronized_str = "true";
-            new Message(e.getMessage() + " (Err: 115)");
-        }
+    boolean isSynchronized(Wini communication_ini) {
+        String isSynchronized_str = Global.getRidOf_quotationMarks(communication_ini.get("General", "isSynchronized", String.class));
 
         return !isSynchronized_str.equals("false");
     }

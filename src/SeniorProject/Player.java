@@ -76,7 +76,7 @@ public class Player implements Serializable, IObservable {
         ArrayList<IAction> actionList = AI_instance.createActions(isInitial);
         AI_instance.clearNegotiationActions();
 
-        String fileName = "actions_temp" + index + ".txt";
+        String fileName = "actions_agentPlatform_" + index + ".txt";
         String actionList_str = "";
         for (IAction action : actionList) {
             String action_str = action.getCommand();

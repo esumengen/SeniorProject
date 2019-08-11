@@ -23,7 +23,7 @@ public class Main {
     static Board virtualBoard_last;
     static Synchronizer synchronizer;
 
-    static File actions_file = new File(Global.get_working_path(Global.ACTIONS_FILE));
+    static File actions_file = new File(Global.get_working_path(Global.GAME_PLATFORM_ACTIONS));
     static File communication_file = new File(Global.get_working_path(Global.COMMUNICATION_FILE));
     static File longest_roads_file = new File(Global.get_working_path(Global.LONGEST_ROADS_FILE));
     static Timer timer = new Timer();
@@ -34,103 +34,113 @@ public class Main {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                if (synchronizer.getState() == SynchronizerState.WAITING && actions_file.exists() && !synchronizer.isSynchronized())
-                    synchronizer.sync(actions_file);
+                programTermination();
 
-                boolean skip = false;
+                Wini communication_ini = null;
+                boolean isInitial;
+
+                // Players must be waiting.
                 for (Player player : players) {
                     if (player.getState() == PlayerState.THINKING) {
-                        skip = true;
                         new Message("A loop is skipped. (Err: 522)");
+                        return;
                     }
                 }
 
-                if (!skip && communication_file.exists()) {
-                    Wini communication_ini = null;
+                // Communication file must exists.
+                if (!communication_file.exists()) {
+                    new Message("communication.ini does not exists. (Err: 114)");
+                    return;
+                }
+
+                // Creation of communication.ini
+                try {
+                    communication_ini = new Wini(communication_file);
+                } catch (Exception e) {
+                    new Message(e.getMessage() + " (Err: 448)");
+                }
+
+                // communication.ini must be opened correctly.
+                if (communication_ini == null || communication_ini.isEmpty()) {
+                    new Message("communication.ini is null or empty. (Err: 112)");
+                    return;
+                }
+
+                if (synchronizer.getState() == SynchronizerState.WAITING && actions_file.exists() && !synchronizer.isSynchronized(communication_ini)) {
+                    synchronizer.sync(actions_file, communication_ini);
+
                     try {
-                        communication_ini = new Wini(communication_file);
+                        communication_ini.store();
+                    } catch (Exception e) {
+                        new Message(e.getMessage() + " (Err: 115)");
+                    }
+                }
+
+                isInitial = communication_ini.get("Game State", "isInitial", String.class).equals("\"true\"");
+                board.setInitial(isInitial);
+
+                /// region Road Length Update
+                if (virtualBoard_last != null) {
+                    Wini longest_roads_ini = null;
+                    try {
+                        longest_roads_ini = new Wini(longest_roads_file);
                     } catch (Exception e) {
                         new Message(e.getMessage() + " (Err: 12)");
                     }
 
-                    if (communication_ini == null || communication_ini.isEmpty()) {
-                        new Message("communication.ini is null or empty. (Err: 112)");
-                        return;
+                    if (longest_roads_ini != null) {
+                        for (int i = 0; i < Global.PLAYER_COUNT; i++)
+                            longest_roads_ini.put("LongestRoad", "Player[" + i + "]", Integer.toString(virtualBoard_last.getLongestRoad(i).getKey()));
                     }
 
-                    boolean isInitial = communication_ini.get("Game State", "isInitial", String.class).equals("\"true\"");
-
-                    // New
-                    if (virtualBoard_last != null) {
-                        Wini longest_roads_ini = null;
-                        try {
-                            longest_roads_ini = new Wini(longest_roads_file);
-                        } catch (Exception e) {
-                            new Message(e.getMessage() + " (Err: 12)");
-                        }
-
-                        if (longest_roads_ini != null) {
-                            for (int i = 0; i < Global.PLAYER_COUNT; i++)
-                                longest_roads_ini.put("LongestRoad", "Player[" + i + "]", Integer.toString(virtualBoard_last.getLongestRoad(i).getKey()));
-                        }
-
-                        try {
-                            longest_roads_ini.store();
-                        } catch (Exception e) {
-                            new Message(e.getMessage() + " (Err: 4782)");
-                        }
-
-                        virtualBoard_last = null;
+                    try {
+                        longest_roads_ini.store();
+                    } catch (Exception e) {
+                        new Message(e.getMessage() + " (Err: 4782)");
                     }
 
-                    boolean isPlayed = false;
-                    Player player_lastMoved = null;
+                    virtualBoard_last = null;
+                }
+                /// endregion
 
-                    for (Player player : players) {
-                        if (player.getType() != PlayerType.HUMAN) {
-                            String turnMode = communication_ini.get("General", "turnMode[" + player.getIndex() + "]", String.class);
-                            turnMode = Global.getRidOf_quotationMarks(turnMode);
+                boolean isPlayed = false;
+                Player player_lastMoved = null;
+                for (Player player : players) {
+                    if (player.getType() != PlayerType.HUMAN) {
+                        String turnMode = Global.getRidOf_quotationMarks(communication_ini.get("General", "turnMode[" + player.getIndex() + "]", String.class));
 
-                            board.setInitial(isInitial);
+                        if (turnMode.equals("waiting") && player.getState() != PlayerState.THINKING) {
+                            player.setState(PlayerState.THINKING);
 
-                            if (turnMode.equals("waiting") && player.getState() != PlayerState.THINKING) {
-                                player.setState(PlayerState.THINKING);
+                            if (!isInitial)
+                                negotiationPhase(player, board);
 
-                                if (!isInitial)
-                                    negotiationPhase(player, board);
+                            player.writeMove(isInitial);
 
-                                player.writeMove(isInitial);
+                            isPlayed = true;
+                            player_lastMoved = player;
 
-                                isPlayed = true;
-                                player_lastMoved = player;
+                            communication_ini.put("General", "turnMode[" + player.getIndex() + "]", "\"done\"");
 
-                                communication_ini.put("General", "turnMode[" + player.getIndex() + "]", "\"done\"");
-
-                                try {
-                                    communication_ini.store();
-                                } catch (Exception e) {
-                                    new Message(e.getMessage() + " (Err: 11)");
-                                }
+                            try {
+                                communication_ini.store();
+                            } catch (Exception e) {
+                                new Message(e.getMessage() + " (Err: 11)");
                             }
                         }
+                    }
 
-                        // May be problematic.
-                        // This part is agent side controlled turn management.
-                        if (isPlayed) {
-                            if (player_lastMoved.getIndex() == Global.PLAYER_COUNT - 1 && !isInitial
-                                    || player_lastMoved.getIndex() == 0 && board.countStructures(StructureType.SETTLEMENT, Global.PLAYER_COUNT - 1) > 0 && isInitial
-                                    || player_lastMoved.getIndex() == Global.PLAYER_COUNT - 1 && board.countStructures(StructureType.SETTLEMENT, Global.PLAYER_COUNT - 1) == 0 && isInitial)
-                                board.setTurn(board.getTurn() + 1);
+                    // May be problematic.
+                    // This part is agent side controlled turn management.
+                    if (isPlayed) {
+                        if (player_lastMoved.getIndex() == Global.PLAYER_COUNT - 1 && !isInitial
+                                || player_lastMoved.getIndex() == 0 && board.countStructures(StructureType.SETTLEMENT, Global.PLAYER_COUNT - 1) > 0 && isInitial
+                                || player_lastMoved.getIndex() == Global.PLAYER_COUNT - 1 && board.countStructures(StructureType.SETTLEMENT, Global.PLAYER_COUNT - 1) == 0 && isInitial)
+                            board.setTurn(board.getTurn() + 1);
 
-                            break;
-                        }
+                        break;
                     }
                 }
-                else if (!skip) {
-                    new Message("communication.ini does not exist. (Err: 411)");
-                }
-
-                programTermination();
             }
         };
 
