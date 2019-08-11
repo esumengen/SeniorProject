@@ -63,7 +63,7 @@ public class NegotiationSession {
 
             if (bid != null) {
                 ownerAgent.getOwner().getAI().clearNegotiationActions();
-                IAction tradePlayer_action = new TradeWithPlayer(bid.getNegatives().getChange(), bid.getPositives().getChange(), ownerAgent.getOwner().getIndex(), targetAgent.getOwner().getIndex(), Main.board);
+                IAction tradePlayer_action = new TradeWithPlayer(bid.getNegatives().getChange(), bid.getPositives().getChange(), ownerAgent.getOwner().getIndex(), targetAgent.getOwner().getIndex(), null);
                 ownerAgent.getOwner().getAI().addNegotiationAction(tradePlayer_action);
             }
 

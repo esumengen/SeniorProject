@@ -19,11 +19,13 @@ import java.util.TimerTask;
 
 public class Main {
     static ArrayList<Player> players;
-    public static Board board; // public ?
+    static Board board;
+    static Board virtualBoard_last;
     static Synchronizer synchronizer;
 
-    static File actionsFile = new File(Global.get_working_path(Global.ACTIONS_FILE));
+    static File actions_file = new File(Global.get_working_path(Global.ACTIONS_FILE));
     static File communication_file = new File(Global.get_working_path(Global.COMMUNICATION_FILE));
+    static File longest_roads_file = new File(Global.get_working_path(Global.LONGEST_ROADS_FILE));
     static Timer timer = new Timer();
 
     public static void main(String[] args) {
@@ -32,17 +34,50 @@ public class Main {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                if (!synchronizer.isSynchronized() && synchronizer.getState() == SynchronizerState.WAITING) {
-                    if (actionsFile.exists())
-                        synchronizer.sync(actionsFile);
+                if (synchronizer.getState() == SynchronizerState.WAITING && actions_file.exists() && !synchronizer.isSynchronized()) {
+                    synchronizer.sync(actions_file);
                 }
 
-                if (communication_file.exists()) {
+                boolean skip = false;
+                for (Player player : players) {
+                    if (player.getState() == PlayerState.THINKING) {
+                        skip = true;
+                        new Message("A loop is skipped. (Err: 522)");
+                    }
+                }
+
+                if (!skip && communication_file.exists()) {
                     Wini communication_ini = null;
                     try {
                         communication_ini = new Wini(communication_file);
                     } catch (Exception e) {
-                        new Message(e.getMessage() + " - 12");
+                        new Message(e.getMessage() + " (Err: 12)");
+                    }
+
+                    if (communication_ini == null) {
+                        new Message("communication.ini is null. (Err: 112)");
+                        return;
+                    }
+
+                    // New
+                    if (virtualBoard_last != null) {
+                        Wini longest_roads_ini = null;
+                        try {
+                            longest_roads_ini = new Wini(longest_roads_file);
+                        } catch (Exception e) {
+                            new Message(e.getMessage() + " (Err: 12)");
+                        }
+
+                        for (int i = 0; i < Global.PLAYER_COUNT; i++)
+                            longest_roads_ini.put("LongestRoad", "Player[" + i + "]", Integer.toString(virtualBoard_last.getLongestRoad(i).getKey()));
+
+                        try {
+                            longest_roads_ini.store();
+                        } catch (Exception e) {
+
+                        }
+
+                        virtualBoard_last = null;
                     }
 
                     boolean isPlayed = false;
@@ -74,7 +109,7 @@ public class Main {
                                 try {
                                     communication_ini.store();
                                 } catch (Exception e) {
-                                    new Message(e.getMessage() + " - 11");
+                                    new Message(e.getMessage() + " (Err: 11)");
                                 }
                             }
                         }
@@ -90,6 +125,9 @@ public class Main {
                             break;
                         }
                     }
+                }
+                else if (!skip) {
+                    new Message("communication.ini does not exist. (Err: 411)");
                 }
 
                 programTermination();
@@ -123,6 +161,13 @@ public class Main {
     }
 
     private static void initialization() {
+        try {
+            longest_roads_file.createNewFile();
+        }
+        catch (Exception e) {
+
+        }
+
         players = createPlayers();
 
         board = new Board(players);
@@ -148,7 +193,7 @@ public class Main {
                 negotiationDirectories[player.getIndex()] = negotiationDirectory;
                 AIDirectories[player.getIndex()] = AIDirectory;
             } catch (Exception e) {
-                new Message(e.getMessage() + " - 23");
+                new Message(e.getMessage() + " (Err: 23)");
             }
         }
 
@@ -219,7 +264,7 @@ public class Main {
         try {
             process = processBuilder.start();
         } catch (Exception e) {
-            new Message(e.getMessage() + " - 13");
+            new Message(e.getMessage() + " (Err: 13)");
         }
         String tasksList = stream_toString(process.getInputStream());
 
@@ -234,7 +279,7 @@ public class Main {
         for (int i = 0; i < Global.PLAYER_COUNT; i++) {
             Player player = new Player(i);
 
-            if (i == 0) player.setType(PlayerType.HUMAN);
+            if (!Global.FULL_BOT_MODE && i == 0) player.setType(PlayerType.HUMAN);
             else player.setType(PlayerType.AI);
 
             players.add(player);

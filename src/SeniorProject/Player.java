@@ -3,7 +3,9 @@ package SeniorProject;
 import SeniorProject.Actions.TradeWithPlayer;
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
 import SeniorProject.Negotiation.NegotiationAgent;
+import org.ini4j.Wini;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -41,6 +43,8 @@ public class Player implements Serializable, IObservable {
     }
 
     void writeMove(boolean isInitial) {
+
+
         Board board = (Board) getPureBoard();
 
         ///region Print States
@@ -63,10 +67,9 @@ public class Player implements Serializable, IObservable {
         System.out.println();*/
         ///endregion
 
-        AI_instance.virtualBoard = Board.deepCopy(AI_instance.getBoard());
         AI_instance.resetAI();
+        AI_instance.virtualBoard.changeUpdate();
         AI_instance.possibleActions = AI_instance.virtualBoard.getState().getPossibleActions(AI_instance.getOwner().getIndex());
-        System.gc();
 
         for (IAction negotiationAction : AI_instance.getNegotiationActions()) {
             ((TradeWithPlayer) negotiationAction).setBoard(AI_instance.getVirtualBoard());
@@ -83,10 +86,10 @@ public class Player implements Serializable, IObservable {
                 actionList_str += action_str + "\r\n";
         }
 
-        AI_instance.virtualBoard = Board.deepCopy(AI_instance.getBoard());
-        AI_instance.resetAI();
-        AI_instance.possibleActions = AI_instance.virtualBoard.getState().getPossibleActions(AI_instance.getOwner().getIndex());
-        System.gc();
+        // New
+        Main.virtualBoard_last = AI_instance.virtualBoard;
+
+        //System.gc();
 
         Global.createTextFile(fileName, actionList_str);
 
@@ -103,7 +106,7 @@ public class Player implements Serializable, IObservable {
 
             System.out.println();
 
-            Global.createTextFile(System.nanoTime() / 10000 + fileName, actionList_str);
+            //Global.createTextFile(System.nanoTime() / 10000 + "_" + fileName, actionList_str);
         } else
             System.out.println("[" + this + "'s Choice]: []");
         ///endregion

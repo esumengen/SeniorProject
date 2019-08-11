@@ -57,7 +57,7 @@ public abstract class AI implements Serializable {
         virtualBoard = Board.deepCopy(getBoard());
         actionsDone.clear();
         possibleActions.clear();
-        System.gc();
+        //System.gc();
     }
 
     public void updateBidRanking() {

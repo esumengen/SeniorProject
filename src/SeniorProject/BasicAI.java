@@ -29,6 +29,7 @@ public class BasicAI extends AI {
 
             //region While a settlement can be built, build it.
             Double[] _locScores = locScores.get(SETTLEMENT);
+
             while (actions_settlements.size() > 0) {
                 for (int i = 0; i < _locScores.length; i++) {
                     _locScores[i] = Math.abs(_locScores[i]);

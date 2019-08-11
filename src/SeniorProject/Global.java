@@ -16,14 +16,14 @@ enum OSType {
 
 public class Global {
     public static final int PLAYER_COUNT = 4;
+    public static final boolean FULL_BOT_MODE = true;
     public static final OSType OS_TYPE = System.getProperty("os.name").toLowerCase().contains("windows") ? OSType.WINDOWS : OSType.MAC;
     public static final String WORKING_PATH = OS_TYPE == OSType.WINDOWS ? System.getProperty("user.home") + "\\AppData\\Local\\Catan" : "/Users/emresumengen/Desktop/deneme";
     public static final String ENVIRONMENT_FILE = "environment.ini";
     public static final String ACTIONS_FILE = "actions.txt";
     public static final String LOG_FILE = "log.txt";
     public static final String COMMUNICATION_FILE = "communication.ini";
-
-    public static Random randomGenerator = new Random();
+    public static final String LONGEST_ROADS_FILE = "longest_roads.ini";
 
     public static String get_working_path(String filename) {
         String file_path = Global.WORKING_PATH;
@@ -57,7 +57,7 @@ public class Global {
             bufferedWriter.write(text);
             bufferedWriter.newLine();
         } catch (IOException e) {
-            new Message(e.getMessage() + " - 5");
+            new Message(e.getMessage() + " (Err: 5)");
         } finally {
             try {
                 if (bufferedWriter != null)
@@ -67,7 +67,7 @@ public class Global {
                     fileWriter.close();
 
             } catch (IOException e) {
-                new Message(e.getMessage() + " - 6");
+                new Message(e.getMessage() + " (Err: 6)");
             }
         }
     }

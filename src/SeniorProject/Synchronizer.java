@@ -12,6 +12,7 @@ enum SynchronizerState {
 class Synchronizer {
     private SynchronizerState state;
     private Wini communication_ini;
+    private static File communicationFile = new File(Global.get_working_path(Global.COMMUNICATION_FILE));
     private Board board;
 
     Synchronizer(Board board) {
@@ -19,9 +20,9 @@ class Synchronizer {
         this.board = board;
 
         try {
-            communication_ini = new Wini(new File(Global.get_working_path(Global.COMMUNICATION_FILE)));
+            communication_ini = new Wini(communicationFile);
         } catch (Exception e) {
-            new Message(e.getMessage() + " - 4");
+            new Message(e.getMessage() + " (Err: 4)");
         }
     }
 
@@ -41,14 +42,9 @@ class Synchronizer {
             }
 
             communication_ini.put("General", "isSynchronized", "\"true\"");
-
-            for (int i = 0; i < Global.PLAYER_COUNT; i++)
-                communication_ini.put("LongestRoad", "Player[" + i + "]", Integer.toString(board.getLongestRoad(i).getKey()));
-
             communication_ini.store();
-
         } catch (Exception e) {
-            new Message(e.getMessage() + " - 2");
+            new Message(e.getMessage() + "(Err: 2)");
         }
 
         setState(SynchronizerState.WAITING);
@@ -65,11 +61,13 @@ class Synchronizer {
 
                 isSynchronized_str = Global.getRidOf_quotationMarks(isSynchronized_str);
             }
+            else
+                new Message("communication.ini does not exists. (Err: 95)");
         } catch (Exception e) {
             // ? BUG?
             // !
             isSynchronized_str = "true";
-            new Message(e.getMessage() + " - 3");
+            new Message(e.getMessage() + " (Err: 115)");
         }
 
         return !isSynchronized_str.equals("false");
@@ -82,5 +80,4 @@ class Synchronizer {
     void setState(SynchronizerState state) {
         this.state = state;
     }
-
 }

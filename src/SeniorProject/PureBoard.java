@@ -179,7 +179,7 @@ public class PureBoard implements Serializable {
 
             //Global.addLog("SUCCESS: The game is loaded to the AI.");
         } catch (Exception e) {
-            new Message(e.getMessage() + " - 7");
+            new Message(e.getMessage() + " (Err: 7)");
 
             //Global.addLog("ERROR: The game is not loaded to the AI.");
         }

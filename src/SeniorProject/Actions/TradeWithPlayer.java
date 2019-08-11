@@ -14,8 +14,8 @@ public class TradeWithPlayer implements IAction, Serializable {
     public TradeWithPlayer(Resource givenResources, Resource takenResources, int playerGiver, int playerTaker, Board board) {
         this.givenResources = givenResources;
         this.takenResources = takenResources;
-        this.playerGiver = board.getPlayers().get(playerGiver);
-        this.playerTaker = board.getPlayers().get(playerTaker);
+        this.playerGiver = new Player(playerGiver); // ?
+        this.playerTaker = new Player(playerTaker); // ?
         this.board = board;
     }
 

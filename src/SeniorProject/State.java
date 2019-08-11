@@ -328,7 +328,7 @@ public class State implements Serializable {
                         if (affordableMoves.contains(MoveType.CreateSettlement) && pureBoard.isValid(new Settlement(location, player), isInitial))
                             possibleActions.add(new CreateSettlement(location.getIndex(), player.getIndex(), realOwner));
 
-                        if (affordableMoves.contains(MoveType.UpgradeSettlement) && location.hasOwner() && location.getOwner().getIndex() == player.getIndex())
+                        if (affordableMoves.contains(MoveType.UpgradeSettlement) && location.hasOwner() && location.getOwner().getIndex() == player.getIndex() && location.getBuilding() != null && location.getBuilding().getType() == StructureType.SETTLEMENT)
                             possibleActions.add(new UpgradeSettlement(location.getIndex(), player.getIndex(), realOwner));
                     }
                 }
