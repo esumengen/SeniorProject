@@ -20,7 +20,7 @@ public class NegotiationSession {
     // Taken bids from the owner.
     private HashMap<NegotiationAgent, ArrayList<Bid>> takenBids = new HashMap<>();
 
-    NegotiationSession(NegotiationAgent owner, ArrayList<NegotiationAgent> otherAgents, ArrayList<Bid> bidRanking) {
+    public NegotiationSession(NegotiationAgent owner, ArrayList<NegotiationAgent> otherAgents, ArrayList<Bid> bidRanking) {
         this.ownerAgent = owner;
         this.otherAgents = otherAgents;
 
