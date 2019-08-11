@@ -34,9 +34,8 @@ public class Main {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                if (synchronizer.getState() == SynchronizerState.WAITING && actions_file.exists() && !synchronizer.isSynchronized()) {
+                if (synchronizer.getState() == SynchronizerState.WAITING && actions_file.exists() && !synchronizer.isSynchronized())
                     synchronizer.sync(actions_file);
-                }
 
                 boolean skip = false;
                 for (Player player : players) {
@@ -54,10 +53,12 @@ public class Main {
                         new Message(e.getMessage() + " (Err: 12)");
                     }
 
-                    if (communication_ini == null) {
-                        new Message("communication.ini is null. (Err: 112)");
+                    if (communication_ini == null || communication_ini.isEmpty()) {
+                        new Message("communication.ini is null or empty. (Err: 112)");
                         return;
                     }
+
+                    boolean isInitial = communication_ini.get("Game State", "isInitial", String.class).equals("\"true\"");
 
                     // New
                     if (virtualBoard_last != null) {
@@ -86,11 +87,8 @@ public class Main {
                     Player player_lastMoved = null;
 
                     for (Player player : players) {
-                        boolean isInitial = true;
-
                         if (player.getType() != PlayerType.HUMAN) {
                             String turnMode = communication_ini.get("General", "turnMode[" + player.getIndex() + "]", String.class);
-                            isInitial = communication_ini.get("Game State", "isInitial", String.class).equals("\"true\"");
                             turnMode = Global.getRidOf_quotationMarks(turnMode);
 
                             board.setInitial(isInitial);
