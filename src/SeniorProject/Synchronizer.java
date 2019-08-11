@@ -10,9 +10,9 @@ enum SynchronizerState {
 }
 
 class Synchronizer {
+    private static File communicationFile = new File(Global.get_working_path(Global.COMMUNICATION_FILE));
     private SynchronizerState state;
     private Wini communication_ini;
-    private static File communicationFile = new File(Global.get_working_path(Global.COMMUNICATION_FILE));
     private Board board;
 
     Synchronizer(Board board) {
@@ -60,8 +60,7 @@ class Synchronizer {
                 isSynchronized_str = communication_ini.get("General", "isSynchronized", String.class);
 
                 isSynchronized_str = Global.getRidOf_quotationMarks(isSynchronized_str);
-            }
-            else
+            } else
                 new Message("communication.ini does not exists. (Err: 95)");
         } catch (Exception e) {
             // ? BUG?

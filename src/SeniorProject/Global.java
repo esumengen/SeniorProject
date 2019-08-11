@@ -3,7 +3,6 @@ package SeniorProject;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Random;
 
 enum OSType {
     WINDOWS, MAC;

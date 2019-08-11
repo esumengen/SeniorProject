@@ -5,10 +5,10 @@ import SeniorProject.DevelopmentCards.DevelopmentCardType;
 import SeniorProject.Negotiation.NegotiationAgent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.ini4j.Wini;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.AbstractMap.SimpleEntry;
 
 public class Board extends PureBoard implements Serializable {
     private ArrayList<Player> players;
@@ -41,14 +41,14 @@ public class Board extends PureBoard implements Serializable {
         isInitial = true;
     }
 
-    public static boolean isAffordable(MoveType type, Resource resource) {
+    static boolean isAffordable(MoveType type, Resource resource) {
         Player player = new Player(2);
         player.setResource(resource);
 
         return isAffordable(type, player);
     }
 
-    public static boolean isAffordable(MoveType type, Player player) {
+    static boolean isAffordable(MoveType type, Player player) {
         int brick = player.getResource().get(ResourceType.BRICK);
         int grain = player.getResource().get(ResourceType.GRAIN);
         int wool = player.getResource().get(ResourceType.WOOL);
@@ -103,7 +103,8 @@ public class Board extends PureBoard implements Serializable {
         System.gc();
 
         Board _board = (Board) PureBoard.deepCopy(board);
-        _board.setMain(false);
+        if (_board != null)
+            _board.setMain(false);
 
         for (Player player : board.getPlayers()) {
             player.setAI(AIs.get(player.getIndex()));
@@ -375,7 +376,7 @@ public class Board extends PureBoard implements Serializable {
         changeUpdate();
     }
 
-    void addLog(String log) {
+    private void addLog(String log) {
         if (isActive())
             Global.addLog(log);
     }
@@ -435,11 +436,11 @@ public class Board extends PureBoard implements Serializable {
         return text;
     }
 
-    public int getTurn() {
+    int getTurn() {
         return turn;
     }
 
-    public void setTurn(int turn) {
+    void setTurn(int turn) {
         this.turn = turn;
     }
 
@@ -447,22 +448,22 @@ public class Board extends PureBoard implements Serializable {
         return isMain;
     }
 
-    public void setMain(boolean main) {
+    void setMain(boolean main) {
         isMain = main;
     }
 
-    public boolean isInitial() {
+    boolean isInitial() {
         return isInitial;
     }
 
-    public void setInitial(boolean initial) {
+    void setInitial(boolean initial) {
         if (isInitial != initial)
             changeUpdate();
 
         isInitial = initial;
     }
 
-    public void changeUpdate() {
+    void changeUpdate() {
         if (isInitial) {
             for (Player player : players) {
                 if (countStructures(StructureType.SETTLEMENT, player.getIndex()) > 2
@@ -477,15 +478,15 @@ public class Board extends PureBoard implements Serializable {
         state = stateBuilder.build();
     }
 
-    public State getState() {
+    State getState() {
         return state;
     }
 
-    public AbstractMap.SimpleEntry<Integer, Node> getFurthestNode(int playerIndex, Node node) {
+    private AbstractMap.SimpleEntry<Integer, Node> getFurthestNode(int playerIndex, Node node) {
         return getFurthestNode(playerIndex, node, false);
     }
 
-    public AbstractMap.SimpleEntry<Integer, Node> getFurthestNode(int playerIndex, Node node, boolean debug) {
+    private AbstractMap.SimpleEntry<Integer, Node> getFurthestNode(int playerIndex, Node node, boolean debug) {
         ArrayList<Road> playersRoads = new ArrayList<>();
         ArrayList<Node> nodes = new ArrayList<>();
 
@@ -566,7 +567,7 @@ public class Board extends PureBoard implements Serializable {
             }
         }
 
-        Integer max = Integer.MIN_VALUE;
+        int max = Integer.MIN_VALUE;
         Node maxNode = null;
         for (Node _node : distanceMap.keySet()) {
             int value = distanceMap.get(_node);
@@ -584,7 +585,7 @@ public class Board extends PureBoard implements Serializable {
         return new AbstractMap.SimpleEntry<>(max, maxNode);
     }
 
-    public AbstractMap.SimpleEntry<Integer, Node> getLongestRoad(int playerIndex) {
+    AbstractMap.SimpleEntry<Integer, Node> getLongestRoad(int playerIndex) {
         int structureCount = getPlayers().get(playerIndex).getStructures().size();
         if (structureCount < 4)
             return new AbstractMap.SimpleEntry<>((structureCount > 1) ? 1 : 0, new Node(-1));
@@ -617,7 +618,7 @@ public class Board extends PureBoard implements Serializable {
         int maxIndex = 0;
         int maxValue = 0;
         for (int i = 0; i < results.size(); i++) {
-            AbstractMap.SimpleEntry<Integer, Node> result = results.get(i);
+            SimpleEntry<Integer, Node> result = results.get(i);
             if (result.getKey() > maxValue) {
                 maxIndex = i;
                 maxValue = result.getKey();
@@ -627,15 +628,15 @@ public class Board extends PureBoard implements Serializable {
         return results.get(maxIndex);
     }
 
-    public int getTotalDice() {
+    int getTotalDice() {
         return totalDice;
     }
 
-    public boolean hasRobberPlayedRecently() {
+    boolean hasRobberPlayedRecently() {
         return hasRobberPlayedRecently;
     }
 
-    public Player getDiceOwner() {
+    Player getDiceOwner() {
         return diceOwner;
     }
 }

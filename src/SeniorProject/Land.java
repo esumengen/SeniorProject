@@ -29,16 +29,10 @@ public class Land implements Serializable {
     private int j;
     private PureBoard pureBoard;
 
-    public Land(int index) {
+    Land(int index) {
         this.adjacentLocations = new ArrayList<>();
         this.index = index;
         this.type = LandType.NONE;
-    }
-
-    Land(int index, LandType type) {
-        this.adjacentLocations = new ArrayList<>();
-        this.index = index;
-        this.type = type;
     }
 
     ArrayList<Location> getAdjacentLocations() {
@@ -90,7 +84,7 @@ public class Land implements Serializable {
         return i;
     }
 
-    public void setI(int i) {
+    void setI(int i) {
         this.i = i;
     }
 
@@ -98,15 +92,11 @@ public class Land implements Serializable {
         return j;
     }
 
-    public void setJ(int j) {
+    void setJ(int j) {
         this.j = j;
     }
 
-    public PureBoard getPureBoard() {
-        return pureBoard;
-    }
-
-    public void setPureBoard(PureBoard board) {
+    void setPureBoard(PureBoard board) {
         this.pureBoard = board;
     }
 

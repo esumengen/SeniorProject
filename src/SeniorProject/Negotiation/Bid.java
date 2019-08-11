@@ -4,17 +4,14 @@ import SeniorProject.Resource;
 import SeniorProject.ResourceType;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Bid implements Comparable<Bid>, Serializable {
     static private ResourceType bestType;
     private Resource change;
 
-    public Bid(NegotiationAgent owner, NegotiationAgent target, Resource change) {
-        this.change = change;
-    }
-
     public Bid(Resource change) {
-        this(null, null, change);
+        this.change = change;
     }
 
     public static void setBestType(ResourceType bestType) {
@@ -60,15 +57,9 @@ public class Bid implements Comparable<Bid>, Serializable {
         return change;
     }
 
-    private void setChange(Resource change) {
-        this.change = change;
-    }
-
     // ? problematic ?
     @Override
     public int compareTo(Bid o) {
-        double totalResources = change.getSum();
-
         double myScore = change.getSum() + change.get(bestType);
         double itsScore = o.change.getSum() + o.change.get(bestType);
 
@@ -84,7 +75,7 @@ public class Bid implements Comparable<Bid>, Serializable {
             Bid bid = (Bid) object;
 
             for (ResourceType resourceType : ResourceType.values()) {
-                if (bid.getChange().get(resourceType) != change.get(resourceType)) {
+                if (!Objects.equals(bid.getChange().get(resourceType), change.get(resourceType))) {
                     return false;
                 }
             }

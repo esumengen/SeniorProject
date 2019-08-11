@@ -2,7 +2,6 @@ package SeniorProject.Negotiation;
 
 import SeniorProject.Actions.TradeWithPlayer;
 import SeniorProject.IAction;
-import SeniorProject.Main;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,9 +20,7 @@ public class NegotiationSession {
     // Taken bids from the owner.
     private HashMap<NegotiationAgent, ArrayList<Bid>> takenBids = new HashMap<>();
 
-    private boolean isDestroyed = false;
-
-    public NegotiationSession(NegotiationAgent owner, ArrayList<NegotiationAgent> otherAgents, ArrayList<Bid> bidRanking) {
+    NegotiationSession(NegotiationAgent owner, ArrayList<NegotiationAgent> otherAgents, ArrayList<Bid> bidRanking) {
         this.ownerAgent = owner;
         this.otherAgents = otherAgents;
 
@@ -37,15 +34,15 @@ public class NegotiationSession {
         }
     }
 
-    public void addGivenBid(Bid bid, NegotiationAgent agent) {
+    void addGivenBid(Bid bid, NegotiationAgent agent) {
         givenBids.get(agent).add(bid);
     }
 
-    public void addTakenBid(Bid bid, NegotiationAgent agent) {
+    void addTakenBid(Bid bid, NegotiationAgent agent) {
         takenBids.get(agent).add(bid);
     }
 
-    public int getTurn(NegotiationAgent agent1, NegotiationAgent agent2) {
+    int getTurn(NegotiationAgent agent1, NegotiationAgent agent2) {
         return Math.max(takenBids.get(agent1).size(), takenBids.get(agent2).size()) + 1;
     }
 
@@ -57,7 +54,7 @@ public class NegotiationSession {
         return ownerAgent;
     }
 
-    public void complete(Bid bid, NegotiationAgent targetAgent) {
+    void complete(Bid bid, NegotiationAgent targetAgent) {
         if (!isCompleted) {
             acceptedOffer = bid;
 
@@ -71,19 +68,15 @@ public class NegotiationSession {
         }
     }
 
-    public void complete() {
+    void complete() {
         complete(null, bidTarget);
-    }
-
-    public void terminate() {
-        isDestroyed = true;
     }
 
     public NegotiationAgent getBidTarget() {
         return bidTarget;
     }
 
-    public void setBidTarget(NegotiationAgent bidTarget) {
+    void setBidTarget(NegotiationAgent bidTarget) {
         this.bidTarget = bidTarget;
     }
 
@@ -91,7 +84,7 @@ public class NegotiationSession {
         return isCompleted;
     }
 
-    public void setCompleted(boolean completed) {
+    void setCompleted(boolean completed) {
         isCompleted = completed;
     }
 

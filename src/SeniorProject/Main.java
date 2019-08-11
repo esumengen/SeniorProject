@@ -68,13 +68,15 @@ public class Main {
                             new Message(e.getMessage() + " (Err: 12)");
                         }
 
-                        for (int i = 0; i < Global.PLAYER_COUNT; i++)
-                            longest_roads_ini.put("LongestRoad", "Player[" + i + "]", Integer.toString(virtualBoard_last.getLongestRoad(i).getKey()));
+                        if (longest_roads_ini != null) {
+                            for (int i = 0; i < Global.PLAYER_COUNT; i++)
+                                longest_roads_ini.put("LongestRoad", "Player[" + i + "]", Integer.toString(virtualBoard_last.getLongestRoad(i).getKey()));
+                        }
 
                         try {
                             longest_roads_ini.store();
                         } catch (Exception e) {
-
+                            new Message(e.getMessage() + " (Err: 4782)");
                         }
 
                         virtualBoard_last = null;
@@ -165,7 +167,7 @@ public class Main {
             longest_roads_file.createNewFile();
         }
         catch (Exception e) {
-
+            new Message(e.getMessage() + " (Err: 159)");
         }
 
         players = createPlayers();
@@ -220,35 +222,24 @@ public class Main {
             }
 
             try {
-                Class clss, clss2;
                 Constructor constructor, constructor2;
 
                 if (!negotiationDirectories[player.getIndex()].equals("Default")) {
-                    File file = new File(negotiationDirectories[player.getIndex()]);
-                    String name = file.getName().substring(0, file.getName().indexOf("."));
-
-                    clss = new URLClassLoader(new URL[]{file.getParentFile().toURI().toURL()})
-                            .loadClass(name);
-                    constructor = clss.getDeclaredConstructor();
+                    constructor = getConstructor(negotiationDirectories, player);
 
                     negotiationAgent = (NegotiationAgent) constructor.newInstance();
                     negotiationAgent.setOwner(player);
                 }
 
                 if (!AIDirectories[player.getIndex()].equals("Default")) {
-                    File file = new File(AIDirectories[player.getIndex()]);
-                    String name = file.getName().substring(0, file.getName().indexOf("."));
-
-                    clss2 = new URLClassLoader(new URL[]{file.getParentFile().toURI().toURL()})
-                            .loadClass(name);
-                    constructor2 = clss2.getDeclaredConstructor();
+                    constructor2 = getConstructor(AIDirectories, player);
 
                     AI_instance = (AI) constructor2.newInstance();
                     AI_instance.setBoard(board);
                     AI_instance.setOwner(player);
                 }
             } catch (Exception e) {
-                System.out.println(e.fillInStackTrace());
+                System.out.println(e.getMessage() + " (Err: 742)");
             }
 
             player.createAI(AI_instance);
@@ -256,6 +247,19 @@ public class Main {
         }
 
         synchronizer = new Synchronizer(board);
+    }
+
+    private static Constructor getConstructor(String[] directory, Player player) {
+        File file = new File(directory[player.getIndex()]);
+        String name = file.getName().substring(0, file.getName().indexOf("."));
+
+        try {
+            Class _class = new URLClassLoader(new URL[]{file.getParentFile().toURI().toURL()})
+                    .loadClass(name);
+            return _class.getDeclaredConstructor();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private static void programTermination() {
@@ -273,7 +277,7 @@ public class Main {
         }
     }
 
-    public static ArrayList<Player> createPlayers() {
+    static ArrayList<Player> createPlayers() {
         ArrayList<Player> players = new ArrayList<>();
 
         for (int i = 0; i < Global.PLAYER_COUNT; i++) {

@@ -19,6 +19,7 @@ public class TradeWithPlayer implements IAction, Serializable {
         this.board = board;
     }
 
+    // ? Public Bug!
     public void setBoard(Board board) {
         this.board = board;
         this.playerGiver = board.getPlayers().get(playerGiver.getIndex());

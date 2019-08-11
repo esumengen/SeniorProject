@@ -21,14 +21,7 @@ public class PureBoard implements Serializable {
     private int longestRoad_owner;
     private ArrayList<Integer> topLocationIndexes = new ArrayList<>();
 
-    public PureBoard(ArrayList<Land> lands, ArrayList<Location> locations) {
-        init();
-
-        this.lands = lands;
-        this.locations = locations;
-    }
-
-    public PureBoard() {
+    PureBoard() {
         init();
 
         //region Initialization of Lands&Locations
@@ -113,7 +106,7 @@ public class PureBoard implements Serializable {
         return sum;
     }
 
-    public static PureBoard deepCopy(Serializable object) {
+    static PureBoard deepCopy(Serializable object) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ObjectOutputStream outputStrm = new ObjectOutputStream(outputStream);
@@ -269,10 +262,6 @@ public class PureBoard implements Serializable {
             if (!isInitial) {
                 // Tam o location'a bağlı en az bir yolu bulunmalı.
                 return countStructures(StructureType.ROAD, settlement.getLocation(), settlement.getPlayer().getIndex()) != 0;
-            } else {
-                // Köşede olmamalı.
-                /*if (((Building) structure).getLocation().isCorner())
-                    return false;*/
             }
         }
 
@@ -357,7 +346,7 @@ public class PureBoard implements Serializable {
         return isActive;
     }
 
-    public void setActive(boolean active) {
+    void setActive(boolean active) {
         isActive = active;
     }
 
@@ -387,11 +376,11 @@ public class PureBoard implements Serializable {
     @Override
     public String toString() {
         String string = "";
-        for (int i = 0; i < lands.size(); i++) {
-            string += "[LAND " + lands.get(i).getIndex() + "]\nScore: " + lands.get(i).getDiceChance() + "\nType: " + lands.get(i).getType().toString() + "\nLocations: {";
-            int j_max = lands.get(i).getAdjacentLocations().size() - 1;
+        for (Land land : lands) {
+            string += "[LAND " + land.getIndex() + "]\nScore: " + land.getDiceChance() + "\nType: " + land.getType().toString() + "\nLocations: {";
+            int j_max = land.getAdjacentLocations().size() - 1;
             for (int j = 0; j < j_max + 1; j++) {
-                string += lands.get(i).getAdjacentLocations().get(j).getIndex() + (j == j_max ? "" : ", ");
+                string += land.getAdjacentLocations().get(j).getIndex() + (j == j_max ? "" : ", ");
             }
             string += "}\n\n";
         }
@@ -403,7 +392,7 @@ public class PureBoard implements Serializable {
         return robbedLand;
     }
 
-    public void setRobbedLand(Land land) {
+    void setRobbedLand(Land land) {
         robbedLand = land;
     }
 
@@ -411,7 +400,7 @@ public class PureBoard implements Serializable {
         return deck;
     }
 
-    public void setDeck(Deck deck) {
+    void setDeck(Deck deck) {
         this.deck = deck;
     }
 
@@ -419,7 +408,7 @@ public class PureBoard implements Serializable {
         return longestRoad_owner;
     }
 
-    public void setLongestRoad_owner(int longestRoad_owner) {
+    void setLongestRoad_owner(int longestRoad_owner) {
         this.longestRoad_owner = longestRoad_owner;
     }
 }

@@ -19,9 +19,6 @@ public class Negotiator {
     }
 
     public void clearSession() {
-        if (session != null)
-            session.terminate();
-
         this.session = null;
     }
 

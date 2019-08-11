@@ -3,7 +3,7 @@ package SeniorProject.Negotiation;
 import java.util.Random;
 
 public class BasicNegotiationAgent extends NegotiationAgent {
-    private Random randomizer = new Random();
+    private Random randomMachine = new Random();
 
     public double getBaseRatio(NegotiationSession session) {
         return (double) session.getTurn(this, session.getOwnerAgent()) / Negotiator.maximumMutualOffers;
@@ -14,7 +14,7 @@ public class BasicNegotiationAgent extends NegotiationAgent {
         if (bid == null) {
             return getBidRanking().get(0);
         } else {
-            return getBidRanking().get((int) (getBaseRatio(negotiationSession) + randomizer.nextDouble() * 0.1) * getBidRanking().size() / 4);
+            return getBidRanking().get((int) (getBaseRatio(negotiationSession) + randomMachine.nextDouble() * 0.1) * getBidRanking().size() / 4);
         }
     }
 

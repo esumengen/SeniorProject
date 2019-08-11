@@ -66,7 +66,7 @@ public class Location extends Node implements Serializable {
         return owner != null;
     }
 
-    public void setHarborType(HarborType harborType) {
+    void setHarborType(HarborType harborType) {
         this.harborType = harborType;
     }
 
@@ -83,7 +83,7 @@ public class Location extends Node implements Serializable {
         return isActive;
     }
 
-    public void setActive(boolean active) {
+    void setActive(boolean active) {
         isActive = active;
     }
 
@@ -101,10 +101,6 @@ public class Location extends Node implements Serializable {
 
     public void addAdjacentLocations(Location location) {
         adjacentLocations.add(location);
-    }
-
-    public PureBoard getPureBoard() {
-        return pureBoard;
     }
 
     public void setPureBoard(PureBoard board) {

@@ -4,12 +4,12 @@ import javax.swing.*;
 import java.awt.*;
 
 
-public class DebugFrame extends JFrame {
+class DebugFrame extends JFrame {
     private JPanel aiPanel;
     private JPanel resourcesPanel;
     private Board board;
 
-    public DebugFrame(Board board) {
+    DebugFrame(Board board) {
         this.board = board;
 
         setLayout(new GridLayout(3, 1));

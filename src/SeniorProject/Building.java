@@ -6,7 +6,7 @@ public abstract class Building extends Structure implements Serializable {
     private Location location;
     private StructureType type;
 
-    public Building(Location location, Player player, StructureType type) {
+    Building(Location location, Player player, StructureType type) {
         super(player);
         this.location = location;
         this.type = type;

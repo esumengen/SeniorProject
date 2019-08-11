@@ -109,14 +109,14 @@ public class BasicAI extends AI {
 
                 ArrayList<ArrayList<Road>> threeBestPaths = new ArrayList<>();
                 ArrayList<Integer> threeBestPaths_discounted_len = new ArrayList<>();
-                for (int i = 0; i < best3Locations.length; i++) {
-                    if (best3Locations[i] != null) {
+                for (Location best3Location : best3Locations) {
+                    if (best3Location != null) {
                         ArrayList<Road> bestPath = new ArrayList<>();
                         int bestPath_discounted_len = Integer.MAX_VALUE;
 
                         for (Location location : actionRoad_locations) {
                             if (location.getOwner() != null && location.getOwner().getIndex() == getOwner().getIndex()) {
-                                ArrayList<Road> path = getShortestPath(location, best3Locations[i], false).getValue();
+                                ArrayList<Road> path = getShortestPath(location, best3Location, false).getValue();
 
                                 boolean ignorePath = true;
                                 for (CreateRoad createRoad : actions_roads) {
@@ -251,7 +251,7 @@ public class BasicAI extends AI {
         }
     }
 
-    public <T> ArrayList<T> getActions_of(ArrayList<IAction> actions, Class<T> A) {
+    private <T> ArrayList<T> getActions_of(ArrayList<IAction> actions, Class<T> A) {
         ArrayList<T> selectedActions = new ArrayList<>();
 
         for (IAction action : actions) {
@@ -380,7 +380,7 @@ public class BasicAI extends AI {
         }
     }
 
-    public AbstractMap.SimpleEntry<Integer, ArrayList<Road>> getShortestPath(Location locationSource, Location locationTarget, boolean ignoreBuildings) {
+    private AbstractMap.SimpleEntry<Integer, ArrayList<Road>> getShortestPath(Location locationSource, Location locationTarget, boolean ignoreBuildings) {
         if (locationSource.getIndex() == locationTarget.getIndex())
             return new AbstractMap.SimpleEntry<>(0, null);
 
@@ -429,9 +429,9 @@ public class BasicAI extends AI {
             if (structure instanceof Road && structure.getPlayer().getIndex() != getOwner().getIndex()) {
                 Road road = (Road) structure;
 
-                for (int i = 0; i < nodes.size(); i++) {
-                    if (nodes.get(i).getIndex() == road.getStartLocation().getIndex()) {
-                        Node nodeDeleted = nodes.get(i);
+                for (Node node : nodes) {
+                    if (node.getIndex() == road.getStartLocation().getIndex()) {
+                        Node nodeDeleted = node;
 
                         for (int j = 0; j < nodeDeleted.getAdjacentNodes_manual().size(); j++) {
                             if (nodeDeleted.getAdjacentNodes_manual().get(j).getIndex() == road.getEndLocation().getIndex()) {
@@ -459,9 +459,9 @@ public class BasicAI extends AI {
             } else if (ignoreBuildings && structure instanceof Building && structure.getPlayer().getIndex() != getOwner().getIndex()) {
                 Building building = (Building) structure;
 
-                for (int i = 0; i < nodes.size(); i++) {
-                    if (nodes.get(i).getIndex() == building.getLocation().getIndex()) {
-                        Node nodeDisconnected = nodes.get(i);
+                for (Node node : nodes) {
+                    if (node.getIndex() == building.getLocation().getIndex()) {
+                        Node nodeDisconnected = node;
 
                         for (int j = 0; j < nodeDisconnected.getAdjacentNodes_manual().size(); j++) {
                             Node adjacentNode = nodeDisconnected.getAdjacentNodes_manual().get(j);
@@ -478,11 +478,11 @@ public class BasicAI extends AI {
 
         Node startNode = null;
         Node targetNode = null;
-        for (int i = 0; i < nodes.size(); i++) {
-            if (nodes.get(i).getIndex() == locationSource.getIndex()) {
-                startNode = nodes.get(i);
-            } else if (nodes.get(i).getIndex() == locationTarget.getIndex()) {
-                targetNode = nodes.get(i);
+        for (Node node : nodes) {
+            if (node.getIndex() == locationSource.getIndex()) {
+                startNode = node;
+            } else if (node.getIndex() == locationTarget.getIndex()) {
+                targetNode = node;
             }
         }
 

@@ -6,7 +6,7 @@ public class City extends Building implements Serializable {
     public static final StructureType TYPE = StructureType.CITY;
     public static final Resource COST = new Resource(3, 0, 0, 2, 0);
 
-    public City(Location location, Player player) {
+    City(Location location, Player player) {
         super(location, player, TYPE);
         setType(StructureType.CITY);
     }

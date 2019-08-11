@@ -3,9 +3,7 @@ package SeniorProject;
 import SeniorProject.Actions.TradeWithPlayer;
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
 import SeniorProject.Negotiation.NegotiationAgent;
-import org.ini4j.Wini;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -156,7 +154,7 @@ public class Player implements Serializable, IObservable {
         return resource.get(ResourceType.GRAIN);
     }
 
-    public void setGrain(int value) {
+    void setGrain(int value) {
         resource.replace(ResourceType.GRAIN, value);
 
         updateSubscribers();
@@ -180,7 +178,7 @@ public class Player implements Serializable, IObservable {
         return resource.get(ResourceType.LUMBER);
     }
 
-    public void setLumber(int value) {
+    void setLumber(int value) {
         resource.replace(ResourceType.LUMBER, value);
 
         updateSubscribers();
@@ -190,7 +188,7 @@ public class Player implements Serializable, IObservable {
         return resource.get(ResourceType.ORE);
     }
 
-    public void setOre(int value) {
+    void setOre(int value) {
         resource.replace(ResourceType.ORE, value);
 
         updateSubscribers();
@@ -200,7 +198,7 @@ public class Player implements Serializable, IObservable {
         return resource.get(ResourceType.WOOL);
     }
 
-    public void setWool(int value) {
+    void setWool(int value) {
         resource.replace(ResourceType.WOOL, value);
 
         updateSubscribers();
@@ -210,7 +208,7 @@ public class Player implements Serializable, IObservable {
         return resource.get(ResourceType.BRICK);
     }
 
-    public void setBrick(int value) {
+    void setBrick(int value) {
         resource.replace(ResourceType.BRICK, value);
 
         updateSubscribers();
@@ -248,7 +246,7 @@ public class Player implements Serializable, IObservable {
         return AI_instance;
     }
 
-    public void setAI(AI ai) {
+    void setAI(AI ai) {
         this.AI_instance = ai;
     }
 
@@ -260,7 +258,7 @@ public class Player implements Serializable, IObservable {
         return knight;
     }
 
-    public void setKnight(int knight) {
+    void setKnight(int knight) {
         this.knight = knight;
     }
 
@@ -268,7 +266,7 @@ public class Player implements Serializable, IObservable {
         return victoryPoint;
     }
 
-    public void setVictoryPoint(int victoryPoint) {
+    void setVictoryPoint(int victoryPoint) {
         this.victoryPoint = victoryPoint;
     }
 
@@ -277,22 +275,17 @@ public class Player implements Serializable, IObservable {
         observers.add(observer);
     }
 
-    public void updateSubscribers() {
+    void updateSubscribers() {
         for (IObserver observer : observers) {
             observer.update();
         }
-    }
-
-    @Override
-    public ArrayList<IObserver> getObservers() {
-        return observers;
     }
 
     public PureBoard getPureBoard() {
         return pureBoard;
     }
 
-    public void setPureBoard(PureBoard pureBoard) {
+    void setPureBoard(PureBoard pureBoard) {
         this.pureBoard = pureBoard;
     }
 
@@ -304,7 +297,7 @@ public class Player implements Serializable, IObservable {
         this.longestRoad_length = longestRoad_length;
     }
 
-    public void addDevelopmentCard(DevelopmentCardType developmentCardType) {
+    void addDevelopmentCard(DevelopmentCardType developmentCardType) {
         developmentCards.add(developmentCardType);
     }
 
@@ -317,7 +310,7 @@ public class Player implements Serializable, IObservable {
         return NegotiationAgent_instance;
     }
 
-    public void setNegotiationAgent(NegotiationAgent negotiationAgent_instance) {
+    void setNegotiationAgent(NegotiationAgent negotiationAgent_instance) {
         NegotiationAgent_instance = negotiationAgent_instance;
     }
 }

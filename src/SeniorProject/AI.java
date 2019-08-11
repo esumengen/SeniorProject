@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public abstract class AI implements Serializable {
+    Board virtualBoard;
+    ArrayList<IAction> possibleActions = new ArrayList<>();
     private Player owner;
     private Board board;
     private ArrayList<Bid> bidRanking = new ArrayList<>();
     private ArrayList<IAction> negotiationActions = new ArrayList<>();
-    protected Board virtualBoard;
     private ArrayList<IAction> actionsDone = new ArrayList<>();
-    protected ArrayList<IAction> possibleActions = new ArrayList<>();
 
     public AI () {
         //updateBidRanking();
