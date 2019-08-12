@@ -162,7 +162,7 @@ public class Main {
         }
 
         if (player.getAI().getBidRanking().size() > 0) {
-            NegotiationSession session = new NegotiationSession(player.getNegotiationAgent(), otherAgents, player.getAI().getBidRanking());
+            NegotiationSession session = new NegotiationSession(player.getNegotiationAgent(), otherAgents);
             Negotiator.getInstance().startSession(session);
             if (session.isCompleted()) {
 

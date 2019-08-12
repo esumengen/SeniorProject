@@ -1,5 +1,7 @@
 package SeniorProject.Negotiation;
 
+import SeniorProject.AI;
+import SeniorProject.Message;
 import SeniorProject.Resource;
 import SeniorProject.ResourceType;
 
@@ -7,15 +9,11 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class Bid implements Comparable<Bid>, Serializable {
-    static private ResourceType bestType;
     private Resource change;
+    private AI utilityFunction_owner = null;
 
     public Bid(Resource change) {
         this.change = change;
-    }
-
-    public static void setBestType(ResourceType bestType) {
-        Bid.bestType = bestType;
     }
 
     public Bid getReversed() {
@@ -57,16 +55,15 @@ public class Bid implements Comparable<Bid>, Serializable {
         return change;
     }
 
-    // ? problematic ?
     @Override
     public int compareTo(Bid o) {
-        double myScore = change.getSum() + change.get(bestType);
-        double itsScore = o.change.getSum() + o.change.get(bestType);
+        double myUtility = getUtilityFunction_owner().calculateBidUtility(this);
+        double itsUtility = o.getUtilityFunction_owner().calculateBidUtility(o);
 
-        if (myScore - itsScore == 0.0)
+        if (myUtility - itsUtility == 0.0)
             return 0;
 
-        return (myScore - itsScore > 0.0) ? -1 : 1;
+        return (myUtility - itsUtility > 0.0) ? -1 : 1;
     }
 
     @Override
@@ -88,5 +85,24 @@ public class Bid implements Comparable<Bid>, Serializable {
     @Override
     public String toString() {
         return change.toString();
+    }
+
+    Bid setUtilityFunction_owner_protected(AI utilityFunction_owner) {
+        this.utilityFunction_owner = utilityFunction_owner;
+
+        return this;
+    }
+
+    AI getUtilityFunction_owner() {
+        return utilityFunction_owner;
+    }
+
+    public Bid setUtilityFunction_owner(AI utilityFunction_owner) {
+        if (this.utilityFunction_owner == null || utilityFunction_owner == this.utilityFunction_owner)
+            this.utilityFunction_owner = utilityFunction_owner;
+        else
+            new Message("Access to setUtilityFunction_owner is denied. (Err: 884)");
+
+        return this;
     }
 }

@@ -3,8 +3,8 @@ package SeniorProject;
 import javax.swing.*;
 import java.awt.*;
 
-class Message extends JFrame {
-    Message(String s) {
+public class Message extends JFrame {
+    public Message(String s) {
         super("");
 
         JPanel panel = new JPanel();

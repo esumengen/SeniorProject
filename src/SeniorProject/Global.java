@@ -3,6 +3,7 @@ package SeniorProject;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 enum OSType {
     WINDOWS, MAC;
@@ -39,6 +40,17 @@ public class Global {
 
     public static String getRidOf_quotationMarks(String string) {
         return String.copyValueOf(string.toCharArray(), 1, string.length() - 2);
+    }
+
+    public static <T> ArrayList<T> getActions_of(ArrayList<IAction> actions, Class T) {
+        ArrayList<T> selectedActions = new ArrayList<>();
+
+        for (IAction action : actions) {
+            if (action.getClass() == T)
+                selectedActions.add((T) action);
+        }
+
+        return selectedActions;
     }
 
     public static void addLog(String text) {

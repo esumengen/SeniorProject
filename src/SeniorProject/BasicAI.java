@@ -5,13 +5,11 @@ import SeniorProject.Actions.CreateRoad;
 import SeniorProject.Actions.CreateSettlement;
 import SeniorProject.Negotiation.Bid;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
 public class BasicAI extends AI {
-    private static final StructureType SETTLEMENT = StructureType.SETTLEMENT;
-    private static final ResourceType BRICK = ResourceType.BRICK;
-    private static final ResourceType LUMBER = ResourceType.LUMBER;
-
     private HashMap<StructureType, Double[]> locScores;
     private Random randomGenerator = new Random();
 
@@ -23,8 +21,8 @@ public class BasicAI extends AI {
         updateLocationScores(SETTLEMENT);
 
         while (true) {
-            ArrayList<CreateSettlement> actions_settlements = getActions_of(getPossibleActions(), CreateSettlement.class);
-            ArrayList<CreateRoad> actions_roads = getActions_of(getPossibleActions(), CreateRoad.class);
+            ArrayList<CreateSettlement> actions_settlements = Global.getActions_of(getPossibleActions(), CreateSettlement.class);
+            ArrayList<CreateRoad> actions_roads = Global.getActions_of(getPossibleActions(), CreateRoad.class);
 
             //region While a settlement can be built, build it.
             Double[] _locScores = locScores.get(SETTLEMENT);
@@ -51,8 +49,8 @@ public class BasicAI extends AI {
                     }
                 }
 
-                actions_settlements = getActions_of(getPossibleActions(), CreateSettlement.class);
-                actions_roads = getActions_of(getPossibleActions(), CreateRoad.class);
+                actions_settlements = Global.getActions_of(getPossibleActions(), CreateSettlement.class);
+                actions_roads = Global.getActions_of(getPossibleActions(), CreateRoad.class);
             }
             ///endregion
 
@@ -232,32 +230,9 @@ public class BasicAI extends AI {
         return getActionsDone();
     }
 
-    private void updateLocationScores(StructureType structureType) {
-        Double[] _locScores = locScores.get(structureType);
-
-        if (structureType == SETTLEMENT) {
-            for (int i = 0; i < _locScores.length; i++) {
-                Location location = getBoard().getLocations().get(i);
-
-                _locScores[i] = 0.0;
-                for (Land land : location.getAdjacentLands()) {
-                    _locScores[i] += location.isActive() ? 0.01 : 0;
-                    _locScores[i] += land.getDiceChance() * 36.0;
-                    _locScores[i] += (land.getResourceType() == LUMBER ? 3.0 : 0.0) + (land.getResourceType() == BRICK ? 3.0 : 0.0);
-                }
-            }
-        }
-    }
-
-    public <T> ArrayList<T> getActions_of(ArrayList<IAction> actions, Class T) {
-        ArrayList<T> selectedActions = new ArrayList<>();
-
-        for (IAction action : actions) {
-            if (action.getClass() == T)
-                selectedActions.add((T) action);
-        }
-
-        return selectedActions;
+    @Override
+    public double calculateBidUtility(Bid bid) {
+        return bid.getChange().getSum();
     }
 
     @Override
@@ -265,8 +240,6 @@ public class BasicAI extends AI {
         Resource desiredResource;
         Action desiredAction;
         clearBidRanking();
-
-        Bid.setBestType(ResourceType.BRICK);
 
         for (int i = 0; i < Action.values().length; i++) {
             desiredResource = new Resource(getOwner().getResource());
@@ -297,6 +270,23 @@ public class BasicAI extends AI {
             System.out.println("    " + getOwner() + "'s Bid Ranking:");
             for (Bid bid : getBidRanking())
                 System.out.println("    " + bid);
+        }
+    }
+
+    private void updateLocationScores(StructureType structureType) {
+        Double[] _locScores = locScores.get(structureType);
+
+        if (structureType == SETTLEMENT) {
+            for (int i = 0; i < _locScores.length; i++) {
+                Location location = getBoard().getLocations().get(i);
+
+                _locScores[i] = 0.0;
+                for (Land land : location.getAdjacentLands()) {
+                    _locScores[i] += location.isActive() ? 0.01 : 0;
+                    _locScores[i] += land.getDiceChance() * 36.0;
+                    _locScores[i] += (land.getResourceType() == LUMBER ? 3.0 : 0.0) + (land.getResourceType() == BRICK ? 3.0 : 0.0);
+                }
+            }
         }
     }
 
@@ -372,157 +362,5 @@ public class BasicAI extends AI {
                 }
             }
         }
-    }
-
-    public AbstractMap.SimpleEntry<Integer, ArrayList<Road>> getShortestPath(Location locationSource, Location locationTarget, boolean ignoreBuildings) {
-        if (locationSource.getIndex() == locationTarget.getIndex())
-            return new AbstractMap.SimpleEntry<>(0, null);
-
-        ArrayList<Node> nodes = new ArrayList<>();
-
-        for (Location location : getVirtualBoard().getLocations()) {
-            if (location.isActive()) {
-                for (Location _location : location.getAdjacentLocations()) {
-                    Node node = null;
-                    boolean node_exists = false;
-
-                    Node _node = null;
-                    boolean _node_exists = false;
-
-                    for (Node nnode : nodes) {
-                        if (nnode.getIndex() == location.getIndex()) {
-                            node = nnode;
-                            node_exists = true;
-                            continue;
-                        } else if (nnode.getIndex() == _location.getIndex()) {
-                            _node = nnode;
-                            _node_exists = true;
-                            continue;
-                        }
-                    }
-
-                    if (!node_exists) {
-                        node = new Node(location.getIndex());
-                        nodes.add(node);
-                    }
-                    if (!_node_exists) {
-                        _node = new Node(_location.getIndex());
-                        nodes.add(_node);
-                    }
-
-                    if (!node.getAdjacentNodes_manual().contains(_node))
-                        node.getAdjacentNodes_manual().add(_node);
-
-                    if (!_node.getAdjacentNodes_manual().contains(node))
-                        _node.getAdjacentNodes_manual().add(node);
-                }
-            }
-        }
-
-        for (Structure structure : getVirtualBoard().getStructures()) {
-            if (structure instanceof Road && structure.getPlayer().getIndex() != getOwner().getIndex()) {
-                Road road = (Road) structure;
-
-                for (int i = 0; i < nodes.size(); i++) {
-                    if (nodes.get(i).getIndex() == road.getStartLocation().getIndex()) {
-                        Node nodeDeleted = nodes.get(i);
-
-                        for (int j = 0; j < nodeDeleted.getAdjacentNodes_manual().size(); j++) {
-                            if (nodeDeleted.getAdjacentNodes_manual().get(j).getIndex() == road.getEndLocation().getIndex()) {
-                                Node nodeDeleted2 = nodeDeleted.getAdjacentNodes_manual().get(j);
-
-                                for (Node x : nodeDeleted.getAdjacentNodes_manual()) {
-                                    if (x.getIndex() == nodeDeleted2.getIndex()) {
-                                        nodeDeleted.getAdjacentNodes_manual().remove(x);
-                                        break;
-                                    }
-                                }
-                                for (Node x : nodeDeleted2.getAdjacentNodes_manual()) {
-                                    if (x.getIndex() == nodeDeleted.getIndex()) {
-                                        nodeDeleted2.getAdjacentNodes_manual().remove(x);
-                                        break;
-                                    }
-                                }
-
-                                /*System.out.println(nodeDeleted2.getIndex() + "is deleted from " + nodeDeleted.getIndex());
-                                System.out.println(nodeDeleted.getIndex() + "is deleted from " + nodeDeleted2.getIndex());*/
-                            }
-                        }
-                    }
-                }
-            } else if (ignoreBuildings && structure instanceof Building && structure.getPlayer().getIndex() != getOwner().getIndex()) {
-                Building building = (Building) structure;
-
-                for (int i = 0; i < nodes.size(); i++) {
-                    if (nodes.get(i).getIndex() == building.getLocation().getIndex()) {
-                        Node nodeDisconnected = nodes.get(i);
-
-                        for (int j = 0; j < nodeDisconnected.getAdjacentNodes_manual().size(); j++) {
-                            Node adjacentNode = nodeDisconnected.getAdjacentNodes_manual().get(j);
-
-                            nodeDisconnected.getAdjacentNodes_manual().remove(adjacentNode);
-                            j--;
-
-                            adjacentNode.getAdjacentNodes_manual().remove(nodeDisconnected);
-                        }
-                    }
-                }
-            }
-        }
-
-        Node startNode = null;
-        Node targetNode = null;
-        for (int i = 0; i < nodes.size(); i++) {
-            if (nodes.get(i).getIndex() == locationSource.getIndex()) {
-                startNode = nodes.get(i);
-            } else if (nodes.get(i).getIndex() == locationTarget.getIndex()) {
-                targetNode = nodes.get(i);
-            }
-        }
-
-        ArrayDeque<Node> stack = new ArrayDeque();
-        ArrayDeque<ArrayList<Node>> chainStack = new ArrayDeque();
-
-        int minDistance = -1;
-        ArrayList<Node> minChain = new ArrayList<>();
-
-        ArrayList<Node> chain = new ArrayList<>();
-        chain.add(startNode);
-
-        stack.addLast(startNode);
-        chainStack.addLast(chain);
-
-        while (!stack.isEmpty()) {
-            Node _node = stack.removeFirst();
-            ArrayList<Node> _chain = chainStack.removeFirst();
-
-            for (Node adjNode : _node.getAdjacentNodes_manual()) {
-                if (!_chain.contains(adjNode)) {
-                    if (adjNode.getIndex() == targetNode.getIndex()) {
-                        minDistance = _chain.size();
-
-                        _chain.add(adjNode);
-                        minChain = _chain;
-                        break;
-                    } else {
-                        ArrayList<Node> newChain = new ArrayList<>(_chain);
-                        newChain.add(adjNode);
-
-                        stack.addLast(adjNode);
-                        chainStack.addLast(newChain);
-                    }
-                }
-            }
-
-            if (minDistance != -1)
-                break;
-        }
-
-        ArrayList<Road> resultRoads = new ArrayList<>();
-        for (int i = 0; i < minChain.size() - 1; i++) {
-            resultRoads.add(new Road(getVirtualBoard().getLocations().get(minChain.get(i).getIndex()), getVirtualBoard().getLocations().get(minChain.get(i + 1).getIndex()), getOwner()));
-        }
-
-        return new AbstractMap.SimpleEntry<>(minDistance, resultRoads);
     }
 }

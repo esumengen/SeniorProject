@@ -91,7 +91,7 @@ public class Negotiator {
     }
 
     public void addBid(NegotiationAgent agent, Bid bid) {
-        agent.getOwner().getAI().getBidRanking().add(bid);
+        agent.getOwner().getAI().getBidRanking().add(bid.setUtilityFunction_owner_protected(agent.getOwner().getAI()));
         Collections.sort(agent.getOwner().getAI().getBidRanking());
 
         System.out.println("    " + bid + " is added to " + agent.getOwner() + "'s list. [" + (agent.getOwner().getAI().getBidRanking().indexOf(bid) + 1) + ". order]");
