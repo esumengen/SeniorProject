@@ -3,7 +3,6 @@ package SeniorProject;
 import javax.swing.*;
 import java.awt.*;
 
-
 class DebugFrame extends JFrame {
     private JPanel aiPanel;
     private JPanel resourcesPanel;

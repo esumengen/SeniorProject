@@ -42,7 +42,7 @@ public class NegotiationSession {
         takenBids.get(agent).add(bid);
     }
 
-    int getTurn(NegotiationAgent agent1, NegotiationAgent agent2) {
+    public int getTurn(NegotiationAgent agent1, NegotiationAgent agent2) {
         return Math.max(takenBids.get(agent1).size(), takenBids.get(agent2).size()) + 1;
     }
 

@@ -116,11 +116,6 @@ public class State implements Serializable {
         private Player diceOwner;
         private boolean hasRobberPlayedRecently;
 
-        public StateBuilder() {
-            initVariables();
-            pureBoard = new PureBoard();
-        }
-
         /*public StateBuilder(State state) {
             initVariables();
             pureBoard = new PureBoard();
@@ -176,7 +171,7 @@ public class State implements Serializable {
             }
         }
 
-        public StateBuilder setVictoryPoints(int victoryPoint, int playerIndex) {
+        /*public StateBuilder setVictoryPoints(int victoryPoint, int playerIndex) {
             this.victoryPoints[playerIndex] = victoryPoint;
 
             return this;
@@ -198,17 +193,17 @@ public class State implements Serializable {
             isInitial = initial;
 
             return this;
-        }
+        }*/
 
         public PureBoard getPureBoard() {
             return pureBoard;
         }
 
-        public StateBuilder setPureBoard(PureBoard pureBoard) {
+        /*public StateBuilder setPureBoard(PureBoard pureBoard) {
             this.pureBoard = pureBoard;
 
             return this;
-        }
+        }*/
 
         public State build() {
             ArrayList<Player> players = Main.createPlayers();
@@ -268,7 +263,6 @@ public class State implements Serializable {
                     }
                     if (Board.isAffordable(MoveType.TradePlayer, player.getResource())) {
                         affordableMoves.add(MoveType.TradePlayer);
-                        // TODO
                     }
                 }
                 /// endregion

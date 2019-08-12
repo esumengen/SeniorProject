@@ -169,12 +169,8 @@ public class PureBoard implements Serializable {
                     location.setHarborType(HarborType.valueOf(harbor_str));
                 }
             }
-
-            //Global.addLog("SUCCESS: The game is loaded to the AI.");
         } catch (Exception e) {
             new Message(e.getMessage() + " (Err: 7)");
-
-            //Global.addLog("ERROR: The game is not loaded to the AI.");
         }
     }
 
@@ -207,10 +203,6 @@ public class PureBoard implements Serializable {
     private void bind(Land land, Location location) {
         land.getAdjacentLocations().add(location);
         location.getAdjacentLands().add(land);
-    }
-
-    boolean isValid(Structure structure) {
-        return isValid(structure, false);
     }
 
     boolean isValid(Structure structure, boolean isInitial) {
@@ -400,15 +392,11 @@ public class PureBoard implements Serializable {
         return deck;
     }
 
-    void setDeck(Deck deck) {
+    private void setDeck(Deck deck) {
         this.deck = deck;
     }
 
     public int getLongestRoad_owner() {
         return longestRoad_owner;
-    }
-
-    void setLongestRoad_owner(int longestRoad_owner) {
-        this.longestRoad_owner = longestRoad_owner;
     }
 }

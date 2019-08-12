@@ -79,30 +79,6 @@ public class Main {
                 isInitial = communication_ini.get("Game State", "isInitial", String.class).equals("\"true\"");
                 board.setInitial(isInitial);
 
-                /// region Road Length Update
-                if (virtualBoard_last != null) {
-                    Wini longest_roads_ini = null;
-                    try {
-                        longest_roads_ini = new Wini(longest_roads_file);
-                    } catch (Exception e) {
-                        new Message(e.getMessage() + " (Err: 12)");
-                    }
-
-                    if (longest_roads_ini != null) {
-                        for (int i = 0; i < Global.PLAYER_COUNT; i++)
-                            longest_roads_ini.put("LongestRoad", "Player[" + i + "]", Integer.toString(virtualBoard_last.getLongestRoad(i).getKey()));
-                    }
-
-                    try {
-                        longest_roads_ini.store();
-                    } catch (Exception e) {
-                        new Message(e.getMessage() + " (Err: 4782)");
-                    }
-
-                    virtualBoard_last = null;
-                }
-                /// endregion
-
                 boolean isPlayed = false;
                 Player player_lastMoved = null;
                 for (Player player : players) {
@@ -127,6 +103,30 @@ public class Main {
                             } catch (Exception e) {
                                 new Message(e.getMessage() + " (Err: 11)");
                             }
+
+                            /// region Road Length Update
+                            if (virtualBoard_last != null) {
+                                Wini longest_roads_ini = null;
+                                try {
+                                    longest_roads_ini = new Wini(longest_roads_file);
+                                } catch (Exception e) {
+                                    new Message(e.getMessage() + " (Err: 12)");
+                                }
+
+                                if (longest_roads_ini != null) {
+                                    for (int i = 0; i < Global.PLAYER_COUNT; i++)
+                                        longest_roads_ini.put("LongestRoad", "Player[" + i + "]", Integer.toString(virtualBoard_last.getLongestRoad(i).getKey()));
+                                }
+
+                                try {
+                                    longest_roads_ini.store();
+                                } catch (Exception e) {
+                                    new Message(e.getMessage() + " (Err: 4782)");
+                                }
+
+                                virtualBoard_last = null;
+                            }
+                            /// endregion
                         }
                     }
 
@@ -203,7 +203,7 @@ public class Main {
                 negotiationDirectories[player.getIndex()] = negotiationDirectory;
                 AIDirectories[player.getIndex()] = AIDirectory;
             } catch (Exception e) {
-                new Message(e.getMessage() + " (Err: 23)");
+                new Message(e.fillInStackTrace() + " (Err: 23)");
             }
         }
 

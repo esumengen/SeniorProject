@@ -3,7 +3,6 @@ package SeniorProject;
 import SeniorProject.Actions.Action;
 import SeniorProject.Actions.CreateRoad;
 import SeniorProject.Actions.CreateSettlement;
-import SeniorProject.Actions.DrawDevelopmentCard;
 import SeniorProject.Negotiation.Bid;
 
 import java.util.*;
@@ -29,7 +28,6 @@ public class BasicAI extends AI {
 
             //region While a settlement can be built, build it.
             Double[] _locScores = locScores.get(SETTLEMENT);
-
             while (actions_settlements.size() > 0) {
                 for (int i = 0; i < _locScores.length; i++) {
                     _locScores[i] = Math.abs(_locScores[i]);
@@ -91,7 +89,7 @@ public class BasicAI extends AI {
                                 }
                             }
 
-                            best3Locations[j] = virtualBoard.getLocations().get(i);
+                            best3Locations[j] = getVirtualBoard().getLocations().get(i);
                             best3Locations_score[j] = _locScores[i];
                             break;
                         }
@@ -109,14 +107,14 @@ public class BasicAI extends AI {
 
                 ArrayList<ArrayList<Road>> threeBestPaths = new ArrayList<>();
                 ArrayList<Integer> threeBestPaths_discounted_len = new ArrayList<>();
-                for (Location best3Location : best3Locations) {
-                    if (best3Location != null) {
+                for (int i = 0; i < best3Locations.length; i++) {
+                    if (best3Locations[i] != null) {
                         ArrayList<Road> bestPath = new ArrayList<>();
                         int bestPath_discounted_len = Integer.MAX_VALUE;
 
                         for (Location location : actionRoad_locations) {
                             if (location.getOwner() != null && location.getOwner().getIndex() == getOwner().getIndex()) {
-                                ArrayList<Road> path = getShortestPath(location, best3Location, false).getValue();
+                                ArrayList<Road> path = getShortestPath(location, best3Locations[i], false).getValue();
 
                                 boolean ignorePath = true;
                                 for (CreateRoad createRoad : actions_roads) {
@@ -206,7 +204,7 @@ public class BasicAI extends AI {
                     locationIndexes[0] = road.getStartLocation().getIndex();
                     locationIndexes[1] = road.getEndLocation().getIndex();
 
-                    int index = actions_roads.indexOf(new CreateRoad(locationIndexes, getOwner().getIndex(), virtualBoard));
+                    int index = actions_roads.indexOf(new CreateRoad(locationIndexes, getOwner().getIndex(), getVirtualBoard()));
                     if (index != -1) {
                         doVirtually(actions_roads.get(index));
                         updateLocationScores(SETTLEMENT);
@@ -251,11 +249,11 @@ public class BasicAI extends AI {
         }
     }
 
-    private <T> ArrayList<T> getActions_of(ArrayList<IAction> actions, Class<T> A) {
+    public <T> ArrayList<T> getActions_of(ArrayList<IAction> actions, Class T) {
         ArrayList<T> selectedActions = new ArrayList<>();
 
         for (IAction action : actions) {
-            if (action.getClass() == A)
+            if (action.getClass() == T)
                 selectedActions.add((T) action);
         }
 
@@ -289,10 +287,6 @@ public class BasicAI extends AI {
                 }
             } else if (desiredAction == Action.UpgradeSettlement) {
                 desiredResource.disjoin(City.COST);
-                if (desiredResource.getSum() >= 0)         // checks if the desired Resource have potential
-                    resourceAnalyze(desiredResource);
-            } else if (desiredAction == Action.DrawDevCard) {
-                desiredResource.disjoin(DrawDevelopmentCard.COST);
                 if (desiredResource.getSum() >= 0)         // checks if the desired Resource have potential
                     resourceAnalyze(desiredResource);
             }
@@ -380,13 +374,13 @@ public class BasicAI extends AI {
         }
     }
 
-    private AbstractMap.SimpleEntry<Integer, ArrayList<Road>> getShortestPath(Location locationSource, Location locationTarget, boolean ignoreBuildings) {
+    public AbstractMap.SimpleEntry<Integer, ArrayList<Road>> getShortestPath(Location locationSource, Location locationTarget, boolean ignoreBuildings) {
         if (locationSource.getIndex() == locationTarget.getIndex())
             return new AbstractMap.SimpleEntry<>(0, null);
 
         ArrayList<Node> nodes = new ArrayList<>();
 
-        for (Location location : virtualBoard.getLocations()) {
+        for (Location location : getVirtualBoard().getLocations()) {
             if (location.isActive()) {
                 for (Location _location : location.getAdjacentLocations()) {
                     Node node = null;
@@ -425,13 +419,13 @@ public class BasicAI extends AI {
             }
         }
 
-        for (Structure structure : virtualBoard.getStructures()) {
+        for (Structure structure : getVirtualBoard().getStructures()) {
             if (structure instanceof Road && structure.getPlayer().getIndex() != getOwner().getIndex()) {
                 Road road = (Road) structure;
 
-                for (Node node : nodes) {
-                    if (node.getIndex() == road.getStartLocation().getIndex()) {
-                        Node nodeDeleted = node;
+                for (int i = 0; i < nodes.size(); i++) {
+                    if (nodes.get(i).getIndex() == road.getStartLocation().getIndex()) {
+                        Node nodeDeleted = nodes.get(i);
 
                         for (int j = 0; j < nodeDeleted.getAdjacentNodes_manual().size(); j++) {
                             if (nodeDeleted.getAdjacentNodes_manual().get(j).getIndex() == road.getEndLocation().getIndex()) {
@@ -459,9 +453,9 @@ public class BasicAI extends AI {
             } else if (ignoreBuildings && structure instanceof Building && structure.getPlayer().getIndex() != getOwner().getIndex()) {
                 Building building = (Building) structure;
 
-                for (Node node : nodes) {
-                    if (node.getIndex() == building.getLocation().getIndex()) {
-                        Node nodeDisconnected = node;
+                for (int i = 0; i < nodes.size(); i++) {
+                    if (nodes.get(i).getIndex() == building.getLocation().getIndex()) {
+                        Node nodeDisconnected = nodes.get(i);
 
                         for (int j = 0; j < nodeDisconnected.getAdjacentNodes_manual().size(); j++) {
                             Node adjacentNode = nodeDisconnected.getAdjacentNodes_manual().get(j);
@@ -478,11 +472,11 @@ public class BasicAI extends AI {
 
         Node startNode = null;
         Node targetNode = null;
-        for (Node node : nodes) {
-            if (node.getIndex() == locationSource.getIndex()) {
-                startNode = node;
-            } else if (node.getIndex() == locationTarget.getIndex()) {
-                targetNode = node;
+        for (int i = 0; i < nodes.size(); i++) {
+            if (nodes.get(i).getIndex() == locationSource.getIndex()) {
+                startNode = nodes.get(i);
+            } else if (nodes.get(i).getIndex() == locationTarget.getIndex()) {
+                targetNode = nodes.get(i);
             }
         }
 
@@ -526,7 +520,7 @@ public class BasicAI extends AI {
 
         ArrayList<Road> resultRoads = new ArrayList<>();
         for (int i = 0; i < minChain.size() - 1; i++) {
-            resultRoads.add(new Road(virtualBoard.getLocations().get(minChain.get(i).getIndex()), virtualBoard.getLocations().get(minChain.get(i + 1).getIndex()), getOwner()));
+            resultRoads.add(new Road(getVirtualBoard().getLocations().get(minChain.get(i).getIndex()), getVirtualBoard().getLocations().get(minChain.get(i + 1).getIndex()), getOwner()));
         }
 
         return new AbstractMap.SimpleEntry<>(minDistance, resultRoads);
