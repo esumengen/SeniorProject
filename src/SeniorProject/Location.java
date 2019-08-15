@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Location extends Node implements Serializable {
-
     private HarborType harborType;
     private ArrayList<Land> adjacentLands;
     private ArrayList<Location> adjacentLocations;
@@ -46,7 +45,7 @@ public class Location extends Node implements Serializable {
         structures.add(structure);
     }
 
-    ArrayList<Road> getConnectedRoads() {
+    public ArrayList<Road> getConnectedRoads() {
         return connectedRoads;
     }
 

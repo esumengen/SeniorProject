@@ -1,6 +1,5 @@
 package SeniorProject;
 
-import SeniorProject.DevelopmentCards.Deck;
 import org.ini4j.Wini;
 
 import java.io.*;
@@ -15,7 +14,6 @@ public class PureBoard implements Serializable {
     private ArrayList<Land> lands = new ArrayList<>();
     private ArrayList<Location> locations = new ArrayList<>();
     private ArrayList<Structure> structures = new ArrayList<>();
-    private Deck deck;
     private Land robbedLand;
     private boolean isActive;
     private int longestRoad_owner;
@@ -128,7 +126,6 @@ public class PureBoard implements Serializable {
 
     private void init() {
         this.isActive = false;
-        this.deck = new Deck();
     }
 
     private void makeAdjacent(Location location1, Location location2) {
@@ -205,7 +202,7 @@ public class PureBoard implements Serializable {
         location.getAdjacentLands().add(land);
     }
 
-    boolean isValid(Structure structure, boolean isInitial) {
+    public boolean isValid(Structure structure, boolean isInitial) {
         if (structure instanceof Road) {
             Road road = (Road) structure;
             Location end = road.getEndLocation();
@@ -386,14 +383,6 @@ public class PureBoard implements Serializable {
 
     void setRobbedLand(Land land) {
         robbedLand = land;
-    }
-
-    public Deck getDeck() {
-        return deck;
-    }
-
-    private void setDeck(Deck deck) {
-        this.deck = deck;
     }
 
     public int getLongestRoad_owner() {

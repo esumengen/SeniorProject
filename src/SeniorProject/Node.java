@@ -17,6 +17,14 @@ public class Node implements Serializable {
             adjacentNodes.add(new ArrayList<>());
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Node)
+            return ((Node) obj).getIndex() == index;
+
+        return false;
+    }
+
     public ArrayList<Node> getAdjacentNodes_player(int playerIndex) {
         return adjacentNodes.get(playerIndex);
     }

@@ -11,6 +11,8 @@ import java.util.Map;
 public class State implements Serializable {
     private int[] victoryPoints;
     private Map<Integer, Resource> allResources;
+    private Map<Integer, Integer> knights;
+    private Map<Integer, Integer> victoryCards;
     private Map<Integer, ArrayList<DevelopmentCardType>> allDevelopmentCards;
     private Map<Integer, ArrayList<IAction>> allPossibleActions;
     private Map<Integer, ArrayList<MoveType>> allAffordableMoves;
@@ -20,8 +22,15 @@ public class State implements Serializable {
     private boolean isInitial;
     private int turn;
     private int totalDice;
-    private Player diceOwner;
     private boolean hasRobberPlayedRecently;
+
+    // Initialization of action categories
+    private ArrayList<MoveRobber> actions_robber = new ArrayList<>();
+    private ArrayList<CreateSettlement> actions_settlement = new ArrayList<>();
+    private ArrayList<CreateRoad> actions_road = new ArrayList<>();
+    private ArrayList<UpgradeSettlement> actions_upgrade = new ArrayList<>();
+    private ArrayList<TradeWithBank> tradeBank_actions = new ArrayList<>();
+    private ArrayList<DrawDevelopmentCard> actions_draw = new ArrayList<>();
 
     public State(StateBuilder stateBuilder) {
         victoryPoints = stateBuilder.victoryPoints;
@@ -36,7 +45,8 @@ public class State implements Serializable {
         turn = stateBuilder.turn;
         totalDice = stateBuilder.totalDice;
         hasRobberPlayedRecently = stateBuilder.hasRobberPlayedRecently;
-        diceOwner = stateBuilder.diceOwner;
+        victoryCards = stateBuilder.victoryCards;
+        knights = stateBuilder.knights;
     }
 
     public int getVictoryPoints(int playerIndex) {
@@ -57,6 +67,36 @@ public class State implements Serializable {
 
     public ArrayList<DevelopmentCardType> getDevelopmentCards(int playerIndex) {
         return allDevelopmentCards.get(playerIndex);
+    }
+
+    public Integer getKnights(int playerIndex) {
+        return knights.get(playerIndex);
+    }
+
+    public Integer getVictoryCards(int playerIndex) {
+        return victoryCards.get(playerIndex);
+    }
+
+    public Integer getVictoryCards_max() {
+        Integer max = -Integer.MIN_VALUE;
+
+        for (int i = 0; i < Global.PLAYER_COUNT; i++) {
+            if (victoryCards.get(i) > max)
+                max = victoryCards.get(i);
+        }
+
+        return max;
+    }
+
+    public Integer getKnights_max() {
+        Integer max = -Integer.MIN_VALUE;
+
+        for (int i = 0; i < Global.PLAYER_COUNT; i++) {
+            if (knights.get(i) > max)
+                max = knights.get(i);
+        }
+
+        return max;
     }
 
     public ArrayList<IAction> getPossibleActions(int playerIndex) {
@@ -83,7 +123,7 @@ public class State implements Serializable {
             string += "P" + (i + 1) + "'s Longest Road: " + longestRoad_lengths.get(i) + "\n";*/
 
         for (int i = 0; i < Global.PLAYER_COUNT; i++)
-            string += "P" + (i + 1) + "'s Resource: " + allResources.get(i) + ((i != Global.PLAYER_COUNT - 1) ? "\n" : "");
+            string += "P" + (i + 1) + "'s Resource: " + allResources.get(i) + "  VP: " + victoryPoints[i] + "  LR: " + longestRoad_lengths.get(i) + "  KN: " + knights.get(i) + "  VC: " + victoryCards.get(i) + ((i != Global.PLAYER_COUNT - 1) ? "\n" : "");
 
         return string;
     }
@@ -103,6 +143,8 @@ public class State implements Serializable {
     public static class StateBuilder {
         private int[] victoryPoints;
         private Map<Integer, Resource> allResources;
+        private Map<Integer, Integer> knights;
+        private Map<Integer, Integer> victoryCards;
         private Map<Integer, ArrayList<DevelopmentCardType>> allDevelopmentCards;
         private Map<Integer, ArrayList<IAction>> allPossibleActions;
         private Map<Integer, ArrayList<MoveType>> allAffordableMoves;
@@ -141,6 +183,18 @@ public class State implements Serializable {
                 allDevelopmentCards.put(i, new ArrayList<>(board.getPlayers().get(i).getDevelopmentCards()));
                 longestRoad_lengths.put(i, board.getLongestRoad(i).getKey());
                 longestRoad_owner = board.getLongestRoad_owner();
+
+                int knights_count = 0;
+                int victoryCards_count = 0;
+                for (DevelopmentCardType developmentCardType : board.getPlayers().get(i).getDevelopmentCards()) {
+                    if (developmentCardType == DevelopmentCardType.KNIGHT)
+                        knights_count++;
+                    else if (developmentCardType == DevelopmentCardType.VICTORYPOINT)
+                        victoryCards_count++;
+                }
+
+                knights.put(i, knights_count);
+                victoryCards.put(i, victoryCards_count);
             }
 
             isInitial = board.isInitial();
@@ -154,6 +208,8 @@ public class State implements Serializable {
             allPossibleActions = new HashMap<>();
             allAffordableMoves = new HashMap<>();
             longestRoad_lengths = new HashMap<>();
+            knights = new HashMap<>();
+            victoryCards = new HashMap<>();
             isInitial = false;
             turn = Integer.MAX_VALUE;
             totalDice = 0;
@@ -240,7 +296,7 @@ public class State implements Serializable {
                         affordableMoves.add(MoveType.UpgradeSettlement);
                     if (Board.isAffordable(MoveType.DevelopmentCard, player.getResource())) {
                         affordableMoves.add(MoveType.DevelopmentCard);
-                        //possibleActions.add(new DrawDevelopmentCard(player.getIndex(), realOwner));
+                        possibleActions.add(new DrawDevelopmentCard(player.getIndex(), realOwner.getDeck(), realOwner));
                     }
                     /*if (Board.isAffordable(MoveType.KnightCard, player.getResource())) {
                         affordableMoves.add(MoveType.KnightCard);
@@ -296,12 +352,12 @@ public class State implements Serializable {
                         ArrayList<Integer> temporaryLocationList_index = new ArrayList<>();
                         for (Land land : getPureBoard().getLands()) {
                             if (land.getType() != LandType.SEA) {
-                                for (Location _location : land.getAdjacentLocations()) {
-                                    if ((!_location.hasOwner() || _location.getOwner().getIndex() != player.getIndex()) && !temporaryLocationList_index.contains(_location.getIndex())) {
-                                        possibleActions.add(new MoveRobber(land.getIndex(), diceOwner.getIndex(), _location.hasOwner() ? _location.getOwner().getIndex() : -1, realOwner));
+                                //for (Location _location : land.getAdjacentLocations()) {
+                                //if ((!_location.hasOwner() || _location.getOwner().getIndex() != player.getIndex()) && !temporaryLocationList_index.contains(_location.getIndex())) {
+                                possibleActions.add(new MoveRobber(land.getIndex(), diceOwner.getIndex(), -1/*_location.hasOwner() ? _location.getOwner().getIndex() : -1*/, realOwner));
                                         temporaryLocationList_index.add(location.getIndex());
-                                    }
-                                }
+                                //}
+                                //}
                             }
                         }
                     } else {

@@ -17,11 +17,14 @@ public abstract class AI implements Serializable {
     private ArrayList<IAction> negotiationActions = new ArrayList<>();
     private ArrayList<IAction> actionsDone = new ArrayList<>();
 
-    static final StructureType SETTLEMENT = StructureType.SETTLEMENT;
-    static final ResourceType BRICK = ResourceType.BRICK;
-    static final ResourceType LUMBER = ResourceType.LUMBER;
-    static final ResourceType WOOL = ResourceType.WOOL;
-    static final ResourceType ORE = ResourceType.ORE;
+    public static final StructureType SETTLEMENT = StructureType.SETTLEMENT;
+    public static final StructureType ROAD = StructureType.ROAD;
+    public static final StructureType CITY = StructureType.CITY;
+    public static final ResourceType BRICK = ResourceType.BRICK;
+    public static final ResourceType LUMBER = ResourceType.LUMBER;
+    public static final ResourceType WOOL = ResourceType.WOOL;
+    public static final ResourceType ORE = ResourceType.ORE;
+    public static final ResourceType GRAIN = ResourceType.GRAIN;
 
     public abstract ArrayList<IAction> createActions(boolean isInitial);
 

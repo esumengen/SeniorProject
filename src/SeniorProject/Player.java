@@ -18,7 +18,6 @@ public class Player implements Serializable, IObservable {
     private ArrayList<Structure> structures = new ArrayList<>();
     private Resource resource;
     private ArrayList<DevelopmentCardType> developmentCards = new ArrayList<>();
-    private int knight = 0;
     private PureBoard pureBoard;
     private PlayerState state = PlayerState.IDLE;
     private ArrayList<IObserver> observers;
@@ -41,17 +40,16 @@ public class Player implements Serializable, IObservable {
     }
 
     void writeMove(boolean isInitial) {
-
-
         Board board = (Board) getPureBoard();
 
         ///region Print States
         State.StateBuilder stateBuilder = new State.StateBuilder(board);
         State currentState = stateBuilder.build();
 
-        System.out.println("\n---------\n" + this + "'s " + (isInitial ? "[Initial]" : "") + " Turn " + currentState.getTurn());
+        System.out.println("\n---------\n" + this + "'s Move [" + (isInitial ? "[Initial] " : "") + "Turn " + currentState.getTurn() + "]");
 
         System.out.println(currentState);
+        System.out.println();
         System.out.println("[My Affordable Moves]: " + currentState.getAffordableMoves(index));
         /*System.out.print("[My Possible Actions]: ");
 
@@ -84,10 +82,7 @@ public class Player implements Serializable, IObservable {
                 actionList_str += action_str + "\r\n";
         }
 
-        // New
         Main.virtualBoard_last = AI_instance.virtualBoard;
-
-        //System.gc();
 
         Global.createTextFile(fileName, actionList_str);
 
@@ -102,20 +97,26 @@ public class Player implements Serializable, IObservable {
                 System.out.println(ActionFactory.getAction(action, (Board) getPureBoard()));
             }
 
-            System.out.println();
-
             //Global.createTextFile(System.nanoTime() / 10000 + "_" + fileName, actionList_str);
         } else
             System.out.println("[" + this + "'s Choice]: []");
         ///endregion
 
-        /*for (Player player : board.getPlayers()) {
-            for (ResourceType resourceType : player.getResource().keySet()) {
-                if (player.getResource().get(resourceType) < 0) {
-                    System.out.println("\n\n\n\n\n\n\n\n\n\nERROR! Negative values.");
-                }
+        System.out.println();
+        for (Player player : Main.virtualBoard_last.getPlayers()) {
+            int knights_count = 0;
+            int victoryCards_count = 0;
+
+            for (DevelopmentCardType developmentCardType : player.getDevelopmentCards()) {
+                if (developmentCardType == DevelopmentCardType.KNIGHT)
+                    knights_count++;
+                else if (developmentCardType == DevelopmentCardType.VICTORYPOINT)
+                    victoryCards_count++;
             }
-        }*/
+
+            System.out.println(player + "'s Last Resource: " + player.getResource() + "  VP: " + player.getVictoryPoint() + "  LR: " + Main.virtualBoard_last.getLongestRoad(player.getIndex()).getKey()
+                    + "  KN: " + knights_count + "  VC: " + victoryCards_count);
+        }
 
         setState(PlayerState.IDLE);
     }
@@ -254,16 +255,14 @@ public class Player implements Serializable, IObservable {
         return developmentCards;
     }
 
-    public int getKnight() {
-        return knight;
-    }
+    public int getKnights() {
+        int count = 0;
 
-    void setKnight(int knight) {
-        this.knight = knight;
-    }
+        for (DevelopmentCardType developmentCardType : developmentCards)
+            if (developmentCardType == DevelopmentCardType.KNIGHT)
+                count++;
 
-    public int getVictoryPoint() {
-        return victoryPoint;
+        return count;
     }
 
     void setVictoryPoint(int victoryPoint) {
@@ -312,5 +311,9 @@ public class Player implements Serializable, IObservable {
 
     void setNegotiationAgent(NegotiationAgent negotiationAgent_instance) {
         NegotiationAgent_instance = negotiationAgent_instance;
+    }
+
+    public int getVictoryPoint() {
+        return victoryPoint;
     }
 }

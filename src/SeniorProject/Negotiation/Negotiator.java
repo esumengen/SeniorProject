@@ -73,7 +73,7 @@ public class Negotiator {
             if (isAccepted) {
                 session.complete(lastBid, targetAgent);
                 System.out.println("    Negotiation Ended: Agreement between " + ownerAgent.getOwner() + " and " + targetAgent.getOwner());
-                System.out.println("    Agreed on " + lastBid.getChange());
+                System.out.println("    Agreed on " + lastBid.getChange() + " at turn " + session.getTurn(ownerAgent, targetAgent));
 
                 return true;
             } else {

@@ -1,13 +1,12 @@
 package SeniorProject.Actions;
 
-import SeniorProject.Board;
-import SeniorProject.IAction;
-import SeniorProject.Location;
-import SeniorProject.Player;
+import SeniorProject.*;
 
 import java.io.Serializable;
 
 public class CreateSettlement implements IAction, Serializable {
+    public static final Resource COST = Settlement.COST;
+
     Player player;
     Board board;
     private Location location;

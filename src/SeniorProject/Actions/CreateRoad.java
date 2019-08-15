@@ -5,6 +5,8 @@ import SeniorProject.*;
 import java.io.Serializable;
 
 public class CreateRoad implements IAction, Serializable {
+    public static final Resource COST = Road.COST;
+
     Player player;
     Board board;
     private Location[] locations = new Location[2];

@@ -1,13 +1,12 @@
 package SeniorProject.Actions;
 
-import SeniorProject.Board;
-import SeniorProject.IAction;
-import SeniorProject.Location;
-import SeniorProject.Player;
+import SeniorProject.*;
 
 import java.io.Serializable;
 
 public class UpgradeSettlement implements IAction, Serializable {
+    public static final Resource COST = City.COST;
+
     Location location;
     Player player;
     Board board;

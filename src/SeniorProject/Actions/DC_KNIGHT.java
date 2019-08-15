@@ -1,11 +1,9 @@
 package SeniorProject.Actions;
 
 import SeniorProject.Board;
-import SeniorProject.DevelopmentCards.DevelopmentCardType;
 import SeniorProject.IAction;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class DC_KNIGHT implements IAction, Serializable {
     int landIndex;
@@ -22,15 +20,14 @@ public class DC_KNIGHT implements IAction, Serializable {
 
     @Override
     public void execute() {
-        ArrayList<DevelopmentCardType> developmentCardTypes = board.getPlayers().get(playerIndex).getDevelopmentCards();
+        return;
+        /*ArrayList<DevelopmentCardType> developmentCardTypes = board.getPlayers().get(playerIndex).getDevelopmentCards();
         for (DevelopmentCardType developmentCardType : developmentCardTypes) {
             if (developmentCardType == DevelopmentCardType.KNIGHT) {
                 developmentCardTypes.remove(developmentCardType);
                 board.useDevelopmentCard_KNIGHT(landIndex, playerIndex, victimIndex);
             }
-        }
-
-
+        }*/
     }
 
     @Override

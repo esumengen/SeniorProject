@@ -24,6 +24,7 @@ public class Global {
     public static final String LOG_FILE = "log.txt";
     public static final String COMMUNICATION_FILE = "communication.ini";
     public static final String LONGEST_ROADS_FILE = "longest_roads.ini";
+    public static final int MAX_VICTORY_POINTS = 8;
 
     public static String get_working_path(String filename) {
         String file_path = Global.WORKING_PATH;

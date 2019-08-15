@@ -35,11 +35,24 @@ public class Land implements Serializable {
         this.type = LandType.NONE;
     }
 
-    ArrayList<Location> getAdjacentLocations() {
+    public ArrayList<Location> getAdjacentLocations() {
         return adjacentLocations;
     }
 
-    int getDiceNo() {
+    public ArrayList<Building> getAllBuildings() {
+        ArrayList<Building> buildings = new ArrayList<>();
+
+        for (Player player : Main.players) {
+            for (Location location : adjacentLocations) {
+                if (location.getOwner() != null && location.getOwner().getIndex() == player.getIndex())
+                    buildings.add(location.getBuilding());
+            }
+        }
+
+        return buildings;
+    }
+
+    public int getDiceNo() {
         return diceNo;
     }
 
@@ -48,7 +61,7 @@ public class Land implements Serializable {
         this.diceChance = calculateDiceChance();
     }
 
-    LandType getType() {
+    public LandType getType() {
         return type;
     }
 
@@ -60,11 +73,11 @@ public class Land implements Serializable {
         return type.toResourceType();
     }
 
-    int getIndex() {
+    public int getIndex() {
         return index;
     }
 
-    private double calculateDiceChance() {
+    public double calculateDiceChance() {
         double numerator = 0.0;
 
         for (int k = 1; k <= 6; k++) {

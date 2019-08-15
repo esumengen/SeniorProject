@@ -1,9 +1,6 @@
 package SeniorProject;
 
-import SeniorProject.Negotiation.BasicNegotiationAgent;
-import SeniorProject.Negotiation.NegotiationAgent;
-import SeniorProject.Negotiation.NegotiationSession;
-import SeniorProject.Negotiation.Negotiator;
+import SeniorProject.Negotiation.*;
 import org.ini4j.Wini;
 
 import java.io.File;
@@ -140,6 +137,12 @@ public class Main {
 
                         break;
                     }
+
+                    if (board.getTurn() > 50) {
+                        System.out.println("The turn is higher than 50. The game has no winner.");
+                        new Message("The turn is higher than 50. The game has no winner.");
+                        System.exit(0);
+                    }
                 }
             }
         };
@@ -150,16 +153,26 @@ public class Main {
     private static void negotiationPhase(Player player, Board board) {
         ArrayList<NegotiationAgent> otherAgents = new ArrayList<>();
 
+        System.out.println("---------\n");
+        System.out.println("    " + player + "'s Negotiation Session has been started.");
+
         for (Player _player : board.getPlayers()) {
             if (_player.getType() == PlayerType.HUMAN)
                 continue;
 
             _player.getAI().updateBidRanking();
 
-            if (_player.getIndex() != player.getIndex()) {
+            if (_player.getIndex() != player.getIndex())
                 otherAgents.add(_player.getNegotiationAgent());
-            }
         }
+
+        System.out.println();
+        if (player.getAI().getBidRanking().size() > 0) {
+            System.out.println("    " + player + "'s Bid Ranking:");
+            for (Bid bid : player.getAI().getBidRanking())
+                System.out.println("    " + bid + " with utility: " + player.getAI().calculateBidUtility(bid));
+        } else
+            System.out.println("    " + player + " has no bid Ranking.");
 
         if (player.getAI().getBidRanking().size() > 0) {
             NegotiationSession session = new NegotiationSession(player.getNegotiationAgent(), otherAgents);
@@ -194,10 +207,10 @@ public class Main {
             try {
                 Wini ini = new Wini(new File(Global.get_working_path(Global.ENVIRONMENT_FILE)));
 
-                String negotiationDirectory = ini.get("NegotiationSetup", Integer.toString(player.getIndex()), String.class);
+                String negotiationDirectory = ini.get("NegotiationAgents", Integer.toString(player.getIndex()), String.class);
                 negotiationDirectory = Global.getRidOf_quotationMarks(negotiationDirectory);
 
-                String AIDirectory = ini.get("AISetup", Integer.toString(player.getIndex()), String.class);
+                String AIDirectory = ini.get("StrategyAgents", Integer.toString(player.getIndex()), String.class);
                 AIDirectory = Global.getRidOf_quotationMarks(AIDirectory);
 
                 negotiationDirectories[player.getIndex()] = negotiationDirectory;

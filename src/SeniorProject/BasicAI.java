@@ -225,7 +225,7 @@ public class BasicAI extends AI {
         ///endregion
 
         for (Player player : getVirtualBoard().getPlayers())
-            System.out.println("   " + player + "'s Last Resource: " + player.getResource());
+            System.out.println(player + "'s Last Resource: " + player.getResource());
 
         return getActionsDone();
     }

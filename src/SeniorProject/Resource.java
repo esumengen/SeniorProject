@@ -34,6 +34,28 @@ public class Resource extends HashMap<ResourceType, Integer> {
         }
     }
 
+    public Resource getPositives() {
+        Resource positives = new Resource();
+
+        for (ResourceType resourceType : ResourceType.values()) {
+            if (get(resourceType) > 0)
+                positives.put(resourceType, get(resourceType));
+        }
+
+        return positives;
+    }
+
+    public Resource getNegatives() {
+        Resource negatives = new Resource();
+
+        for (ResourceType resourceType : ResourceType.values()) {
+            if (get(resourceType) < 0)
+                negatives.put(resourceType, get(resourceType));
+        }
+
+        return negatives;
+    }
+
     public void disjoin(Resource resource) {
         for (ResourceType type : this.keySet()) {
             this.add(type, -resource.get(type));

@@ -1,6 +1,9 @@
 package SeniorProject;
 
-import SeniorProject.Actions.*;
+import SeniorProject.Actions.DC_KNIGHT;
+import SeniorProject.Actions.DC_MONOPOLY;
+import SeniorProject.Actions.DC_ROADBUILDING;
+import SeniorProject.Actions.DC_YEAROFPLENTY;
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
 import SeniorProject.Negotiation.NegotiationAgent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -15,9 +18,12 @@ public class Board extends PureBoard implements Serializable {
     private int turn;
     private boolean isMain;
     private State state;
+    private Deck deck;
     private boolean isInitial;
     private int totalDice;
     private Player diceOwner;
+    private Player lastLongestRoad_owner = null;
+    private Player lastMaxKnight_owner = null;
     private boolean hasRobberPlayedRecently;
 
     public Board(ArrayList<Player> players) {
@@ -35,10 +41,12 @@ public class Board extends PureBoard implements Serializable {
             player.setPureBoard(this);
 
         changeUpdate();
+        updateVictoryPoints();
 
         turn = 1;
         isMain = false;
         isInitial = true;
+        deck = new Deck();
     }
 
     static boolean isAffordable(MoveType type, Resource resource) {
@@ -46,6 +54,30 @@ public class Board extends PureBoard implements Serializable {
         player.setResource(resource);
 
         return isAffordable(type, player);
+    }
+
+    public static Board deepCopy(Board board) {
+        ArrayList<AI> AIs = new ArrayList<>();
+        ArrayList<NegotiationAgent> agents = new ArrayList<>();
+
+        for (Player player : board.getPlayers()) {
+            AIs.add(player.getAI());
+            agents.add(player.getNegotiationAgent());
+            player.setAI(null);
+            player.setNegotiationAgent(null);
+        }
+        System.gc();
+
+        Board _board = (Board) PureBoard.deepCopy(board);
+        if (_board != null)
+            _board.setMain(false);
+
+        for (Player player : board.getPlayers()) {
+            player.setAI(AIs.get(player.getIndex()));
+            player.setNegotiationAgent(agents.get(player.getIndex()));
+        }
+
+        return _board;
     }
 
     static boolean isAffordable(MoveType type, Player player) {
@@ -90,28 +122,62 @@ public class Board extends PureBoard implements Serializable {
         return false;
     }
 
-    static Board deepCopy(Board board) {
-        ArrayList<AI> AIs = new ArrayList<>();
-        ArrayList<NegotiationAgent> agents = new ArrayList<>();
+    void updateVictoryPoints() {
+        int longestRoad_value = 0;
+        Player longestRoad_owner = null;
+        int maxKnight_value = 0;
+        Player maxKnight_owner = null;
+        int lastLongestRoad_value = lastLongestRoad_owner == null ? -1 : getLongestRoad(lastLongestRoad_owner.getIndex()).getKey();
+        for (int playerIndex = -1; playerIndex < players.size(); playerIndex++) {
+            // Priority for diceOwner
+            int beforeI = playerIndex;
+            if (playerIndex == -1 && diceOwner != null)
+                playerIndex = diceOwner.getIndex();
+            else if (playerIndex == -1)
+                playerIndex = 0;
 
-        for (Player player : board.getPlayers()) {
-            AIs.add(player.getAI());
-            agents.add(player.getNegotiationAgent());
-            player.setAI(null);
-            player.setNegotiationAgent(null);
+            int _longestRoad_value = getLongestRoad(playerIndex).getKey();
+            if (_longestRoad_value > 4 && _longestRoad_value > longestRoad_value
+                    && (lastLongestRoad_owner == null || (playerIndex == lastLongestRoad_owner.getIndex() && _longestRoad_value >= lastLongestRoad_value) || _longestRoad_value > lastLongestRoad_value)) {
+                longestRoad_owner = getPlayers().get(playerIndex);
+                longestRoad_value = _longestRoad_value;
+
+                lastLongestRoad_owner = getPlayers().get(playerIndex);
+            }
+
+            int _knight_value = getPlayers().get(playerIndex).getKnights();
+            if (_knight_value > 2 && _knight_value > maxKnight_value
+                    && (lastMaxKnight_owner == null || (playerIndex == lastMaxKnight_owner.getIndex() && _knight_value >= lastMaxKnight_owner.getKnights()) || _knight_value > lastMaxKnight_owner.getKnights())) {
+                maxKnight_owner = getPlayers().get(playerIndex);
+                maxKnight_value = _knight_value;
+
+                lastMaxKnight_owner = getPlayers().get(playerIndex);
+            }
+
+            playerIndex = beforeI;
         }
-        System.gc();
 
-        Board _board = (Board) PureBoard.deepCopy(board);
-        if (_board != null)
-            _board.setMain(false);
+        for (Player player : players) {
+            player.setVictoryPoint(0);
 
-        for (Player player : board.getPlayers()) {
-            player.setAI(AIs.get(player.getIndex()));
-            player.setNegotiationAgent(agents.get(player.getIndex()));
+            for (Structure structure : player.getStructures()) {
+                if (structure.getType() == StructureType.SETTLEMENT)
+                    player.setVictoryPoint(player.getVictoryPoint() + 1);
+                else if (structure.getType() == StructureType.CITY)
+                    player.setVictoryPoint(player.getVictoryPoint() + 2);
+            }
+
+            if (longestRoad_owner != null && player.getIndex() == longestRoad_owner.getIndex())
+                player.setVictoryPoint(player.getVictoryPoint() + 2);
+
+            if (maxKnight_owner != null && player.getIndex() == maxKnight_owner.getIndex())
+                player.setVictoryPoint(player.getVictoryPoint() + 2);
+
+            for (DevelopmentCardType developmentCard : player.getDevelopmentCards()) {
+                if (developmentCard == DevelopmentCardType.VICTORYPOINT)
+                    player.setVictoryPoint(player.getVictoryPoint() + 1);
+            }
         }
-
-        return _board;
     }
 
     public void createRoad(Player player, Location location_first, Location location_second) {
@@ -131,6 +197,7 @@ public class Board extends PureBoard implements Serializable {
 
         syncPlayer(player);
         changeUpdate();
+        updateVictoryPoints();
 
         location_first.addAdjacentNodes_player(player.getIndex(), location_second);
         location_second.addAdjacentNodes_player(player.getIndex(), location_first);
@@ -155,6 +222,7 @@ public class Board extends PureBoard implements Serializable {
 
         syncPlayer(player);
         changeUpdate();
+        updateVictoryPoints();
 
         addLog("ACTION: A settlement has been upgraded on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
     }
@@ -191,26 +259,24 @@ public class Board extends PureBoard implements Serializable {
         addLog("ACTION: The robber has been moved to [Land " + getLands().get(landIndex).getIndex() + "] by [Player " + (playerIndex + 1) + "]");
     }
 
-    public void drawDevelopmentCard(Player player) {
-        DevelopmentCardType developmentCardType = getDeck().pickDevelopmentCard();
-        player.addDevelopmentCard(developmentCardType);
+    public void drawDevelopmentCard(int playerIndex, DevelopmentCardType cardType) {
+        Player player = getPlayers().get(playerIndex);
 
-        if (!isInitial) {
-            player.getResource().add(ResourceType.WOOL, -1);
-            player.getResource().add(ResourceType.GRAIN, -1);
-            player.getResource().add(ResourceType.ORE, -1);
-        }
+        DevelopmentCardType _cardType = getDeck().pickDevelopmentCard(cardType);
+        player.addDevelopmentCard(_cardType);
 
-        if(developmentCardType == DevelopmentCardType.VICTORYPOINT)
-            new DC_VICTORYPOINT(player.getIndex(), this).execute();
+        player.getResource().add(ResourceType.WOOL, -1);
+        player.getResource().add(ResourceType.GRAIN, -1);
+        player.getResource().add(ResourceType.ORE, -1);
 
         syncPlayer(player);
         changeUpdate();
+        updateVictoryPoints();
 
-        addLog("ACTION: A development card(" + developmentCardType + ") is drawn by [Player " + (player.getIndex() + 1) + "]");
+        addLog("ACTION: A development card(" + cardType + ") is drawn by [Player " + (player.getIndex() + 1) + "]");
     }
 
-    public void useDevelopmentCard_KNIGHT(int landIndex, int playerIndex, int victimIndex) {
+    /*public void useDevelopmentCard_KNIGHT(int landIndex, int playerIndex, int victimIndex) {
         getPlayers().get(playerIndex).setKnight(getPlayers().get(playerIndex).getKnight() + 1);
         moveRobber(landIndex, playerIndex, victimIndex);
 
@@ -218,7 +284,7 @@ public class Board extends PureBoard implements Serializable {
         changeUpdate();
 
         addLog("ACTION: Knight card is used by [Player " + (playerIndex + 1) + "]");
-    }
+    }*/
 
     public void useDevelopmentCard_MONOPOLY(int playerIndex, ResourceType resourceType) {
         for (Player _player : players) {
@@ -242,15 +308,6 @@ public class Board extends PureBoard implements Serializable {
         changeUpdate();
 
         addLog("ACTION: Road Building card is used by [Player " + (playerIndex + 1) + "]");
-    }
-
-    public void useDevelopmentCard_VICTORYPOINT(int playerIndex) {
-        players.get(playerIndex).setVictoryPoint(players.get(playerIndex).getVictoryPoint() + 1);
-
-        syncPlayer(players.get(playerIndex));
-        changeUpdate();
-
-        addLog("ACTION: Victory Point card is used by [Player " + (playerIndex + 1) + "]");
     }
 
     public void useDevelopmentCard_YEAROFPLENTY(int playerIndex, ResourceType resourceType1, ResourceType resourceType2) {
@@ -407,6 +464,7 @@ public class Board extends PureBoard implements Serializable {
 
         syncPlayer(player);
         changeUpdate();
+        updateVictoryPoints();
 
         addLog("ACTION: A settlement has been added on [Location " + location.getIndex() + "] by [Player " + (player.getIndex() + 1) + "]");
     }
@@ -436,7 +494,7 @@ public class Board extends PureBoard implements Serializable {
         return text;
     }
 
-    int getTurn() {
+    public int getTurn() {
         return turn;
     }
 
@@ -452,7 +510,7 @@ public class Board extends PureBoard implements Serializable {
         isMain = main;
     }
 
-    boolean isInitial() {
+    public boolean isInitial() {
         return isInitial;
     }
 
@@ -482,11 +540,11 @@ public class Board extends PureBoard implements Serializable {
         return state;
     }
 
-    private AbstractMap.SimpleEntry<Integer, Node> getFurthestNode(int playerIndex, Node node) {
-        return getFurthestNode(playerIndex, node, false);
+    private AbstractMap.SimpleEntry<Integer, ArrayList<Node>> getFurthestNodes(int playerIndex, Node node) {
+        return getFurthestNodes(playerIndex, node, false);
     }
 
-    private AbstractMap.SimpleEntry<Integer, Node> getFurthestNode(int playerIndex, Node node, boolean debug) {
+    private AbstractMap.SimpleEntry<Integer, ArrayList<Node>> getFurthestNodes(int playerIndex, Node node, boolean debug) {
         ArrayList<Road> playersRoads = new ArrayList<>();
         ArrayList<Node> nodes = new ArrayList<>();
 
@@ -527,105 +585,119 @@ public class Board extends PureBoard implements Serializable {
                 System.out.println("Taken Chain: " + chain);
             }
 
-            int newDistance = Math.max(distanceMap.get(_node), chain.size());
-            distanceMap.put(_node, newDistance);
-
             ArrayList<Node> newChain = new ArrayList<>(chain);
             ArrayList<Pair<Integer, Integer>> newEdges = new ArrayList<>(edges);
 
-            newChain.add(_node);
             if (chain.size() > 0) {
-                newEdges.add(new ImmutablePair<>(_node.getIndex(), chain.get(chain.size() - 1).getIndex()));
-                newEdges.add(new ImmutablePair<>(chain.get(chain.size() - 1).getIndex(), _node.getIndex()));
+                int edgeNode1_index = _node.getIndex();
+                int edgeNode2_index = chain.get(chain.size() - 1).getIndex();
+
+                newEdges.add(new ImmutablePair<>(edgeNode1_index, edgeNode2_index));
+                newEdges.add(new ImmutablePair<>(edgeNode2_index, edgeNode1_index));
             }
 
-            for (Node adjNode : _node.getAdjacentNodes_player(playerIndex)) {
-                boolean doPush = false;
+            newChain.add(_node);
 
-                if (!newEdges.contains(new ImmutablePair<>(_node.getIndex(), adjNode.getIndex()))) {
-                    for (Node sec_adjNode : adjNode.getAdjacentNodes_player(playerIndex)) {
-                        if (!chain.contains(sec_adjNode)) {
-                            doPush = true;
-                            break;
+            int newDistance = Math.max(distanceMap.get(_node), chain.size());
+            distanceMap.put(_node, newDistance);
+
+            Player lastNode = getLocations().get(_node.getIndex()).getOwner();
+
+            if (lastNode == null || lastNode.getIndex() == playerIndex || chain.size() == 0) {
+                for (Node adjNode : _node.getAdjacentNodes_player(playerIndex)) {
+                    boolean doPush = false;
+                    if (!newEdges.contains(new ImmutablePair<>(_node.getIndex(), adjNode.getIndex()))) {
+                        for (Node sec_adjNode : adjNode.getAdjacentNodes_player(playerIndex)) {
+                            if (!chain.contains(sec_adjNode)) {
+                                doPush = true;
+                                break;
+                            }
                         }
                     }
-                }
 
-                if (!newChain.contains(adjNode))
-                    doPush = true;
+                    if (!newChain.contains(adjNode))
+                        doPush = true;
 
-                if (doPush) {
-                    stack.addFirst(adjNode);
-                    chainStack.addFirst(newChain);
-                    edgesStack.addFirst(newEdges);
+                    if (doPush) {
+                        stack.addFirst(adjNode);
+                        chainStack.addFirst(newChain);
+                        edgesStack.addFirst(newEdges);
 
-                    if (debug) {
-                        System.out.println("    Added Node: " + adjNode);
-                        System.out.println("    Added Chain: " + newChain);
+                        if (debug) {
+                            System.out.println("    Added Node: " + adjNode);
+                            System.out.println("    Added Chain: " + newChain);
+                        }
                     }
                 }
             }
         }
 
         int max = Integer.MIN_VALUE;
-        Node maxNode = null;
+        ArrayList<Node> maxNodes = new ArrayList<>();
         for (Node _node : distanceMap.keySet()) {
             int value = distanceMap.get(_node);
             if (value > max) {
                 max = value;
-                maxNode = _node;
-            }
+                maxNodes.clear();
+                maxNodes.add(_node);
+            } else if (value == max)
+                maxNodes.add(_node);
         }
 
         if (debug) {
             System.out.println("Max Distance: " + max);
-            System.out.println("Max Node: " + maxNode);
+            System.out.println("First Max Node: " + maxNodes.get(0));
         }
 
-        return new AbstractMap.SimpleEntry<>(max, maxNode);
+        return new AbstractMap.SimpleEntry<>(max, maxNodes);
     }
 
-    AbstractMap.SimpleEntry<Integer, Node> getLongestRoad(int playerIndex) {
+    public AbstractMap.SimpleEntry<Integer, Node> getLongestRoad(int playerIndex) {
         int structureCount = getPlayers().get(playerIndex).getStructures().size();
         if (structureCount < 4)
             return new AbstractMap.SimpleEntry<>((structureCount > 1) ? 1 : 0, new Node(-1));
 
-        ArrayList<AbstractMap.SimpleEntry<Integer, Node>> results = new ArrayList<>();
-        AbstractMap.SimpleEntry<Integer, Node> _r;
+        ArrayList<AbstractMap.SimpleEntry<Integer, ArrayList<Node>>> results = new ArrayList<>();
+        AbstractMap.SimpleEntry<Integer, ArrayList<Node>> _r;
 
         for (Structure structure : getPlayers().get(playerIndex).getStructures()) {
             if (structure instanceof Road) {
                 Road road = (Road) structure;
 
                 if (road.getStartLocation().getConnectedRoads().size() == 1) {
-                    _r = getFurthestNode(playerIndex, road.getStartLocation());
-                    results.add(getFurthestNode(playerIndex, _r.getValue()));
+                    _r = getFurthestNodes(playerIndex, road.getStartLocation());
+                    for (Node node : _r.getValue())
+                        results.add(getFurthestNodes(playerIndex, node));
                 }
 
                 if (road.getEndLocation().getConnectedRoads().size() == 1) {
-                    _r = getFurthestNode(playerIndex, road.getEndLocation());
-                    results.add(getFurthestNode(playerIndex, _r.getValue()));
+                    _r = getFurthestNodes(playerIndex, road.getEndLocation());
+                    for (Node node : _r.getValue())
+                        results.add(getFurthestNodes(playerIndex, node));
                 }
             }
         }
 
-        _r = getFurthestNode(playerIndex, ((Building) getPlayers().get(playerIndex).getStructures().get(0)).getLocation());
-        results.add(getFurthestNode(playerIndex, _r.getValue()));
+        _r = getFurthestNodes(playerIndex, ((Building) getPlayers().get(playerIndex).getStructures().get(0)).getLocation());
+        for (Node node : _r.getValue())
+            results.add(getFurthestNodes(playerIndex, node));
 
-        _r = getFurthestNode(playerIndex, ((Building) getPlayers().get(playerIndex).getStructures().get(2)).getLocation());
-        results.add(getFurthestNode(playerIndex, _r.getValue()));
+        _r = getFurthestNodes(playerIndex, ((Building) getPlayers().get(playerIndex).getStructures().get(2)).getLocation());
+        for (Node node : _r.getValue())
+            results.add(getFurthestNodes(playerIndex, node));
 
         int maxIndex = 0;
         int maxValue = 0;
         for (int i = 0; i < results.size(); i++) {
-            SimpleEntry<Integer, Node> result = results.get(i);
+            SimpleEntry<Integer, ArrayList<Node>> result = results.get(i);
+
             if (result.getKey() > maxValue) {
                 maxIndex = i;
                 maxValue = result.getKey();
             }
         }
 
-        return results.get(maxIndex);
+        return new AbstractMap.SimpleEntry<>(maxValue, results.get(maxIndex).getValue().get(0));
     }
 
     int getTotalDice() {
@@ -638,5 +710,13 @@ public class Board extends PureBoard implements Serializable {
 
     Player getDiceOwner() {
         return diceOwner;
+    }
+
+    public Deck getDeck() {
+        return deck;
+    }
+
+    void setDeck(Deck deck) {
+        this.deck = deck;
     }
 }

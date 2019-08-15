@@ -55,4 +55,11 @@ public class TradeWithBank implements IAction, Serializable {
         return player + " TRA(B) " + "Given: " + givenResources + ", Taken: " + takenResources;
     }
 
+    public Resource getGivenResources() {
+        return givenResources;
+    }
+
+    public Resource getTakenResources() {
+        return takenResources;
+    }
 }

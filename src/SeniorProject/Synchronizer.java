@@ -39,6 +39,16 @@ class Synchronizer {
         }
 
         setState(SynchronizerState.WAITING);
+
+        board.updateVictoryPoints();
+        for (Player player : board.getPlayers()) {
+            if (player.getVictoryPoint() >= Global.MAX_VICTORY_POINTS) {
+                System.out.println(player + " won.");
+                Global.addLog(player + " won.");
+
+                System.exit(0);
+            }
+        }
     }
 
     boolean isSynchronized(Wini communication_ini) {

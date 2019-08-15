@@ -28,8 +28,20 @@ public class MoveRobber implements IAction, Serializable {
         return board.getPlayers().get(playerIndex) + " [MO " + ((landIndex < 10) ? ("0" + landIndex) : landIndex) + " " + ((victimIndex < 10) ? (victimIndex == -1 ? victimIndex : ("0" + victimIndex)) : victimIndex) + "] T";
     }
 
+    public int getLandIndex() {
+        return landIndex;
+    }
+
+    public int getPlayerIndex() {
+        return playerIndex;
+    }
+
+    public int getVictimIndex() {
+        return victimIndex;
+    }
+
     @Override
     public String toString() {
-        return board.getPlayers().get(playerIndex) + " ROB " + board.getLands().get(landIndex) + " VIC " + ((victimIndex == -1) ? "Nobody" : board.getPlayers().get(victimIndex));
+        return board.getPlayers().get(playerIndex) + " ROB " + board.getLands().get(landIndex)/* + " VIC " + ((victimIndex == -1) ? "Nobody" : board.getPlayers().get(victimIndex))*/;
     }
 }

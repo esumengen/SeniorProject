@@ -1,6 +1,7 @@
 package SeniorProject;
 
 import SeniorProject.Actions.*;
+import SeniorProject.DevelopmentCards.DevelopmentCardType;
 
 import java.util.ArrayList;
 
@@ -52,8 +53,26 @@ public class ActionFactory {
                 } else { //P0 [TR 35 35 35 35 35 35 35 35 35 35] 1
                     return new TradeWithPlayer(givenResources, takenResources, playerIndex, Integer.parseInt(objectType) - 1, board);
                 }
-            case "RD":  //P0 [RD 06 03] X q
+            case "RD":  //P0 [RD 06 03] X
                 return new RollDice(playerIndex, actionParam.get(0), actionParam.get(1), board);
+            case "DR":  //P0 [DR] T
+                DrawDevelopmentCard drawDevelopmentCard = new DrawDevelopmentCard(playerIndex, null, board);
+
+                DevelopmentCardType cardType = null;
+                if (objectType.equals("K"))
+                    cardType = DevelopmentCardType.KNIGHT;
+                else if (objectType.equals("Y"))
+                    cardType = DevelopmentCardType.YEAROFPLENTY;
+                else if (objectType.equals("M"))
+                    cardType = DevelopmentCardType.MONOPOLY;
+                else if (objectType.equals("R"))
+                    cardType = DevelopmentCardType.ROADBUILDING;
+                else if (objectType.equals("V"))
+                    cardType = DevelopmentCardType.VICTORYPOINT;
+
+                drawDevelopmentCard.setCardType(cardType);
+
+                return drawDevelopmentCard;
         }
 
         return null;
