@@ -134,7 +134,7 @@ public class Player implements Serializable, IObservable {
         return name;
     }
 
-    public void setName(String name) {
+    void setName(String name) {
         this.name = name;
         updateSubscribers();
     }
@@ -292,7 +292,7 @@ public class Player implements Serializable, IObservable {
         return longestRoad_length;
     }
 
-    public void setLongestRoad_length(int longestRoad_length) {
+    void setLongestRoad_length(int longestRoad_length) {
         this.longestRoad_length = longestRoad_length;
     }
 

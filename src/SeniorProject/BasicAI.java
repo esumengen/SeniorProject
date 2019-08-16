@@ -1,6 +1,6 @@
 package SeniorProject;
 
-import SeniorProject.Actions.Action;
+import SeniorProject.Actions.ActionType;
 import SeniorProject.Actions.CreateRoad;
 import SeniorProject.Actions.CreateSettlement;
 import SeniorProject.Negotiation.Bid;
@@ -238,27 +238,27 @@ public class BasicAI extends AI {
     @Override
     public void updateBidRanking() {
         Resource desiredResource;
-        Action desiredAction;
+        ActionType desiredAction;
         clearBidRanking();
 
-        for (int i = 0; i < Action.values().length; i++) {
+        for (int i = 0; i < ActionType.values().length; i++) {
             desiredResource = new Resource(getOwner().getResource());
-            desiredAction = Action.values()[i];
+            desiredAction = ActionType.values()[i];
 
             // Ignore the ineffective action
-            if (desiredAction == Action.ZeroCost)
+            if (desiredAction == ActionType.ZeroCost)
                 continue;
 
-            if (desiredAction == Action.CreateRoad) {
+            if (desiredAction == ActionType.CreateRoad) {
                 desiredResource.disjoin(Road.COST);
                 if (desiredResource.getSum() >= 0)         // checks if the desired Resource have potential
                     resourceAnalyze(desiredResource);
-            } else if (desiredAction == Action.CreateSettlement) {
+            } else if (desiredAction == ActionType.CreateSettlement) {
                 desiredResource.disjoin(Settlement.COST);
                 if (desiredResource.getSum() >= 0) {       // checks if the desired Resource have potential
                     resourceAnalyze(desiredResource);
                 }
-            } else if (desiredAction == Action.UpgradeSettlement) {
+            } else if (desiredAction == ActionType.UpgradeSettlement) {
                 desiredResource.disjoin(City.COST);
                 if (desiredResource.getSum() >= 0)         // checks if the desired Resource have potential
                     resourceAnalyze(desiredResource);

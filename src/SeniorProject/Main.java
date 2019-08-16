@@ -138,9 +138,9 @@ public class Main {
                         break;
                     }
 
-                    if (board.getTurn() > 50) {
-                        System.out.println("The turn is higher than 50. The game has no winner.");
-                        new Message("The turn is higher than 50. The game has no winner.");
+                    if (board.getTurn() > 60) {
+                        System.out.println("The turn is higher than 60. The game has no winner.");
+                        new Message("The turn is higher than 60. The game has no winner.");
                         System.exit(0);
                     }
                 }

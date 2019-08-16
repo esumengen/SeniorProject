@@ -1,9 +1,6 @@
 package SeniorProject;
 
-import SeniorProject.Actions.DC_KNIGHT;
-import SeniorProject.Actions.DC_MONOPOLY;
-import SeniorProject.Actions.DC_ROADBUILDING;
-import SeniorProject.Actions.DC_YEAROFPLENTY;
+import SeniorProject.Actions.ActionType;
 import SeniorProject.DevelopmentCards.DevelopmentCardType;
 import SeniorProject.Negotiation.NegotiationAgent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -43,17 +40,17 @@ public class Board extends PureBoard implements Serializable {
         changeUpdate();
         updateVictoryPoints();
 
-        turn = 1;
+        turn = 0;
         isMain = false;
         isInitial = true;
         deck = new Deck();
     }
 
-    static boolean isAffordable(MoveType type, Resource resource) {
+    public static boolean isAffordable(ActionType action, Resource resource) {
         Player player = new Player(2);
         player.setResource(resource);
 
-        return isAffordable(type, player);
+        return isAffordable(action, player);
     }
 
     public static Board deepCopy(Board board) {
@@ -80,14 +77,14 @@ public class Board extends PureBoard implements Serializable {
         return _board;
     }
 
-    static boolean isAffordable(MoveType type, Player player) {
+    public static boolean isAffordable(ActionType action, Player player) {
         int brick = player.getResource().get(ResourceType.BRICK);
         int grain = player.getResource().get(ResourceType.GRAIN);
         int wool = player.getResource().get(ResourceType.WOOL);
         int ore = player.getResource().get(ResourceType.ORE);
         int lumber = player.getResource().get(ResourceType.LUMBER);
 
-        switch (type) {
+        switch (action) {
             case CreateSettlement:
                 if (brick >= 1 && grain >= 1 && wool >= 1 && lumber >= 1)
                     return true;
@@ -100,23 +97,12 @@ public class Board extends PureBoard implements Serializable {
                 if (ore >= 3 && grain >= 2)
                     return true;
                 break;
-            case DevelopmentCard:
+            case DrawDevCard:
                 if (grain >= 1 && wool >= 1 && ore >= 1)
                     return true;
                 break;
-            case TradeBank:
-                /*if (brick < 4 && grain < 4 && wool < 4 && ore < 4 && lumber < 4)
-                    return false;*/
-
+            case TradeWithBank:
                 return brick / 4 + grain / 4 + wool / 4 + ore / 4 + lumber / 4 != 0;
-            case KnightCard:
-                return player.getDevelopmentCards().contains(DC_KNIGHT.class);
-            case MonopolyCard:
-                return player.getDevelopmentCards().contains(DC_MONOPOLY.class);
-            case RoadBuildingCard:
-                return player.getDevelopmentCards().contains(DC_ROADBUILDING.class);
-            case YearOfPlentyCard:
-                return player.getDevelopmentCards().contains(DC_YEAROFPLENTY.class);
         }
 
         return false;
@@ -436,6 +422,10 @@ public class Board extends PureBoard implements Serializable {
     private void addLog(String log) {
         if (isActive())
             Global.addLog(log);
+    }
+
+    public void setDiceOwner(Player diceOwner) {
+        this.diceOwner = diceOwner;
     }
 
     public void createSettlement(Player player, Location location) {
