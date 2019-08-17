@@ -7,9 +7,8 @@ import SeniorProject.ResourceType;
 import java.util.Collections;
 
 public class Negotiator {
-    public static final int maximumMutualOffers = 100;
+    public static final int maximumMutualOffers = 200;
     private static Negotiator instance = new Negotiator();
-    private NegotiationSession session;
 
     private Negotiator() {
     }
@@ -18,14 +17,7 @@ public class Negotiator {
         return instance;
     }
 
-    public void clearSession() {
-        this.session = null;
-    }
-
     public boolean startSession(NegotiationSession session) {
-        clearSession();
-        this.session = session;
-
         int countOffers = 0;
 
         int sequentialPass = 0;

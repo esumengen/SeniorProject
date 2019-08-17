@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 enum LandType implements Serializable {
-    HILLS, MOUNTAINS, FIELDS, FOREST, PASTURE, DESERT, SEA, NONE;
+    FIELDS, FOREST, PASTURE, MOUNTAINS, HILLS, DESERT, SEA, NONE;
 
     @Override
     public String toString() {

@@ -29,9 +29,8 @@ public class Resource extends HashMap<ResourceType, Integer> {
     }
 
     public void join(Resource resource) {
-        for (ResourceType type : this.keySet()) {
+        for (ResourceType type : ResourceType.values())
             this.add(type, resource.get(type));
-        }
     }
 
     public Resource getPositives() {
@@ -57,16 +56,16 @@ public class Resource extends HashMap<ResourceType, Integer> {
     }
 
     public void disjoin(Resource resource) {
-        for (ResourceType type : this.keySet()) {
+        for (ResourceType type : ResourceType.values())
             this.add(type, -resource.get(type));
-        }
     }
 
     public int getSum() {
         int sum = 0;
-        for (ResourceType type : this.keySet()) {
+
+        for (ResourceType type : ResourceType.values())
             sum += this.get(type);
-        }
+
         return sum;
     }
 

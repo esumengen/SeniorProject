@@ -155,6 +155,7 @@ public class Main {
 
         System.out.println("---------\n");
         System.out.println("    " + player + "'s Negotiation Session has been started.");
+        System.out.println("    " + player + "'s Resource: " + player.getResource());
 
         for (Player _player : board.getPlayers()) {
             if (_player.getType() == PlayerType.HUMAN)

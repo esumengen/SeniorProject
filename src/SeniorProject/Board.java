@@ -22,6 +22,7 @@ public class Board extends PureBoard implements Serializable {
     private Player lastLongestRoad_owner = null;
     private Player lastMaxKnight_owner = null;
     private boolean hasRobberPlayedRecently;
+    private Player winner = null;
 
     public Board(ArrayList<Player> players) {
         super();
@@ -123,6 +124,7 @@ public class Board extends PureBoard implements Serializable {
                 playerIndex = 0;
 
             int _longestRoad_value = getLongestRoad(playerIndex).getKey();
+            players.get(playerIndex).setLongestRoad_length(_longestRoad_value);
             if (_longestRoad_value > 4 && _longestRoad_value > longestRoad_value
                     && (lastLongestRoad_owner == null || (playerIndex == lastLongestRoad_owner.getIndex() && _longestRoad_value >= lastLongestRoad_value) || _longestRoad_value > lastLongestRoad_value)) {
                 longestRoad_owner = getPlayers().get(playerIndex);
@@ -163,6 +165,9 @@ public class Board extends PureBoard implements Serializable {
                 if (developmentCard == DevelopmentCardType.VICTORYPOINT)
                     player.setVictoryPoint(player.getVictoryPoint() + 1);
             }
+
+            if (player.getVictoryPoint() >= Global.MAX_VICTORY_POINTS && winner == null)
+                winner = player;
         }
     }
 
@@ -245,6 +250,26 @@ public class Board extends PureBoard implements Serializable {
         addLog("ACTION: The robber has been moved to [Land " + getLands().get(landIndex).getIndex() + "] by [Player " + (playerIndex + 1) + "]");
     }
 
+    public Player getLastLongestRoad_owner() {
+        return lastLongestRoad_owner;
+    }
+
+    public Player getLastMaxKnight_owner() {
+        return lastMaxKnight_owner;
+    }
+
+    public int getVictoryCards_max() {
+        return getState().getVictoryCards_max();
+    }
+
+    public int getKnights_max() {
+        return getState().getKnights_max();
+    }
+
+    public int getLongestRoads_max() {
+        return getState().getLongestRoad_max();
+    }
+
     public void drawDevelopmentCard(int playerIndex, DevelopmentCardType cardType) {
         Player player = getPlayers().get(playerIndex);
 
@@ -271,6 +296,10 @@ public class Board extends PureBoard implements Serializable {
 
         addLog("ACTION: Knight card is used by [Player " + (playerIndex + 1) + "]");
     }*/
+
+    public Player getWinner() {
+        return winner;
+    }
 
     public void useDevelopmentCard_MONOPOLY(int playerIndex, ResourceType resourceType) {
         for (Player _player : players) {
@@ -443,13 +472,12 @@ public class Board extends PureBoard implements Serializable {
         if (settlementCount == 1) {
             for (Land land : location.getAdjacentLands())
                 player.getResource().add(land.getResourceType(), 1);
-        } else {
-            if (!isInitial) {
-                player.getResource().add(ResourceType.BRICK, -1);
-                player.getResource().add(ResourceType.GRAIN, -1);
-                player.getResource().add(ResourceType.WOOL, -1);
-                player.getResource().add(ResourceType.LUMBER, -1);
-            }
+        }
+        if (!isInitial) {
+            player.getResource().add(ResourceType.BRICK, -1);
+            player.getResource().add(ResourceType.GRAIN, -1);
+            player.getResource().add(ResourceType.WOOL, -1);
+            player.getResource().add(ResourceType.LUMBER, -1);
         }
 
         syncPlayer(player);

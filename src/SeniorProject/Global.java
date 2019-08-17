@@ -1,5 +1,7 @@
 package SeniorProject;
 
+import SeniorProject.Actions.*;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -52,6 +54,21 @@ public class Global {
         }
 
         return selectedActions;
+    }
+
+    public static Resource getCost(ActionType actionType) {
+        switch (actionType) {
+            case CreateRoad:
+                return CreateRoad.COST;
+            case CreateSettlement:
+                return CreateSettlement.COST;
+            case UpgradeSettlement:
+                return UpgradeSettlement.COST;
+            case DrawDevCard:
+                return DrawDevelopmentCard.COST;
+        }
+
+        return new Resource(0, 0, 0, 0, 0);
     }
 
     public static void addLog(String text) {

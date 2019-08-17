@@ -84,10 +84,6 @@ public class NegotiationSession {
         return isCompleted;
     }
 
-    void setCompleted(boolean completed) {
-        isCompleted = completed;
-    }
-
     public Bid getAcceptedOffer() {
         return acceptedOffer;
     }

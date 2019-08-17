@@ -16,7 +16,6 @@ public class PureBoard implements Serializable {
     private ArrayList<Structure> structures = new ArrayList<>();
     private Land robbedLand;
     private boolean isActive;
-    private int longestRoad_owner;
     private ArrayList<Integer> topLocationIndexes = new ArrayList<>();
 
     PureBoard() {
@@ -383,9 +382,5 @@ public class PureBoard implements Serializable {
 
     void setRobbedLand(Land land) {
         robbedLand = land;
-    }
-
-    public int getLongestRoad_owner() {
-        return longestRoad_owner;
     }
 }

@@ -9,12 +9,16 @@ public class BasicNegotiationAgent extends NegotiationAgent {
         return (double) session.getTurn(this, session.getOwnerAgent()) / Negotiator.maximumMutualOffers;
     }
 
+    public double getOfferRatio(NegotiationSession session) {
+        return (getBaseRatio(session) + randomMachine.nextDouble() * 0.1) * (getBidRanking().size() / 2.0);
+    }
+
     @Override
     public Bid handleOffer(NegotiationSession negotiationSession, Bid bid) {
         if (bid == null) {
             return getBidRanking().get(0);
         } else {
-            return getBidRanking().get((int) (getBaseRatio(negotiationSession) + randomMachine.nextDouble() * 0.1) * getBidRanking().size() / 4);
+            return getBidRanking().get((int) getOfferRatio(negotiationSession));
         }
     }
 
@@ -25,8 +29,9 @@ public class BasicNegotiationAgent extends NegotiationAgent {
 
     @Override
     public boolean isAccepted(NegotiationSession negotiationSession, Bid bid) {
-        double ratio = (double) getBidRanking().indexOf(bid) / (getBidRanking().size() / 4);
+        double ratio = (double) getBidRanking().indexOf(bid) / getBidRanking().size();
 
-        return ratio <= getBaseRatio(negotiationSession);
+        return ratio <= getOfferRatio(negotiationSession);
+
     }
 }
